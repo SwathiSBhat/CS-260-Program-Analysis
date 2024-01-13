@@ -1,3 +1,13 @@
+# Added by Vinayak
+tests/
+.idea/
+.DS_Store
+CMakeFiles/
+Makefile
+cmake_install.cmake
+CMakeCache.txt
+assn0
+
 # Prerequisites
 *.d
 

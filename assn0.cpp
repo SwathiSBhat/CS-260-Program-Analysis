@@ -89,31 +89,84 @@ int main(int argc, char *argv[]) {
                 }
 
                 /*
-                 * Count up the function parameters.
+                 * Count up the function parameters, local vars, basic blocks,
+                 * and terminals.
                  */
                 num_func_params += func_value["params"].size();
-
-                /*
-                 * Count up the local variables.
-                 */
                 num_local_vars += func_value["locals"].size();
-
-                /*
-                 * Count up basic blocks. Because the number of terminals will
-                 * always equal the number of basic blocks, we can count
-                 * terminals here too.
-                 */
-
                 num_basic_blocks += func_value["body"].size();
                 num_terminals += func_value["body"].size();
 
                 /*
+                 * Count up the types of each local var.
+                 */
+                for (auto &local : func_value["locals"]) {
+                    std::cout << local << std::endl;
+                    if (local["typ"]["Int"] != nullptr) {
+                        num_int_locals_globals++;
+                    }
+                    if (local["typ"]["Struct"] != nullptr) {
+                        num_struct_locals_globals++;
+                    }
+                    if (local["typ"]["Pointer"] != nullptr) {
+
+                        /*
+                         * Blegh we have to do recursion here too.
+                         */
+                        std::cout << "Blegh it's a pointer" << std::endl;
+                    }
+                }
+
+                /*
                  * Count up the number of instructions by going through each
-                 * block. TODO this doesn't work properly?
+                 * block.
                  */
                 for (auto &[func_body_key, func_body_val] : func_value["body"].items()) {
 
                     num_instructions += func_body_val["insts"].size();
+                }
+            }
+        }
+
+        /*
+         * Count up global variables.
+         */
+        if (lir_key == "globals") {
+            for (auto &[globals_key, globals_val] : lir_value.items()) {
+
+                /*
+                 * Now we need to find the type of each global so we can
+                 * increment the right accumulator.
+                 */
+
+                if (globals_val["typ"]["Int"] != nullptr) {
+                    num_int_locals_globals++;
+                }
+
+                if (globals_val["typ"]["Struct"] != nullptr) {
+                    num_struct_locals_globals++;
+                }
+
+                /*
+                 * If it's a pointer, we have to figure out what kind of pointer
+                 * it is.
+                 */
+                /*
+                 * TODO I think this is where we have to use recursion.
+                 */
+                if (globals_val["typ"]["Pointer"] != nullptr) {
+                    if (globals_val["typ"]["Pointer"]["Struct"] != nullptr) {
+                        num_ptr_struct_locals_globals++;
+                    }
+                    if (globals_val["typ"]["Pointer"]["Function"] != nullptr) {
+                        num_ptr_func_locals_globals++;
+                    }
+                    if (globals_val["typ"]["Pointer"]["Int"] != nullptr) {
+                        num_ptr_int_locals_globals++;
+                    }
+                    if (globals_val["typ"]["Pointer"]["Pointer"] != nullptr) {
+                        num_ptr_ptr_locals_globals++;
+                    }
                 }
             }
         }
@@ -135,4 +188,6 @@ int main(int argc, char *argv[]) {
     std::cout << "Number of struct pointer locals/globals: " << num_ptr_struct_locals_globals << std::endl;
     std::cout << "Number of function pointer locals/globals: " << num_ptr_func_locals_globals << std::endl;
     std::cout << "Number of pointer pointer locals/globals: " << num_ptr_ptr_locals_globals << std::endl;
+
+    return EXIT_SUCCESS;
 }

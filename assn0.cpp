@@ -99,16 +99,21 @@ int main(int argc, char *argv[]) {
                 num_local_vars += func_value["locals"].size();
 
                 /*
-                 * Count up basic blocks.
+                 * Count up basic blocks. Because the number of terminals will
+                 * always equal the number of basic blocks, we can count
+                 * terminals here too.
                  */
+
                 num_basic_blocks += func_value["body"].size();
+                num_terminals += func_value["body"].size();
 
                 /*
                  * Count up the number of instructions by going through each
                  * block. TODO this doesn't work properly?
                  */
                 for (auto &[func_body_key, func_body_val] : func_value["body"].items()) {
-                    num_instructions += func_body_val.size();
+
+                    num_instructions += func_body_val["insts"].size();
                 }
             }
         }

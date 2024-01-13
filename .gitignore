@@ -7,6 +7,7 @@ Makefile
 cmake_install.cmake
 CMakeCache.txt
 assn0
+cmake-build-debug/
 
 # Prerequisites
 *.d

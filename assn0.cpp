@@ -101,14 +101,17 @@ int main(int argc, char *argv[]) {
                  * Count up the types of each local var.
                  */
                 for (auto &local : func_value["locals"]) {
-                    std::cout << local << std::endl;
-                    if (local["typ"]["Int"] != nullptr) {
+                    if (local["typ"] == "Int") {
                         num_int_locals_globals++;
                     }
-                    if (local["typ"]["Struct"] != nullptr) {
+                    if (local["typ"] == "Struct") {
                         num_struct_locals_globals++;
                     }
-                    if (local["typ"]["Pointer"] != nullptr) {
+
+                    /*
+                     * TODO This doesn't work right now.
+                     */
+                    if (local["typ"] == "Pointer") {
 
                         /*
                          * Blegh we have to do recursion here too.

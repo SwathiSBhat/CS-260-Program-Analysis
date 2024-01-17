@@ -115,11 +115,18 @@ int main(int argc, char *argv[]) {
                      */
                     if (local["typ"]["Pointer"] == "Int") {
                         num_ptr_int_locals_globals++;
-                    } else if (local["typ"]["Pointer"] == "Struct") {
+                    } else if (local["typ"]["Pointer"]["Struct"] != nullptr) {
                         num_ptr_struct_locals_globals++;
-                    } else if (local["typ"]["Pointer"] == "Function") {
+                    } else if (local["typ"]["Pointer"]["Function"] != nullptr) {
                         num_ptr_func_locals_globals++;
                     } else {
+
+                        /*
+                         * If we're here, our local variable is a pointer to a
+                         * pointer.
+                         *
+                         * TODO Apparently this isn't true?
+                         */
                         num_ptr_ptr_locals_globals++;
                     }
                 }
@@ -148,31 +155,34 @@ int main(int argc, char *argv[]) {
 
                 if (globals_val["typ"]["Int"] != nullptr) {
                     num_int_locals_globals++;
+                    continue;
                 }
 
                 if (globals_val["typ"]["Struct"] != nullptr) {
                     num_struct_locals_globals++;
+                    continue;
                 }
 
                 /*
                  * If it's a pointer, we have to figure out what kind of pointer
                  * it is.
                  */
-                /*
-                 * TODO I think this is where we have to use recursion.
-                 */
                 if (globals_val["typ"]["Pointer"] != nullptr) {
                     if (globals_val["typ"]["Pointer"]["Struct"] != nullptr) {
                         num_ptr_struct_locals_globals++;
+                        continue;
                     }
                     if (globals_val["typ"]["Pointer"]["Function"] != nullptr) {
                         num_ptr_func_locals_globals++;
+                        continue;
                     }
                     if (globals_val["typ"]["Pointer"]["Int"] != nullptr) {
                         num_ptr_int_locals_globals++;
+                        continue;
                     }
                     if (globals_val["typ"]["Pointer"]["Pointer"] != nullptr) {
                         num_ptr_ptr_locals_globals++;
+                        continue;
                     }
                 }
             }

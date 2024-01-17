@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
                         num_int_locals_globals++;
                         continue;
                     }
-                    if (local["typ"] == "Struct") {
+                    if (local["typ"].contains("Struct")) {
                         num_struct_locals_globals++;
                         continue;
                     }
@@ -151,10 +151,6 @@ int main(int argc, char *argv[]) {
                  * increment the right accumulator.
                  */
 
-                /*
-                 * TODO Here?
-                 */
-                std::cout << globals_val["typ"] <<std::endl;
                 if (globals_val["typ"] == "Int") {
                     num_int_locals_globals++;
                     continue;
@@ -170,8 +166,6 @@ int main(int argc, char *argv[]) {
                  * it is.
                  */
                 if (globals_val["typ"]["Pointer"] != nullptr) {
-
-                    // TODO Aha! ptr ptr throws error
                     if (globals_val["typ"]["Pointer"].contains("Struct")) {
                         num_ptr_struct_locals_globals++;
                         continue;

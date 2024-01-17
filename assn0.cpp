@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
                 for (auto &[func_body_key, func_body_val] : func_value["body"].items()) {
 
                     num_instructions += func_body_val["insts"].size();
-
+                    //BasicBlock 
                     for (auto &[inst_key, inst_val] : func_body_val["insts"].items()) {
                         // Store each instruction inside basic block structure based on instruction type
                         for (auto i = inst_val.items().begin(); i != inst_val.items().end(); ++i) {

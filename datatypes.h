@@ -26,7 +26,9 @@ class Type;
 class Variable {
     public:
         Variable() {};
-        Variable(std::string name, Type *type) : name(name), type(type) {std::cout << "Variable" << std::endl;std::cout << name << std::endl;};
+        Variable(std::string name, Type *type) : name(name), type(type) {
+            //std::cout << "Variable" << std::endl;std::cout << name << std::endl;
+        };
         std::string name;
         Type *type;
 };
@@ -37,10 +39,7 @@ class Variable {
 class Struct{
     public:
     Struct(json struct_json) {
-        //name = struct_json["name"];
-        /*for (auto &field : struct_json["fields"]) {
-            fields.push_back(Variable(field["name"], Type(field["typ"])));
-        }*/
+
     };
 };
 
@@ -116,13 +115,19 @@ class Global;
  */
 class ExternalFunction;
 
-
+/*
+ * Instruction base class
+*/
+class Instruction{};
 
 /*
  * A basic block is a label and an ordered list of instructions, ending in a
  * terminal.
  */
-class BasicBlock;
+class BasicBlock {
+    std::string label;
+    std::vector<Instruction> instructions;
+};
 
 class Operand {
     public:
@@ -140,51 +145,50 @@ class Operand {
 /*
  * These are all instructions.
  */
-
 /*
  * x = $addrof y
  */
-class AddrofInstruction;
+class AddrofInstruction : Instruction{};
 
 /*
  * x = $alloc 10 [_a1]
  */
-class AllocInstruction;
+class AllocInstruction : Instruction{};
 
 /*
  * x = $arith add y 2
  */
-class ArithInstruction;
+class ArithInstruction : Instruction{};
 
 /*
  * x = $cmp eq y 2
  */
-class CmpInstruction;
+class CmpInstruction : Instruction{};
 
 /*
  * x = $copy y
  */
-class CopyInstruction;
+class CopyInstruction : Instruction{};
 
 /*
  * x = $gep y 10
  */
-class GepInstruction;
+class GepInstruction : Instruction{};
 
 /*
  * x = $gfp y foo
  */
-class GfpInstruction;
+class GfpInstruction : Instruction{};
 
 /*
  * x = $load y
  */
-class LoadInstruction;
+class LoadInstruction : Instruction{};
 
 /*
  * store x y
  */
-class StoreInstruction {
+class StoreInstruction : Instruction {
     public:
         StoreInstruction(json inst_val) {
             std::cout << "Store Instruction" << std::endl;
@@ -207,7 +211,7 @@ class StoreInstruction {
 /*
  * x = $call_ext foo(10)
  */
-class CallExtInstruction;
+class CallExtInstruction : Instruction{};
 
 /*
  * These instructions are all terminals.
@@ -216,24 +220,24 @@ class CallExtInstruction;
 /*
  * $branch x bb1 bb2
  */
-class BranchInstruction;
+class BranchInstruction : Instruction{};
 
 /*
  * $jump bb1
  */
-class JumpInstruction;
+class JumpInstruction : Instruction{};
 
 /*
  * $ret x
  */
-class RetInstruction;
+class RetInstruction : Instruction{};
 
 /*
  * x = $call_dir foo(10) then bb1
  */
-class CallDirInstruction;
+class CallDirInstruction : Instruction{};
 
 /*
  * x = $call_idr fp(10) then bb1
  */
-class CallIdrInstruction;
+class CallIdrInstruction : Instruction{};

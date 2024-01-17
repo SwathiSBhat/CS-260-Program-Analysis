@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
                  * Only increment our accumulator if the function actually
                  * returns something.
                  */
-                if (func_value["ret_ty"] != nullptr) {
+                if (func_value.contains("ret_ty")) {
                     num_return_funcs++;
                 }
 
@@ -115,17 +115,15 @@ int main(int argc, char *argv[]) {
                      */
                     if (local["typ"]["Pointer"] == "Int") {
                         num_ptr_int_locals_globals++;
-                    } else if (local["typ"]["Pointer"]["Struct"] != nullptr) {
+                    } else if (local["typ"]["Pointer"].contains("Struct")) {
                         num_ptr_struct_locals_globals++;
-                    } else if (local["typ"]["Pointer"]["Function"] != nullptr) {
+                    } else if (local["typ"]["Pointer"].contains("Function")) {
                         num_ptr_func_locals_globals++;
                     } else {
 
                         /*
                          * If we're here, our local variable is a pointer to a
                          * pointer.
-                         *
-                         * TODO Apparently this isn't true?
                          */
                         num_ptr_ptr_locals_globals++;
                     }
@@ -153,12 +151,16 @@ int main(int argc, char *argv[]) {
                  * increment the right accumulator.
                  */
 
-                if (globals_val["typ"]["Int"] != nullptr) {
+                /*
+                 * TODO Here?
+                 */
+                std::cout << globals_val["typ"] <<std::endl;
+                if (globals_val["typ"] == "Int") {
                     num_int_locals_globals++;
                     continue;
                 }
 
-                if (globals_val["typ"]["Struct"] != nullptr) {
+                if (globals_val["typ"].contains("Struct")) {
                     num_struct_locals_globals++;
                     continue;
                 }
@@ -168,19 +170,21 @@ int main(int argc, char *argv[]) {
                  * it is.
                  */
                 if (globals_val["typ"]["Pointer"] != nullptr) {
-                    if (globals_val["typ"]["Pointer"]["Struct"] != nullptr) {
+
+                    // TODO Aha! ptr ptr throws error
+                    if (globals_val["typ"]["Pointer"].contains("Struct")) {
                         num_ptr_struct_locals_globals++;
                         continue;
                     }
-                    if (globals_val["typ"]["Pointer"]["Function"] != nullptr) {
+                    if (globals_val["typ"]["Pointer"].contains("Function")) {
                         num_ptr_func_locals_globals++;
                         continue;
                     }
-                    if (globals_val["typ"]["Pointer"]["Int"] != nullptr) {
+                    if (globals_val["typ"]["Pointer"] == "Int") {
                         num_ptr_int_locals_globals++;
                         continue;
                     }
-                    if (globals_val["typ"]["Pointer"]["Pointer"] != nullptr) {
+                    if (globals_val["typ"]["Pointer"].contains("Pointer")) {
                         num_ptr_ptr_locals_globals++;
                         continue;
                     }

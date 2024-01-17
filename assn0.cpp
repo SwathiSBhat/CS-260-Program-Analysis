@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
                  * Only increment our accumulator if the function actually
                  * returns something.
                  */
-                if (func_value.contains("ret_ty")) {
+                if (func_value["ret_ty"] != nullptr) {
                     num_return_funcs++;
                 }
 

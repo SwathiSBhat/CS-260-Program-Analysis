@@ -120,14 +120,7 @@ class ExternalFunction;
 */
 class Instruction{};
 
-/*
- * A basic block is a label and an ordered list of instructions, ending in a
- * terminal.
- */
-class BasicBlock {
-    std::string label;
-    std::vector<Instruction> instructions;
-};
+
 
 class Operand {
     public:
@@ -148,47 +141,47 @@ class Operand {
 /*
  * x = $addrof y
  */
-class AddrofInstruction : Instruction{};
+class AddrofInstruction : public Instruction{};
 
 /*
  * x = $alloc 10 [_a1]
  */
-class AllocInstruction : Instruction{};
+class AllocInstruction : public Instruction{};
 
 /*
  * x = $arith add y 2
  */
-class ArithInstruction : Instruction{};
+class ArithInstruction : public Instruction{};
 
 /*
  * x = $cmp eq y 2
  */
-class CmpInstruction : Instruction{};
+class CmpInstruction : public Instruction{};
 
 /*
  * x = $copy y
  */
-class CopyInstruction : Instruction{};
+class CopyInstruction : public Instruction{};
 
 /*
  * x = $gep y 10
  */
-class GepInstruction : Instruction{};
+class GepInstruction : public Instruction{};
 
 /*
  * x = $gfp y foo
  */
-class GfpInstruction : Instruction{};
+class GfpInstruction : public Instruction{};
 
 /*
  * x = $load y
  */
-class LoadInstruction : Instruction{};
+class LoadInstruction : public Instruction{};
 
 /*
  * store x y
  */
-class StoreInstruction : Instruction {
+class StoreInstruction : public Instruction {
     public:
         StoreInstruction(json inst_val) {
             std::cout << "Store Instruction" << std::endl;
@@ -211,7 +204,7 @@ class StoreInstruction : Instruction {
 /*
  * x = $call_ext foo(10)
  */
-class CallExtInstruction : Instruction{};
+class CallExtInstruction : public Instruction{};
 
 /*
  * These instructions are all terminals.
@@ -220,24 +213,48 @@ class CallExtInstruction : Instruction{};
 /*
  * $branch x bb1 bb2
  */
-class BranchInstruction : Instruction{};
+class BranchInstruction : public Instruction{};
 
 /*
  * $jump bb1
  */
-class JumpInstruction : Instruction{};
+class JumpInstruction : public Instruction{};
 
 /*
  * $ret x
  */
-class RetInstruction : Instruction{};
+class RetInstruction : public Instruction{};
 
 /*
  * x = $call_dir foo(10) then bb1
  */
-class CallDirInstruction : Instruction{};
+class CallDirInstruction : public Instruction{};
 
 /*
  * x = $call_idr fp(10) then bb1
  */
-class CallIdrInstruction : Instruction{};
+class CallIdrInstruction : public Instruction{};
+
+/*
+ * A basic block is a label and an ordered list of instructions, ending in a
+ * terminal.
+ */
+class BasicBlock {
+    public:
+    std::string label;
+    // The last instruction in the list is the terminal
+    std::vector<Instruction*> instructions;
+    BasicBlock(json bb_json) : label(bb_json["id"]){
+        for (auto &[inst_key, inst_val] : bb_json["insts"].items()) {
+            // Store each instruction inside basic block structure based on instruction type
+            for (auto i = inst_val.items().begin(); i != inst_val.items().end(); ++i) {
+                std::cout << i.key() << " " << i.value() << std::endl;
+                if (i.key() == "Store") {
+                    StoreInstruction *store_inst = new StoreInstruction(i.value());
+                    instructions.push_back(store_inst);
+                }
+            }
+                        
+        }
+    }
+};

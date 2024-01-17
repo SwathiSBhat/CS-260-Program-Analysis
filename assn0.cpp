@@ -2,9 +2,6 @@
  * CS260 winter 2024 assignment 0.
  */
 
-/*
- * diff struct for each
- */
 #include <fstream>
 #include <iostream>
 
@@ -103,20 +100,27 @@ int main(int argc, char *argv[]) {
                 for (auto &local : func_value["locals"]) {
                     if (local["typ"] == "Int") {
                         num_int_locals_globals++;
+                        continue;
                     }
                     if (local["typ"] == "Struct") {
                         num_struct_locals_globals++;
+                        continue;
                     }
 
                     /*
-                     * TODO This doesn't work right now.
+                     * If we're here, local is definitely a pointer. We just
+                     * have to figure out what kind.
+                     *
+                     * TODO This is better as a switch/case statement.
                      */
-                    if (local["typ"] == "Pointer") {
-
-                        /*
-                         * Blegh we have to do recursion here too.
-                         */
-                        std::cout << "Blegh it's a pointer" << std::endl;
+                    if (local["typ"]["Pointer"] == "Int") {
+                        num_ptr_int_locals_globals++;
+                    } else if (local["typ"]["Pointer"] == "Struct") {
+                        num_ptr_struct_locals_globals++;
+                    } else if (local["typ"]["Pointer"] == "Function") {
+                        num_ptr_func_locals_globals++;
+                    } else {
+                        num_ptr_ptr_locals_globals++;
                     }
                 }
 

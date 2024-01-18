@@ -9,6 +9,8 @@ using json = nlohmann::json;
 
 #define STRUCT "Struct"
 #define FUNCTION "Function"
+#define STORE "Store"
+#define RETURN "Ret"
 
 enum DataType {
     IntType = 0,
@@ -25,6 +27,7 @@ enum TerminalType {
 };
 
 // TODO: Add a print method for all classes to be able to print the data easily
+// TODO: Replace all string based index access with constant names
 
 /*
  * A program is a set of structs, global variables, function definitions, and
@@ -32,6 +35,7 @@ enum TerminalType {
  */
 class Program;
 
+// Forward declaration of Type class to allow usage in Variable class
 class Type;
 
 /*
@@ -40,9 +44,7 @@ class Type;
 class Variable {
     public:
         Variable() {};
-        Variable(std::string name, Type *type) : name(name), type(type) {
-            //std::cout << "Variable" << std::endl;std::cout << name << std::endl;
-        };
+        Variable(std::string name, Type *type) : name(name), type(type) {};
         std::string name;
         Type *type;
 };
@@ -81,8 +83,6 @@ class Type {
         DataType type;
         
         Type(json type_json) : indirection(0) {
-            std::cout << "Type" << std::endl;
-            std::cout << type_json << std::endl;
             // TODO : Need to check if any other types are defined this way
             // Only int has direct string coming in type. For example "typ": "Int"
             if (type_json.dump() == "\"Int\"")
@@ -167,7 +167,21 @@ class Operand {
 /*
  * x = $addrof y
  */
-class AddrofInstruction : public Instruction{};
+class AddrofInstruction : public Instruction{
+    public:
+        AddrofInstruction(json inst_val) {
+            std::cout << "Addrof Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["rhs"] != nullptr) {
+                rhs = new Variable(inst_val["rhs"]["name"], new Type(inst_val["rhs"]["typ"]));
+            }
+        }
+        Variable *lhs;
+        Variable *rhs;
+};
 
 /*
  * x = $alloc 10 [_a1]
@@ -202,7 +216,21 @@ class GfpInstruction : public Instruction{};
 /*
  * x = $load y
  */
-class LoadInstruction : public Instruction{};
+class LoadInstruction : public Instruction{
+    public:
+        LoadInstruction(json inst_val) {
+            std::cout << "Load Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["src"] != nullptr) {
+                src = new Variable(inst_val["src"]["name"], new Type(inst_val["src"]["typ"]));
+            }
+        }
+        Variable *lhs;
+        Variable *src;
+};
 
 /*
  * store x y
@@ -243,7 +271,14 @@ class BranchInstruction : public Instruction{};
 /*
  * $jump bb1
  */
-class JumpInstruction : public Instruction{};
+class JumpInstruction : public Instruction{
+    public:
+    JumpInstruction(json inst_val) : label(inst_val.dump()) {
+        std::cout << "Jump Instruction" << std::endl;
+        std::cout << inst_val << std::endl;
+    };
+    std::string label;
+};
 
 /*
  * $ret x - x can be a constant or a variable or null
@@ -293,6 +328,14 @@ class BasicBlock {
                     StoreInstruction *store_inst = new StoreInstruction(i.value());
                     instructions.push_back(store_inst);
                 }
+                else if (i.key() == "AddrOf") {
+                    AddrofInstruction *addrof_inst = new AddrofInstruction(i.value());
+                    instructions.push_back(addrof_inst);
+                }
+                else if (i.key() == "Load") {
+                    LoadInstruction *load_inst = new LoadInstruction(i.value());
+                    instructions.push_back(load_inst);
+                }
             }            
         }
         // Parse terminal instruction
@@ -305,7 +348,7 @@ class BasicBlock {
                 terminal = branch_inst;
             }
             else if(term_type == "Jump"){
-                JumpInstruction *jump_inst = new JumpInstruction();
+                JumpInstruction *jump_inst = new JumpInstruction(bb_json["term"]["Jump"]);
                 terminal = jump_inst;
             }
             else if(term_type == "Ret"){

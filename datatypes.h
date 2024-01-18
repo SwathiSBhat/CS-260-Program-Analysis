@@ -50,16 +50,6 @@ class Variable {
 };
 
 /*
- * A struct type is a name and a nonempty list of field names and types.
- */
-class Struct{
-    public:
-    Struct(json struct_json) {
-
-    };
-};
-
-/*
  * A type is either an integer, struct, function , or pointer.
  */
 class Type {
@@ -150,6 +140,27 @@ class Type {
             }
             else std::cout << "Error: Type not found" << std::endl;
         };
+};
+
+/*
+ * A struct type is a name and a nonempty list of field names and types.
+ */
+class Struct{
+    public:
+    Struct(json struct_json) {
+
+        std::cout << "Struct" << std::endl;
+        std::cout << struct_json << std::endl;
+        
+        if (struct_json.begin() != struct_json.end()) {
+            name = struct_json.begin().key();
+            for (auto &[field_key, field_val] : struct_json.begin().value().items()) {
+            fields.push_back(new Variable(field_val["name"], new Type(field_val["typ"])));
+        }
+        }
+    };
+    std::string name;
+    std::vector<Variable*> fields;
 };
 
 /*

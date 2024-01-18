@@ -56,13 +56,14 @@ int main(int argc, char *argv[]) {
             /*
              * Loop through each struct.
              */
-            for (auto &[structs_key, structs_val] : lir_value.items()) {
+            for (auto structs: lir_value.items()) {
 
                 /*
                  * Loop through all fields within that struct and count up the
                  * number of fields.
                  */
-                for (auto &[struct_key, struct_val] : structs_val.items()) {
+                Struct *s = new Struct(structs);
+                for (auto &[struct_key, struct_val] : structs.value().items()) {
                     num_struct_fields++;
                 }
             }
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
              * Loop through all functions.
              */
             for (auto &[func_key, func_value] : lir_value.items()) {
-                Function *f = new Function(func_value);
+                //Function *f = new Function(func_value);
                 /*
                  * Only increment our accumulator if the function actually
                  * returns something.

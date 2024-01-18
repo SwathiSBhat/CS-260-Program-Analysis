@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
              * Loop through all functions.
              */
             for (auto &[func_key, func_value] : lir_value.items()) {
-
+                Function *f = new Function(func_value);
                 /*
                  * Only increment our accumulator if the function actually
                  * returns something.
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
                 for (auto &[func_body_key, func_body_val] : func_value["body"].items()) {
 
                     num_instructions += func_body_val["insts"].size();
-                    BasicBlock *bb = new BasicBlock(func_body_val);
+                    //BasicBlock *bb = new BasicBlock(func_body_val);
                 }
             }
         }

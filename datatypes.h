@@ -60,20 +60,6 @@ class Struct{
 };
 
 /*
- * A function definition is:
- * - A name
- * - An ordered list of parameters (with names and types)
- * - An optional return type
- * - A set of local variables (with names and types)
- * - A set of basic blocks
- */
-class Function {
-    public:
-    Function(json func_json) {
-    }
-};
-
-/*
  * A type is either an integer, struct, function , or pointer.
  */
 class Type {
@@ -96,8 +82,9 @@ class Type {
                         ret = new Type(func_type_json["ret_ty"]);
                     }
                     if (func_type_json["param_ty"] != nullptr) {
-                        for (auto &[param_key, param_val] : func_type_json["param_ty"].items()) {
-                            params.push_back(new Type(param_val["typ"]));
+                        for (auto param : func_type_json["param_ty"].items()) {
+                            // std::cout << "Param: " << param.value() << std::endl;
+                            params.push_back(new Type(param.value()));
                         }
                     }
                 }
@@ -666,4 +653,54 @@ class BasicBlock {
             }
         }
     }
+};
+
+/*
+ * A function definition is:
+ * - A name
+ * - An ordered list of parameters (with names and types)
+ * - An optional return type
+ * - A set of local variables (with names and types)
+ * - A set of basic blocks
+ */
+// TODO: It is better to store the basic blocks in a map with key as label of basic block and value as basic block contents
+class Function {
+    public:
+    Function(json func_json) {
+
+        std::cout << "Function" << std::endl;
+        std::cout << func_json << std::endl;
+
+        if (func_json["id"] != nullptr) {
+            name = func_json["id"].dump();
+        }
+        
+        if (func_json["params"] != nullptr) {
+            for (auto &[param_key, param_val] : func_json["params"].items()) {
+                params.push_back(new Variable(param_val["name"], new Type(param_val["typ"])));
+            }
+        }
+        
+        if (func_json["ret_ty"].dump() == "null" || func_json["ret_ty"] == nullptr)
+            ret = nullptr;
+        else if (func_json["ret_ty"] != nullptr) {
+            ret = new Type(func_json["ret_ty"]);
+        }
+
+        if (func_json["locals"] != nullptr) {
+            for (auto &[local_key, local_val] : func_json["locals"].items()) {
+                locals.push_back(new Variable(local_val["name"], new Type(local_val["typ"])));
+            }
+        }
+        if (func_json["body"] != nullptr) {
+            for (auto &[bb_key, bb_val] : func_json["body"].items()) {
+                bbs.push_back(new BasicBlock(bb_val));
+            }
+        }
+    }
+    std::string name;
+    std::vector<Variable*> params;
+    std::vector<Variable*> locals;
+    std::vector<BasicBlock*> bbs;
+    Type *ret;
 };

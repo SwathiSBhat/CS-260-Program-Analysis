@@ -7,11 +7,25 @@
 
 using json = nlohmann::json;
 
+#define STRUCT "Struct"
+#define FUNCTION "Function"
+
 enum DataType {
     IntType = 0,
     StructType,
     FuncType
 };
+
+enum TerminalType {
+    Branch = 0,
+    Jump,
+    Ret,
+    CallDirect,
+    CallIndirect
+};
+
+// TODO: Add a print method for all classes to be able to print the data easily
+
 /*
  * A program is a set of structs, global variables, function definitions, and
  * external function declarations.
@@ -65,39 +79,55 @@ class Type {
         int indirection;
         void* ptr_type;
         DataType type;
-        // TODO : Need to check if any other types are defined this way
-        // Only int has direct string coming in type. For example "typ": "Int"
-        Type(std::string intType) : indirection(0),ptr_type(nullptr), type(DataType::IntType){};
-        /*
-         *  TODO: Need to add logic for nested pointers here
-        */
+        
         Type(json type_json) : indirection(0) {
             std::cout << "Type" << std::endl;
             std::cout << type_json << std::endl;
+            // TODO : Need to check if any other types are defined this way
+            // Only int has direct string coming in type. For example "typ": "Int"
             if (type_json.dump() == "\"Int\"")
             {
                 ptr_type = nullptr;
                 type = DataType::IntType;
             }
-            else if (type_json["Int"] != nullptr) {
+            /*else if (type_json["Int"] != nullptr) {
                 int* intPtr = new int(type_json["Int"]);
                 ptr_type = intPtr;
                 type = DataType::IntType;
-            } else if (type_json["Struct"] != nullptr) {
+            }*/ else if (type_json["Struct"] != nullptr) { // occurs for operand with store instruction
                 Struct* structPtr = new Struct(type_json["Struct"]);
                 ptr_type = structPtr;
                 type = DataType::StructType;
-            } else if (type_json["Func"] != nullptr) {
-                Function* funcPtr = new Function(type_json["Func"]);
+            } /*else if (type_json["Func"] != nullptr) {
+                Function* funcPtr = new Function(type_json["Function"]);
                 ptr_type = funcPtr;
                 type = DataType::FuncType;
-            } 
-            // TODO: Need to populate correct type. For now, defaulting to int
+            } */
+
             else if (type_json["Pointer"] != nullptr) {
+                json ptr_json = type_json["Pointer"];
                 indirection++;
+
+                // Update indirection and ptr_type based on nested pointers
+                while (ptr_json != nullptr && ptr_json.dump() != "\"Int\"" &&
+                    ptr_json.begin().key() == "Pointer") {
+                    ptr_json = ptr_json["Pointer"];
+                    indirection++;
+                }
+
                 int* typePtr = 0;
                 ptr_type = typePtr;
-                type = DataType::IntType;
+
+                if (ptr_json.dump() == "\"Int\"")
+                    type = DataType::IntType;
+                else if (ptr_json.begin().key() == "Struct")
+                    type = DataType::StructType;
+                else if (ptr_json.begin().key() == "Function")
+                    type = DataType::FuncType;
+                else
+                    std::cout << "Error: Pointer type not found" << std::endl;
+                std::cout << "Indirection: " << indirection << std::endl;
+                std::cout << "Type: " << type << std::endl;
             }
             else std::cout << "Error: Type not found" << std::endl;
         };
@@ -106,7 +136,9 @@ class Type {
 /*
  * A global variable is a name and a type.
  */
-class Global;
+class Global{
+
+};
 
 /*
  * An external function declaration is a name and a function type. We know its
@@ -120,19 +152,13 @@ class ExternalFunction;
 */
 class Instruction{};
 
-
-
 class Operand {
     public:
         Operand() {};
-        Operand(Variable *var) : var(var), val(0) {
-            //std::cout << "Operand" << std::endl;std::cout << var->name << std::endl;
-        };
-        Operand(int val) : var(nullptr), val(val) {
-            //std::cout << "Operand CInt" << std::endl;std::cout << val << std::endl;
-        };
-    Variable *var;
-    int val;
+        Operand(Variable *var) : var(var), val(0) {};
+        Operand(int val) : var(nullptr), val(val) {};
+        Variable *var;
+        int val;
 };
 
 /*
@@ -190,7 +216,6 @@ class StoreInstruction : public Instruction {
                 dst = new Variable(inst_val["dst"]["name"], new Type(inst_val["dst"]["typ"]));
             }
             if (inst_val["op"] != nullptr) {
-                    //std::cout << "op" << std::endl;
                     if (inst_val["op"]["Var"] != nullptr)
                         op = new Operand(new Variable(inst_val["op"]["Var"]["name"], new Type(inst_val["op"]["Var"]["typ"])));
                     else if (inst_val["op"]["CInt"] != nullptr)
@@ -221,9 +246,24 @@ class BranchInstruction : public Instruction{};
 class JumpInstruction : public Instruction{};
 
 /*
- * $ret x
+ * $ret x - x can be a constant or a variable or null
  */
-class RetInstruction : public Instruction{};
+class RetInstruction : public Instruction{
+    public:
+        RetInstruction(json inst_val) {
+            std::cout << "Ret Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            // When return instruction is null, it means it is a void return
+            if (inst_val.dump() == "null" || inst_val == nullptr)
+                op = nullptr;
+            else if (inst_val["Var"] != nullptr) {
+                op = new Operand(new Variable(inst_val["Var"]["name"], new Type(inst_val["Var"]["typ"])));
+            }
+            else if (inst_val["CInt"] != nullptr)
+                op = new Operand(inst_val["CInt"]);
+        }
+        Operand *op;
+};
 
 /*
  * x = $call_dir foo(10) then bb1
@@ -242,19 +282,44 @@ class CallIdrInstruction : public Instruction{};
 class BasicBlock {
     public:
     std::string label;
-    // The last instruction in the list is the terminal
     std::vector<Instruction*> instructions;
+    Instruction* terminal;
     BasicBlock(json bb_json) : label(bb_json["id"]){
         for (auto &[inst_key, inst_val] : bb_json["insts"].items()) {
             // Store each instruction inside basic block structure based on instruction type
             for (auto i = inst_val.items().begin(); i != inst_val.items().end(); ++i) {
-                std::cout << i.key() << " " << i.value() << std::endl;
+                //std::cout << i.key() << " " << i.value() << std::endl;
                 if (i.key() == "Store") {
                     StoreInstruction *store_inst = new StoreInstruction(i.value());
                     instructions.push_back(store_inst);
                 }
+            }            
+        }
+        // Parse terminal instruction
+        if (bb_json["term"] != nullptr)
+        {
+            std::string term_type = bb_json["term"].begin().key();
+            std::cout << "Terminal type: " << term_type << std::endl;
+            if(term_type == "Branch"){
+                BranchInstruction *branch_inst = new BranchInstruction();
+                terminal = branch_inst;
             }
-                        
+            else if(term_type == "Jump"){
+                JumpInstruction *jump_inst = new JumpInstruction();
+                terminal = jump_inst;
+            }
+            else if(term_type == "Ret"){
+                RetInstruction *ret_inst = new RetInstruction(bb_json["term"]["Ret"]);
+                terminal = ret_inst;
+            }
+            else if(term_type == "CallDirect"){
+                CallDirInstruction *call_dir_inst = new CallDirInstruction();
+                terminal = call_dir_inst;
+            }
+            else if(term_type == "CallIndirect"){
+                CallIdrInstruction *call_idr_inst = new CallIdrInstruction();
+                terminal = call_idr_inst;
+            }
         }
     }
 };

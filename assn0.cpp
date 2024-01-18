@@ -138,17 +138,6 @@ int main(int argc, char *argv[]) {
 
                     num_instructions += func_body_val["insts"].size();
                     BasicBlock *bb = new BasicBlock(func_body_val);
-                    // TODO: Move the below logic inside basic block constructor
-                    /*for (auto &[inst_key, inst_val] : func_body_val["insts"].items()) {
-                        // Store each instruction inside basic block structure based on instruction type
-                        for (auto i = inst_val.items().begin(); i != inst_val.items().end(); ++i) {
-                            //std::cout << i.key() << " " << i.value() << std::endl;
-                            if (i.key() == "Store") {
-                                StoreInstruction *store_inst = new StoreInstruction(i.value());
-                            }
-                        }
-                        
-                    }*/
                 }
             }
         }

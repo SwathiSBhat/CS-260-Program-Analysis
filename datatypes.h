@@ -212,12 +212,69 @@ class AllocInstruction : public Instruction{
 /*
  * x = $arith add y 2
  */
-class ArithInstruction : public Instruction{};
+class ArithInstruction : public Instruction{
+    public:
+        ArithInstruction(json inst_val) {
+            std::cout << "Arith Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["op1"] != nullptr) {
+                if (inst_val["op1"]["Var"] != nullptr)
+                    op1 = new Operand(new Variable(inst_val["op1"]["Var"]["name"], new Type(inst_val["op1"]["Var"]["typ"])));
+                else if (inst_val["op1"]["CInt"] != nullptr)
+                    op1 = new Operand(inst_val["op1"]["CInt"]);
+            }
+            if (inst_val["op2"] != nullptr) {
+                if (inst_val["op2"]["Var"] != nullptr)
+                    op2 = new Operand(new Variable(inst_val["op2"]["Var"]["name"], new Type(inst_val["op2"]["Var"]["typ"])));
+                else if (inst_val["op2"]["CInt"] != nullptr)
+                    op2 = new Operand(inst_val["op2"]["CInt"]);
+            }
+            if (inst_val["aop"] != nullptr) {
+                arith_op = inst_val["aop"].dump();
+            }
+        }
+        Variable *lhs;
+        std::string arith_op;
+        Operand *op1;
+        Operand *op2;
+};
 
 /*
  * x = $cmp eq y 2
  */
-class CmpInstruction : public Instruction{};
+class CmpInstruction : public Instruction{
+    public:
+        CmpInstruction(json inst_val) {
+            std::cout << "Cmp Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["op1"] != nullptr) {
+                if (inst_val["op1"]["Var"] != nullptr)
+                    op1 = new Operand(new Variable(inst_val["op1"]["Var"]["name"], new Type(inst_val["op1"]["Var"]["typ"])));
+                else if (inst_val["op1"]["CInt"] != nullptr)
+                    op1 = new Operand(inst_val["op1"]["CInt"]);
+            }
+            if (inst_val["op2"] != nullptr) {
+                if (inst_val["op2"]["Var"] != nullptr)
+                    op2 = new Operand(new Variable(inst_val["op2"]["Var"]["name"], new Type(inst_val["op2"]["Var"]["typ"])));
+                else if (inst_val["op2"]["CInt"] != nullptr)
+                    op2 = new Operand(inst_val["op2"]["CInt"]);
+            }
+            if (inst_val["rop"] != nullptr) {
+                cmp_op = inst_val["rop"].dump();
+            }
+        }
+        Variable *lhs;
+        std::string cmp_op;
+        Operand *op1;
+        Operand *op2;
+};
 
 /*
  * x = $copy y
@@ -369,7 +426,29 @@ class CallExtInstruction : public Instruction{
 /*
  * $branch x bb1 bb2
  */
-class BranchInstruction : public Instruction{};
+class BranchInstruction : public Instruction{
+    public:
+        BranchInstruction(json inst_val) {
+            std::cout << "Branch Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["cond"] != nullptr) {
+                if (inst_val["cond"]["Var"] != nullptr)
+                    condition = new Operand(new Variable(inst_val["cond"]["Var"]["name"], new Type(inst_val["cond"]["Var"]["typ"])));
+                else if (inst_val["cond"]["CInt"] != nullptr)
+                    condition = new Operand(inst_val["cond"]["CInt"]);
+            }
+            if (inst_val["tt"] != nullptr) {
+                tt = inst_val["tt"].dump();
+            }
+            if (inst_val["ff"] != nullptr) {
+                ff = inst_val["ff"].dump();
+            }
+        };
+
+        Operand *condition;
+        std::string tt;
+        std::string ff;
+};
 
 /*
  * $jump bb1
@@ -406,12 +485,72 @@ class RetInstruction : public Instruction{
 /*
  * x = $call_dir foo(10) then bb1
  */
-class CallDirInstruction : public Instruction{};
+class CallDirInstruction : public Instruction{
+    public:
+        CallDirInstruction(json inst_val) {
+            std::cout << "CallDir Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            // lhs can be optional
+            if (inst_val["lhs"].dump() == "null" || inst_val["lhs"] == nullptr)
+                lhs = nullptr;
+            else if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["callee"] != nullptr) {
+                callee = inst_val["callee"].dump();
+            }
+            if (inst_val["args"] != nullptr) {
+                for (auto &[arg_key, arg_val] : inst_val["args"].items()) {
+                    if (arg_val["Var"] != nullptr)
+                        args.push_back(new Operand(new Variable(arg_val["Var"]["name"], new Type(arg_val["Var"]["typ"]))));
+                    else if (arg_val["CInt"] != nullptr)
+                        args.push_back(new Operand(arg_val["CInt"]));
+                }
+            }
+            if (inst_val["next_bb"] != nullptr) {
+                next_bb = inst_val["next_bb"].dump();
+            }
+        }
+        Variable *lhs;
+        std::string callee;
+        std::vector<Operand*> args;
+        std::string next_bb;
+};
 
 /*
  * x = $call_idr fp(10) then bb1
  */
-class CallIdrInstruction : public Instruction{};
+class CallIdrInstruction : public Instruction{
+    public:
+        CallIdrInstruction(json inst_val) {
+            std::cout << "CallIdr Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            // lhs can be optional
+            if (inst_val["lhs"].dump() == "null" || inst_val["lhs"] == nullptr)
+                lhs = nullptr;
+            else if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["fp"] != nullptr) {
+                fp = new Variable(inst_val["fp"]["name"], new Type(inst_val["fp"]["typ"]));
+            }
+            if (inst_val["args"] != nullptr) {
+                for (auto &[arg_key, arg_val] : inst_val["args"].items()) {
+                    if (arg_val["Var"] != nullptr)
+                        args.push_back(new Operand(new Variable(arg_val["Var"]["name"], new Type(arg_val["Var"]["typ"]))));
+                    else if (arg_val["CInt"] != nullptr)
+                        args.push_back(new Operand(arg_val["CInt"]));
+                }
+            }
+            if (inst_val["next_bb"] != nullptr) {
+                next_bb = inst_val["next_bb"].dump();
+            }
+        }
+        Variable *lhs;
+        Variable *fp;
+        std::vector<Operand*> args;
+        std::string next_bb;
+};
 
 /*
  * A basic block is a label and an ordered list of instructions, ending in a
@@ -426,7 +565,6 @@ class BasicBlock {
         for (auto &[inst_key, inst_val] : bb_json["insts"].items()) {
             // Store each instruction inside basic block structure based on instruction type
             for (auto i = inst_val.items().begin(); i != inst_val.items().end(); ++i) {
-                //std::cout << i.key() << " " << i.value() << std::endl;
                 if (i.key() == "Store") {
                     StoreInstruction *store_inst = new StoreInstruction(i.value());
                     instructions.push_back(store_inst);
@@ -447,7 +585,7 @@ class BasicBlock {
             std::string term_type = bb_json["term"].begin().key();
             std::cout << "Terminal type: " << term_type << std::endl;
             if(term_type == "Branch"){
-                BranchInstruction *branch_inst = new BranchInstruction();
+                BranchInstruction *branch_inst = new BranchInstruction(bb_json["term"]["Branch"]);
                 terminal = branch_inst;
             }
             else if(term_type == "Jump"){
@@ -459,11 +597,11 @@ class BasicBlock {
                 terminal = ret_inst;
             }
             else if(term_type == "CallDirect"){
-                CallDirInstruction *call_dir_inst = new CallDirInstruction();
+                CallDirInstruction *call_dir_inst = new CallDirInstruction(bb_json["term"]["CallDirect"]);
                 terminal = call_dir_inst;
             }
             else if(term_type == "CallIndirect"){
-                CallIdrInstruction *call_idr_inst = new CallIdrInstruction();
+                CallIdrInstruction *call_idr_inst = new CallIdrInstruction(bb_json["term"]["CallIndirect"]);
                 terminal = call_idr_inst;
             }
         }

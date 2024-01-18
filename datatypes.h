@@ -81,6 +81,41 @@ class Type {
         int indirection;
         void* ptr_type;
         DataType type;
+
+        class FunctionType {
+            public:
+                FunctionType(json func_type_json) {
+                    
+                    std::cout << "Function Type" << std::endl;
+                    std::cout << func_type_json << std::endl;
+
+                    if (func_type_json["ret_ty"].dump() == "null") {
+                        ret = nullptr;
+                    }
+                    else if (func_type_json["ret_ty"] != nullptr) {
+                        ret = new Type(func_type_json["ret_ty"]);
+                    }
+                    if (func_type_json["param_ty"] != nullptr) {
+                        for (auto &[param_key, param_val] : func_type_json["param_ty"].items()) {
+                            params.push_back(new Type(param_val["typ"]));
+                        }
+                    }
+                }
+                Type *ret;
+                std::vector<Type*> params;
+        };
+
+        class StructType {
+            public:
+                StructType(json struct_type_json) {
+
+                    std::cout << "Struct Type" << std::endl;
+                    std::cout << struct_type_json << std::endl;
+
+                    name = struct_type_json.dump();
+                }
+                std::string name;
+        };
         
         Type(json type_json) : indirection(0) {
             // TODO : Need to check if any other types are defined this way
@@ -90,20 +125,12 @@ class Type {
                 ptr_type = nullptr;
                 type = DataType::IntType;
             }
-            /*else if (type_json["Int"] != nullptr) {
-                int* intPtr = new int(type_json["Int"]);
-                ptr_type = intPtr;
-                type = DataType::IntType;
-            }*/ else if (type_json["Struct"] != nullptr) { // occurs for operand with store instruction
-                Struct* structPtr = new Struct(type_json["Struct"]);
+            else if (type_json["Struct"] != nullptr) { // occurs for operand with store instruction
+                // This has indirection 0 and ptr_type as struct
+                StructType* structPtr = new StructType(type_json["Struct"]);
                 ptr_type = structPtr;
                 type = DataType::StructType;
-            } /*else if (type_json["Func"] != nullptr) {
-                Function* funcPtr = new Function(type_json["Function"]);
-                ptr_type = funcPtr;
-                type = DataType::FuncType;
-            } */
-
+            }
             else if (type_json["Pointer"] != nullptr) {
                 json ptr_json = type_json["Pointer"];
                 indirection++;
@@ -115,15 +142,20 @@ class Type {
                     indirection++;
                 }
 
-                int* typePtr = 0;
-                ptr_type = typePtr;
-
-                if (ptr_json.dump() == "\"Int\"")
+                if (ptr_json.dump() == "\"Int\"") {
+                    // TODO: Change this
+                    int *intPtr = 0;
+                    ptr_type = intPtr;
                     type = DataType::IntType;
-                else if (ptr_json.begin().key() == "Struct")
+                }
+                else if (ptr_json.begin().key() == "Struct") {
+                    ptr_type = new StructType(ptr_json["Struct"]);
                     type = DataType::StructType;
-                else if (ptr_json.begin().key() == "Function")
+                }
+                else if (ptr_json.begin().key() == "Function") {
+                    ptr_type = new FunctionType(ptr_json["Function"]);
                     type = DataType::FuncType;
+                }
                 else
                     std::cout << "Error: Pointer type not found" << std::endl;
                 std::cout << "Indirection: " << indirection << std::endl;

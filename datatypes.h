@@ -577,6 +577,34 @@ class BasicBlock {
                     LoadInstruction *load_inst = new LoadInstruction(i.value());
                     instructions.push_back(load_inst);
                 }
+                else if (i.key() == "Alloc") {
+                    AllocInstruction *alloc_inst = new AllocInstruction(i.value());
+                    instructions.push_back(alloc_inst);
+                }
+                else if (i.key() == "Arith") {
+                    ArithInstruction *arith_inst = new ArithInstruction(i.value());
+                    instructions.push_back(arith_inst);
+                }
+                else if (i.key() == "Cmp") {
+                    CmpInstruction *cmp_inst = new CmpInstruction(i.value());
+                    instructions.push_back(cmp_inst);
+                }
+                else if (i.key() == "Copy") {
+                    CopyInstruction *copy_inst = new CopyInstruction(i.value());
+                    instructions.push_back(copy_inst);
+                }
+                else if (i.key() == "Gep") {
+                    GepInstruction *gep_inst = new GepInstruction(i.value());
+                    instructions.push_back(gep_inst);
+                }
+                else if (i.key() == "Gfp") {
+                    GfpInstruction *gfp_inst = new GfpInstruction(i.value());
+                    instructions.push_back(gfp_inst);
+                }
+                else if (i.key() == "CallExt") {
+                    CallExtInstruction *call_ext_inst = new CallExtInstruction(i.value());
+                    instructions.push_back(call_ext_inst);
+                }
             }            
         }
         // Parse terminal instruction

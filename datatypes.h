@@ -29,12 +29,6 @@ enum TerminalType {
 // TODO: Add a print method for all classes to be able to print the data easily
 // TODO: Replace all string based index access with constant names
 
-/*
- * A program is a set of structs, global variables, function definitions, and
- * external function declarations.
- */
-class Program;
-
 // Forward declaration of Type class to allow usage in Variable class
 class Type;
 
@@ -167,7 +161,15 @@ class Struct{
  * A global variable is a name and a type.
  */
 class Global{
+    public:
+    Global(json global_json) {
 
+        std::cout << "Global" << std::endl;
+        std::cout << global_json << std::endl;
+
+        globalVar = new Variable(global_json["name"], new Type(global_json["typ"]));
+    };
+    Variable *globalVar;
 };
 
 /*
@@ -175,7 +177,19 @@ class Global{
  * name/type signature and we can call it, but we don't have access to its
  * source code.
  */
-class ExternalFunction;
+class ExternalFunction {
+    public:
+    ExternalFunction(json ext_func_json) {
+
+        std::cout << "External Function" << std::endl;
+        std::cout << ext_func_json << std::endl;
+
+        name = ext_func_json.begin().key();
+        funcType = new Type::FunctionType(ext_func_json.begin().value());
+    };
+    std::string name;
+    Type::FunctionType *funcType;
+};
 
 /*
  * Instruction base class
@@ -714,4 +728,40 @@ class Function {
     std::vector<Variable*> locals;
     std::vector<BasicBlock*> bbs;
     Type *ret;
+};
+
+/*
+ * A program is a set of structs, global variables, function definitions, and
+ * external function declarations.
+ */
+class Program {
+    public:
+        Program(json program_json) {
+            std::cout << "Program" << std::endl;
+            
+            if (program_json["structs"] != nullptr) {
+                for (auto st : program_json["structs"].items()) {
+                    structs.push_back(new Struct(st));
+                }
+            }
+            if (program_json["globals"] != nullptr) {
+                for (auto &[global_key, global_val] : program_json["globals"].items()) {
+                    globals.push_back(new Global(global_val));
+                }
+            }
+            if (program_json["functions"] != nullptr) {
+                for (auto &[func_key, func_val] : program_json["functions"].items()) {
+                    funcs.push_back(new Function(func_val));
+                }
+            }
+            if (program_json["externs"] != nullptr) {
+                for (auto &[ext_func_key, ext_func_val] : program_json["externs"].items()) {
+                    ext_funcs.push_back(new ExternalFunction(ext_func_val));
+                }
+            }
+        };
+        std::vector<Struct*> structs;
+        std::vector<Global*> globals;
+        std::vector<Function*> funcs;
+        std::vector<ExternalFunction*> ext_funcs;
 };

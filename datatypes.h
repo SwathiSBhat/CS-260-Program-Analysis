@@ -186,7 +186,28 @@ class AddrofInstruction : public Instruction{
 /*
  * x = $alloc 10 [_a1]
  */
-class AllocInstruction : public Instruction{};
+class AllocInstruction : public Instruction{
+    public:
+        AllocInstruction(json inst_val) {
+            std::cout << "Alloc Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["num"] != nullptr) {
+                if (inst_val["num"]["Var"] != nullptr)
+                    num = new Operand(new Variable(inst_val["num"]["Var"]["name"], new Type(inst_val["num"]["Var"]["typ"])));
+                else if (inst_val["op"]["CInt"] != nullptr)
+                    num = new Operand(inst_val["num"]["CInt"]);
+            }
+            if (inst_val["id"] != nullptr) {
+                id = new Variable(inst_val["id"]["name"], new Type(inst_val["id"]["typ"]));
+            }
+        }
+        Variable *lhs;
+        Operand *num;
+        Variable *id;
+};
 
 /*
  * x = $arith add y 2
@@ -201,17 +222,73 @@ class CmpInstruction : public Instruction{};
 /*
  * x = $copy y
  */
-class CopyInstruction : public Instruction{};
+class CopyInstruction : public Instruction{
+    public:
+        CopyInstruction(json inst_val) {
+            std::cout << "Copy Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["op"] != nullptr) {
+                if (inst_val["op"]["Var"] != nullptr)
+                    op = new Operand(new Variable(inst_val["op"]["Var"]["name"], new Type(inst_val["op"]["Var"]["typ"])));
+                else if (inst_val["op"]["CInt"] != nullptr)
+                    op = new Operand(inst_val["op"]["CInt"]);
+            }
+        }
+        Variable *lhs;
+        Operand *op;
+};
 
 /*
  * x = $gep y 10
  */
-class GepInstruction : public Instruction{};
+class GepInstruction : public Instruction{
+    public:
+        GepInstruction(json inst_val) {
+            std::cout << "Gep Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["src"] != nullptr) {
+                src = new Variable(inst_val["src"]["name"], new Type(inst_val["src"]["typ"]));
+            }
+            if (inst_val["idx"] != nullptr) {
+                if (inst_val["idx"]["Var"] != nullptr)
+                    idx = new Operand(new Variable(inst_val["idx"]["Var"]["name"], new Type(inst_val["idx"]["Var"]["typ"])));
+                else if (inst_val["idx"]["CInt"] != nullptr)
+                    idx = new Operand(inst_val["idx"]["CInt"]);
+            }
+        }
+        Variable *lhs;
+        Variable *src;
+        Operand *idx;
+};
 
 /*
  * x = $gfp y foo
  */
-class GfpInstruction : public Instruction{};
+class GfpInstruction : public Instruction{
+    public:
+        GfpInstruction(json inst_val) {
+            std::cout << "Gfp Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["src"] != nullptr) {
+                src = new Variable(inst_val["src"]["name"], new Type(inst_val["src"]["typ"]));
+            }
+            if (inst_val["field"] != nullptr) {
+                field = new Variable(inst_val["field"]["name"], new Type(inst_val["field"]["typ"]));
+            }
+        }
+        Variable *lhs;
+        Variable *src;
+        Variable *field;
+};
 
 /*
  * x = $load y
@@ -257,7 +334,33 @@ class StoreInstruction : public Instruction {
 /*
  * x = $call_ext foo(10)
  */
-class CallExtInstruction : public Instruction{};
+class CallExtInstruction : public Instruction{
+    public:
+        CallExtInstruction(json inst_val) {
+            std::cout << "CallExt Instruction" << std::endl;
+            std::cout << inst_val << std::endl;
+            // lhs can be optional
+            if (inst_val["lhs"].dump() == "null" || inst_val["lhs"] == nullptr)
+                lhs = nullptr;
+            else if (inst_val["lhs"] != nullptr) {
+                lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
+            }
+            if (inst_val["ext_callee"] != nullptr) {
+                extFuncName = inst_val["ext_callee"].dump();
+            }
+            if (inst_val["args"] != nullptr) {
+                for (auto &[arg_key, arg_val] : inst_val["args"].items()) {
+                    if (arg_val["Var"] != nullptr)
+                        args.push_back(new Operand(new Variable(arg_val["Var"]["name"], new Type(arg_val["Var"]["typ"]))));
+                    else if (arg_val["CInt"] != nullptr)
+                        args.push_back(new Operand(arg_val["CInt"]));
+                }
+            }
+        }
+        Variable *lhs;
+        std::string extFuncName;
+        std::vector<Operand*> args;
+};
 
 /*
  * These instructions are all terminals.

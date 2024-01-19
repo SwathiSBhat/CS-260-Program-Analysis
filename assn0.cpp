@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <iostream>
+#include "./datatypes.h"
 
 /*
  * https://github.com/nlohmann/json
@@ -42,6 +43,9 @@ int main(int argc, char *argv[]) {
     uint64_t num_ptr_func_locals_globals = 0;
     uint64_t num_ptr_ptr_locals_globals = 0;
 
+
+    Program *p = new Program(lir_json);
+
     /*
      * Scan through our top-level LIR JSON object.
      */
@@ -55,13 +59,14 @@ int main(int argc, char *argv[]) {
             /*
              * Loop through each struct.
              */
-            for (auto &[structs_key, structs_val] : lir_value.items()) {
+            for (auto structs: lir_value.items()) {
 
                 /*
                  * Loop through all fields within that struct and count up the
                  * number of fields.
                  */
-                for (auto &[struct_key, struct_val] : structs_val.items()) {
+                //Struct *s = new Struct(structs);
+                for (auto &[struct_key, struct_val] : structs.value().items()) {
                     num_struct_fields++;
                 }
             }
@@ -76,7 +81,7 @@ int main(int argc, char *argv[]) {
              * Loop through all functions.
              */
             for (auto &[func_key, func_value] : lir_value.items()) {
-
+                //Function *f = new Function(func_value);
                 /*
                  * Only increment our accumulator if the function actually
                  * returns something.
@@ -136,6 +141,7 @@ int main(int argc, char *argv[]) {
                 for (auto &[func_body_key, func_body_val] : func_value["body"].items()) {
 
                     num_instructions += func_body_val["insts"].size();
+                    //BasicBlock *bb = new BasicBlock(func_body_val);
                 }
             }
         }
@@ -146,6 +152,7 @@ int main(int argc, char *argv[]) {
         if (lir_key == "globals") {
             for (auto &[globals_key, globals_val] : lir_value.items()) {
 
+                //Global *g = new Global(globals_val);
                 /*
                  * Now we need to find the type of each global so we can
                  * increment the right accumulator.
@@ -183,6 +190,14 @@ int main(int argc, char *argv[]) {
                         continue;
                     }
                 }
+            }
+        }
+        /*
+        * Parse externs in the program
+        */
+        if (lir_key == "externs") {
+            for (auto &[externs_key, externs_val] : lir_value.items()) {
+                //ExternalFunction *e = new ExternalFunction(externs_val);
             }
         }
     }

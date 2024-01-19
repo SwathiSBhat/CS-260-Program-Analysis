@@ -14,7 +14,7 @@ enum AbstractVal {
 
 /*
  * This lets us print out the value of a variant<int, AbstractVal> easily. Helps
- * with debugging.
+ * with debugging and comparison.
  */
 struct AbstractValStringifyVisitor {
     std::string operator()(int val) {
@@ -64,7 +64,7 @@ public:
                  * -> We don't have to worry about BOTTOM because we won't put
                  *    BOTTOM values in our abstract store.
                  */
-                if (std::get<AbstractVal>(pair.second) == TOP) {
+                if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "TOP") {
                     abstract_store[pair.first] = TOP;
                 } else if (pair.second != abstract_store[pair.first]) {
                     abstract_store[pair.first] = TOP;

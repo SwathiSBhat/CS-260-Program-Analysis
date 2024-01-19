@@ -44,3 +44,4 @@ cmake-build-debug/
 *.dSYM/
 __pycache__/
 .vscode/
+test_abstract_store

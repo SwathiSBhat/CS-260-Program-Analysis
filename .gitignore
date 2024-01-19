@@ -1,3 +1,14 @@
+# Added by Vinayak
+tests/
+.idea/
+.DS_Store
+CMakeFiles/
+Makefile
+cmake_install.cmake
+CMakeCache.txt
+assn0
+cmake-build-debug/
+
 # Prerequisites
 *.d
 
@@ -30,6 +41,9 @@
 *.exe
 *.out
 *.app
+*.dSYM/
+__pycache__/
+.vscode/
 
 # pycache
 __pycache__/

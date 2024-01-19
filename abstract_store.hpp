@@ -64,7 +64,7 @@ public:
                  * -> We don't have to worry about BOTTOM because we won't put
                  *    BOTTOM values in our abstract store.
                  */
-                if (pair.second == TOP) {
+                if (std::get<AbstractVal>(pair.second) == TOP) {
                     abstract_store[pair.first] = TOP;
                 } else if (pair.second != abstract_store[pair.first]) {
                     abstract_store[pair.first] = TOP;
@@ -78,7 +78,7 @@ public:
      */
     void print() {
         for (const auto& pair : abstract_store) {
-            std::cout << pair.first << " -> " << pair.second.get << std::endl;
+            std::cout << pair.first << " -> " << std::visit(AbstractValStringifyVisitor{}, pair.second) << std::endl;
         }
     }
 };

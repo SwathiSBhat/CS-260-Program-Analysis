@@ -13,3 +13,9 @@ ADD_EXECUTABLE(test_abstract_store
 	test_abstract_store.cpp
 	abstract_store.hpp
 )
+
+ADD_EXECUTABLE(mfp_worklist
+    mfp_worklist.cpp
+    abstract_store.hpp
+    datatypes.h
+)

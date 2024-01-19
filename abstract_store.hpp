@@ -39,6 +39,13 @@ public:
     std::map<std::string, std::variant<int, AbstractVal>> abstract_store;
 
     /*
+     * Constructor that lets you specify a mapping.
+     */
+    AbstractStore(std::map<std::string, std::variant<int, AbstractVal>> map) {
+        abstract_store = map;
+    }
+
+    /*
      * Join this abstract store with another and store the result into this
      * abstract store.
      */

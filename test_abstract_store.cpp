@@ -6,18 +6,16 @@ int main() {
      * This is how you define an AbstractStore, which is just a glorified
      * wrapper around a std::map.
      */
-    AbstractStore as1;
-    AbstractStore as2;
-    as1.abstract_store = {
-            {"v1", TOP},
-            {"v2", 42},
-            {"v3", 8}
-    };
-    as2.abstract_store = {
-            {"v1", 6},
-            {"v2", 32},
-            {"v4", TOP}
-    };
+    AbstractStore as1 = AbstractStore({
+        {"v1", TOP},
+        {"v2", 42},
+        {"v3", 8}
+    });
+    AbstractStore as2 = AbstractStore({
+        {"v1", 6},
+        {"v2", 32},
+        {"v4", TOP}
+    });
 
     /*
      * We can also pretty-print them out.

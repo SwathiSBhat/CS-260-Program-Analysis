@@ -7,6 +7,7 @@
 #include<fstream>
 #include<queue>
 #include<unordered_set>
+#include<abstract_store.hpp>
 
 using json = nlohmann::json;
 
@@ -75,6 +76,13 @@ class SignAnalysis {
     }
 
     Program program;
+    /*
+     * Our bb2store is a map from a BasicBlock to an AbstractStore.
+     */
+    std::map<BasicBlock, AbstractStore> bb2store;
+    /*
+     * Our worklist is a queue containing BasicBlock labels.
+     */
     std::queue<std::string> worklist;
     // data structures required for prep stage
     std::unordered_set<std::string> int_type_globals; // contains names of all global variables of type int

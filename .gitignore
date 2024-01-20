@@ -45,3 +45,4 @@ cmake-build-debug/
 __pycache__/
 .vscode/
 test_abstract_store
+signanalysis/signanalysis

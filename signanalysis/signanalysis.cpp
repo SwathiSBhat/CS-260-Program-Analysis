@@ -1,5 +1,5 @@
-#include "../datatypes.h"
-#include "../json.hpp"
+#include "../headers/datatypes.h"
+#include "../headers/json.hpp"
 #include<iostream>
 #include<vector>
 #include<map>
@@ -7,7 +7,7 @@
 #include<fstream>
 #include<queue>
 #include<unordered_set>
-#include "../abstract_store.hpp"
+#include "../headers/abstract_store.hpp"
 
 using json = nlohmann::json;
 

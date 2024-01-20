@@ -11,11 +11,11 @@ ADD_EXECUTABLE(assn0
 
 ADD_EXECUTABLE(test_abstract_store
 	test_abstract_store.cpp
-	abstract_store.hpp
+	headers/abstract_store.hpp
 )
 
-ADD_EXECUTABLE(mfp_worklist
-    mfp_worklist.cpp
+ADD_EXECUTABLE(signanalysis
+    signanalysis/signanalysis.cpp
     abstract_store.hpp
     datatypes.h
 )

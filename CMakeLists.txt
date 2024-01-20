@@ -6,7 +6,7 @@ SET(CMAKE_CXX_STANDARD 17)
 
 ADD_EXECUTABLE(assn0
 	assn0.cpp
-	json.hpp
+	headers/json.hpp
 )
 
 ADD_EXECUTABLE(test_abstract_store
@@ -16,6 +16,6 @@ ADD_EXECUTABLE(test_abstract_store
 
 ADD_EXECUTABLE(signanalysis
     signanalysis/signanalysis.cpp
-    abstract_store.hpp
-    datatypes.h
+    headers/abstract_store.hpp
+    headers/datatypes.h
 )

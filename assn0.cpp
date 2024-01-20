@@ -4,12 +4,12 @@
 
 #include <fstream>
 #include <iostream>
-#include "./datatypes.h"
+#include "headers/datatypes.h"
 
 /*
  * https://github.com/nlohmann/json
  */
-#include "json.hpp"
+#include "headers/json.hpp"
 
 using json = nlohmann::json;
 

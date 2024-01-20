@@ -33,17 +33,6 @@ enum TerminalType {
 class Type;
 
 /*
- * A variable is a name and a type.
-*/
-class Variable {
-    public:
-        Variable() {};
-        Variable(std::string name, Type *type) : name(name), type(type) {};
-        std::string name;
-        Type *type;
-};
-
-/*
  * A type is either an integer, struct, function , or pointer.
  */
 class Type {
@@ -129,11 +118,26 @@ class Type {
                 }
                 else
                     std::cout << "Error: Pointer type not found" << std::endl;
-                std::cout << "Indirection: " << indirection << std::endl;
-                std::cout << "Type: " << type << std::endl;
+                // std::cout << "Indirection: " << indirection << std::endl;
+                // std::cout << "Type: " << type << std::endl;
             }
             else std::cout << "Error: Type not found" << std::endl;
         };
+};
+
+/*
+ * A variable is a name and a type.
+*/
+class Variable {
+    public:
+        Variable() {};
+        Variable(std::string name, Type *type) : name(name), type(type) {};
+        std::string name;
+        Type *type;
+
+        bool isIntType() {
+            return (type->indirection == 0 && type->type == DataType::IntType);
+        }
 };
 
 /*
@@ -688,10 +692,9 @@ class BasicBlock {
  * - A set of local variables (with names and types)
  * - A set of basic blocks
  */
-// TODO: It is better to store the basic blocks in a map with key as label of basic block and value as basic block contents
 class Function {
     public:
-    Function(json func_json) {
+    Function(json func_json): params(std::vector<Variable*>()), locals(std::vector<Variable*>()), bbs(std::unordered_map<std::string, BasicBlock*>()) {
 
         std::cout << "Function" << std::endl;
         std::cout << func_json << std::endl;
@@ -719,14 +722,15 @@ class Function {
         }
         if (func_json["body"] != nullptr) {
             for (auto &[bb_key, bb_val] : func_json["body"].items()) {
-                bbs.push_back(new BasicBlock(bb_val));
+                auto bb = new BasicBlock(bb_val);
+                bbs[bb->label] = bb;
             }
         }
     }
     std::string name;
     std::vector<Variable*> params;
     std::vector<Variable*> locals;
-    std::vector<BasicBlock*> bbs;
+    std::unordered_map<std::string, BasicBlock*> bbs;
     Type *ret;
 };
 
@@ -736,7 +740,7 @@ class Function {
  */
 class Program {
     public:
-        Program(json program_json) {
+        Program(json program_json): structs(std::vector<Struct*>()), globals(std::vector<Global*>()), funcs(std::unordered_map<std::string, Function*>()), ext_funcs(std::vector<ExternalFunction*>()) {
             std::cout << "Program" << std::endl;
             
             if (program_json["structs"] != nullptr) {
@@ -751,7 +755,8 @@ class Program {
             }
             if (program_json["functions"] != nullptr) {
                 for (auto &[func_key, func_val] : program_json["functions"].items()) {
-                    funcs.push_back(new Function(func_val));
+                    Function *func = new Function(func_val);
+                    funcs[func_key] = func;
                 }
             }
             if (program_json["externs"] != nullptr) {
@@ -762,6 +767,6 @@ class Program {
         };
         std::vector<Struct*> structs;
         std::vector<Global*> globals;
-        std::vector<Function*> funcs;
+        std::unordered_map<std::string, Function*> funcs;
         std::vector<ExternalFunction*> ext_funcs;
 };

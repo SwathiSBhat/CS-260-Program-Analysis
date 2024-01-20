@@ -1,14 +1,9 @@
+#include <fstream>
+#include <queue>
+#include <unordered_set>
+
 #include "../headers/datatypes.h"
-#include "../headers/json.hpp"
-#include<iostream>
-#include<vector>
-#include<map>
-#include<string>
-#include<fstream>
-#include<queue>
-#include<unordered_set>
 #include "../headers/abstract_store.hpp"
-#include<variant>
 
 using json = nlohmann::json;
 
@@ -143,9 +138,16 @@ class SignAnalysis {
 
             // For each successor, join the abstract store and check if it has changed
             for (const auto& successor : successors) {
-                bool store_changed = true;//JoinAbstractStores(current_bb, successor);
 
-                // If the abstract store of the successor has changed, add it to the worklist
+                /*
+                 * Join abstract stores and check for changes.
+                 */
+                bool store_changed = bb2store[successor].join(bb2store[current_bb]);
+
+                /*
+                 * If the abstract store of the successor has changed, add it to
+                 * the worklist.
+                 */
                 if (store_changed) {
                     worklist.push(successor);
                 }

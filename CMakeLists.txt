@@ -10,7 +10,7 @@ ADD_EXECUTABLE(assn0
 )
 
 ADD_EXECUTABLE(test_abstract_store
-	test_abstract_store.cpp
+	tests/test_abstract_store.cpp
 	headers/abstract_store.hpp
 )
 

@@ -33,25 +33,25 @@ private:
      */
     void init_entry_stores() {
 
-        for (const auto &func : p.funcs) {
+        //for (const auto &func : p.funcs) {
 
             /*
              * For each basic block in the program, add it to bb2store.
              */
-            for (const auto &basic_block : func.second.bbs) {
+            //for (const auto &basic_block : func.second.bbs) {
 
                 /*
                  * Give each basic block an empty abstract store for now.
                  */
-                bb2store[basic_block.second.label] = AbstractStore({});
-            }
+            //    bb2store[basic_block.second.label] = AbstractStore({});
+            //}
 
             /*
              * Set each function parameter to TOP.
              *
              * TODO Is this only for "entry" or for all basic blocks?
              */
-        }
+        //}
     }
 
     /*
@@ -98,8 +98,8 @@ public:
      *
      * TODO Add more constructors for ease of use.
      */
-    MFPWorklistAlgorithm(json j) : p(Program(j)),  {
-    }
+    //MFPWorklistAlgorithm(json j) : p(Program(j)),  {
+    //}
 
     /*
      * Implement the maximal fixpoint worklist algorithm.
@@ -119,13 +119,13 @@ public:
         /*
          * The worklist starts off with only one basic block: "entry".
          */
-        worklist.push_back("entry");
+        //worklist.push_back("entry");
 
         /*
          * The core of the MFP worklist algorithm.
          */
-        while (!worklist.empty()) {
-            std::string sigma = worklist.pop_back();
-        }
+        //while (!worklist.empty()) {
+        //    std::string sigma = worklist.pop_back();
+        //}
     }
 };

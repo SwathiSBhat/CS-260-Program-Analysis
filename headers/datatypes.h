@@ -740,6 +740,9 @@ class JumpInstruction : public Instruction{
         std::cout << "******************* End of Jump Instruction *******************" << std::endl;
     }
 
+    /*
+     * The label of the BasicBlock we're jumping to.
+     */
     std::string label;
 };
 

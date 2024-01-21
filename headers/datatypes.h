@@ -4,6 +4,7 @@
 #include<iostream>
 #include "json.hpp"
 #include<typeinfo>
+#include <unordered_set>
 
 using json = nlohmann::json;
 
@@ -980,7 +981,7 @@ class BasicBlock {
  */
 class Function {
     public:
-    Function(json func_json): params(std::vector<Variable*>()), locals(std::vector<Variable*>()), bbs(std::unordered_map<std::string, BasicBlock*>()) {
+    Function(json func_json): params(std::vector<Variable*>()), locals(std::unordered_map<std::string,Variable*>()), bbs(std::unordered_map<std::string, BasicBlock*>()) {
 
         // std::cout << "Function" << std::endl;
         // std::cout << func_json << std::endl;
@@ -1003,7 +1004,7 @@ class Function {
 
         if (func_json["locals"] != nullptr) {
             for (auto &[local_key, local_val] : func_json["locals"].items()) {
-                locals.push_back(new Variable(local_val["name"], new Type(local_val["typ"])));
+                locals.insert({local_val["name"], new Variable(local_val["name"], new Type(local_val["typ"]))});
             }
         }
         if (func_json["body"] != nullptr) {
@@ -1028,7 +1029,7 @@ class Function {
             std::cout << "void" << std::endl;
         std::cout << "Locals: " << std::endl;
         for (auto local : locals) {
-            local->pretty_print();
+            local.second->pretty_print();
         }
         if (what_to_print["functions"]["bbs"] != nullptr)
         std::cout << "Basic Blocks: " << std::endl;
@@ -1040,7 +1041,7 @@ class Function {
 
     std::string name;
     std::vector<Variable*> params;
-    std::vector<Variable*> locals;
+    std::unordered_map<std::string, Variable*> locals;
     std::unordered_map<std::string, BasicBlock*> bbs;
     Type *ret;
 };

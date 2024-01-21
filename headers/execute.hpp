@@ -43,7 +43,6 @@ AbstractStore execute(
              * Cast it.
              */
             ArithInstruction *arith_inst = dynamic_cast<ArithInstruction*>(*inst);
-            std::cout << "Executing ArithInstruction: " << std::endl;
             /*
              * Since $arith is only done on ints, we know that op1 and op2 are ints
              * the operands can be int typed variables or direct int constants
@@ -68,12 +67,9 @@ AbstractStore execute(
             {
                 int op1_val = std::get<int>(op1);
                 int op2_val = std::get<int>(op2);
-                std::cout << "op1_val: " << op1_val << " op2_val: " << op2_val << " aop : " << arith_inst->arith_op << std::endl;
                 if (arith_inst->arith_op == "Add")
                 {
                     sigma_prime.abstract_store[arith_inst->lhs->name] = op1_val + op2_val;
-                    std::cout << "Setting " << arith_inst->lhs->name << " to " << op1_val + op2_val << std::endl;
-                    std:: cout << "sigma_prime.abstract_store[arith_inst->lhs->name]: " << std::get<int>(sigma_prime.abstract_store[arith_inst->lhs->name]) << std::endl;
                 }
                 else if (arith_inst->arith_op == "Subtract")
                 {
@@ -131,27 +127,27 @@ AbstractStore execute(
             {
                 int op1_val = std::get<int>(op1);
                 int op2_val = std::get<int>(op2);
-                if (cmp_inst->cmp_op == "eq")
+                if (cmp_inst->cmp_op == "Eq")
                 {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val == op2_val);
                 }
-                else if (cmp_inst->cmp_op == "neq")
+                else if (cmp_inst->cmp_op == "Neq")
                 {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val != op2_val);
                 }
-                else if (cmp_inst->cmp_op == "lt")
+                else if (cmp_inst->cmp_op == "Less")
                 {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val < op2_val);
                 }
-                else if (cmp_inst->cmp_op == "lte")
+                else if (cmp_inst->cmp_op == "LessEq")
                 {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val <= op2_val);
                 }
-                else if (cmp_inst->cmp_op == "gt")
+                else if (cmp_inst->cmp_op == "Greater")
                 {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val > op2_val);
                 }
-                else if (cmp_inst->cmp_op == "gte")
+                else if (cmp_inst->cmp_op == "GreaterEq")
                 {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val >= op2_val);
                 }

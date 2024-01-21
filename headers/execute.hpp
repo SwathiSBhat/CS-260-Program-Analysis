@@ -1,3 +1,5 @@
+#pragma once
+
 #include "abstract_store.hpp"
 #include "datatypes.h"
 

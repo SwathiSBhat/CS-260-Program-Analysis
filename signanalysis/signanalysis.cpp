@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "../headers/datatypes.h"
-#include "../headers/abstract_store.hpp"
+#include "../headers/execute.hpp"
 
 using json = nlohmann::json;
 
@@ -68,13 +68,16 @@ class SignAnalysis {
         AbstractStore store = AbstractStore();
 
         // Initialize all globals and parameters in function to TOP
-        for (auto global_var : program.globals) {
+
+        // TODO: Ignoring global variables for assignment 1
+        /*for (auto global_var : program.globals) {
             Variable *global_var_ptr = global_var->globalVar;
             if (global_var_ptr->isIntType()) {
                 // std::cout << "Setting global: " << global_var_ptr->name << " to TOP" << std::endl;
                 store.abstract_store[global_var_ptr->name] = AbstractVal::TOP;
             }  
-        }
+        }*/
+
         for (auto param : program.funcs[funcname]->params) {
             if (param->isIntType()) {
                 // std::cout << "Setting parameter: " << param->name << " to TOP" << std::endl;
@@ -133,7 +136,11 @@ class SignAnalysis {
             worklist.pop();
 
             // Perform the transfer function on the current basic block
-            //TransferFunction(current_bb);
+            std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
+            bb2store[current_bb].print();
+            bb2store[current_bb] = execute(func->bbs[current_bb], bb2store[current_bb]);
+            std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
+            bb2store[current_bb].print();
 
             // Get the successors of the current basic block
             std::vector<std::string> successors; //= GetSuccessors(current_bb);

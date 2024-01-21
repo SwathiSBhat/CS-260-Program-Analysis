@@ -38,21 +38,22 @@ class SignAnalysis {
     }
 
     /*
-    Method to get the set of variables that are addresses of int-typed variables
+     * Get the list of names of all the int-typed local variables whose addresses were
+     * taken using the $addrof command.
+     * TODO: This should also include addrof of global variables but we are not doing it for assignment 1
     */
-    void get_addr_of_int_types(std::unordered_set<std::string> &addr_of_int_types, const std::string &func_name) {
-        for (auto global_var : program.globals) {
-            Variable *global_var_ptr = global_var->globalVar;
-            if (global_var_ptr->type->indirection > 0 && global_var_ptr->type->type == DataType::IntType) {
-                addr_of_int_types.insert(global_var_ptr->name);
-            }  
-        }
-        
-        for (auto local_var : program.funcs[func_name]->locals) {
-            Variable *local_var_ptr = local_var;
-            if (local_var_ptr->type->indirection > 0 && local_var_ptr->type->type == DataType::IntType) {
-                addr_of_int_types.insert(local_var_ptr->name);
-            }  
+    void get_addr_of_int_types(std::unordered_set<std::string> &addr_of_int_types, const std::string &func_name) {  
+        for (auto basic_block : program.funcs[func_name]->bbs) {
+            for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
+                if (dynamic_cast<AddrofInstruction*>(*instruction) != nullptr && 
+                    typeid(dynamic_cast<AddrofInstruction*>(*instruction)).name() == typeid(AddrofInstruction*).name()) {
+                    if (dynamic_cast<AddrofInstruction*>(*instruction)->rhs->isIntType()) { 
+                        if (program.funcs[func_name]->locals.count(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != 0) {
+                            addr_of_int_types.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name);
+                    }
+                    }
+                }
+            }
         }
         return; 
     }
@@ -172,11 +173,20 @@ class SignAnalysis {
 
 int main(int argc, char* argv[]) 
 {
-    std::ifstream f(argv[1]);
+    if (argc != 4) {
+        std::cerr << "Usage: signanalysis <lir file path> <lir json filepath> <funcname>" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    std::ifstream f(argv[2]);
     json lir_json = json::parse(f);
+
+    std::string func_name = argv[3];
 
     Program program = Program(lir_json);
     std::cout << "********** Program created **********" << std::endl;
     SignAnalysis signAnalysis = SignAnalysis(program);
-    signAnalysis.AnalyzeFunc("func2");
+    signAnalysis.AnalyzeFunc(func_name);
+
+    return 0;
 }

@@ -25,8 +25,6 @@ enum TerminalType {
     CallDirect,
     CallIndirect
 };
-
-// TODO: Add a print method for all classes to be able to print the data easily
 // TODO: Replace all string based index access with constant names
 
 // Forward declaration of Type class to allow usage in Variable class
@@ -61,6 +59,27 @@ class Type {
                         }
                     }
                 }
+
+                void pretty_print() {
+                    std::cout << "******************* Function Type *******************" << std::endl;
+                    if (ret != nullptr) {
+                        std::cout << "Return type: " << std::endl;
+                        ret->pretty_print();
+                    }
+                    else {
+                        std::cout << "Return type: " << std::endl;
+                        std::cout << "Void" << std::endl;
+                    }
+                    std::cout << "Parameter types: " << std::endl;
+                    if (params.size() == 0)
+                        std::cout << "None" << std::endl;
+                    else 
+                        for (auto param : params) {
+                            param->pretty_print();
+                        }
+                    std::cout << "******************* End of Function Type *******************" << std::endl;
+                }
+
                 Type *ret;
                 std::vector<Type*> params;
         };
@@ -68,10 +87,6 @@ class Type {
         class StructType {
             public:
                 StructType(json struct_type_json) {
-
-                    std::cout << "Struct Type" << std::endl;
-                    std::cout << struct_type_json << std::endl;
-
                     name = struct_type_json.dump();
                 }
                 std::string name;
@@ -118,11 +133,35 @@ class Type {
                 }
                 else
                     std::cout << "Error: Pointer type not found" << std::endl;
-                // std::cout << "Indirection: " << indirection << std::endl;
-                // std::cout << "Type: " << type << std::endl;
             }
             else std::cout << "Error: Type not found" << std::endl;
         };
+
+        void pretty_print()
+        {
+            std::cout << "******************* Type *******************" << std::endl;
+            std::cout << "Indirection level:          " << indirection << std::endl;
+            switch (type){
+                case DataType::IntType:
+                    std::cout << "Type:         Int" << std::endl;
+                    break;
+                case DataType::StructType:
+                    std::cout << "Type:         Struct" << std::endl;
+                    std::cout << "Struct name:  " << ((StructType*)ptr_type)->name << std::endl;
+                    break;
+                case DataType::FuncType: {
+                    std::cout << "Type:         Function" << std::endl;
+                    FunctionType *funcPtr = (FunctionType*)ptr_type;
+                    funcPtr->pretty_print();
+                    break;
+                }
+                default:
+                    std::cout << "Type:         Unknown" << std::endl;
+                    break;
+            }
+            std::cout << "******************* End of Type *******************" << std::endl;
+        
+        }
 };
 
 /*
@@ -137,6 +176,15 @@ class Variable {
 
         bool isIntType() {
             return (type->indirection == 0 && type->type == DataType::IntType);
+        }
+
+        void pretty_print() {
+            std::cout << "******************* Variable *******************" << std::endl;
+            std::cout << "Name: " << name << std::endl;
+            std::cout << "Type: " << std::endl;
+            type->pretty_print();
+            std::cout << "******************* End of Variable *******************" << std::endl;
+        
         }
 };
 
@@ -157,6 +205,17 @@ class Struct{
         }
         }
     };
+
+    void pretty_print() {
+        std::cout << "******************* Struct *******************" << std::endl;
+        std::cout << "Name: " << name << std::endl;
+        std::cout << "Fields: " << std::endl;
+        for (auto field : fields) {
+            field->pretty_print();
+        }
+        std::cout << "******************* End of Struct *******************" << std::endl;
+    }
+
     std::string name;
     std::vector<Variable*> fields;
 };
@@ -167,12 +226,17 @@ class Struct{
 class Global{
     public:
     Global(json global_json) {
-
-        std::cout << "Global" << std::endl;
-        std::cout << global_json << std::endl;
-
         globalVar = new Variable(global_json["name"], new Type(global_json["typ"]));
     };
+
+    void pretty_print() {
+        std::cout << "******************* Global *******************" << std::endl;
+        std::cout << "Name: " << globalVar->name << std::endl;
+        std::cout << "Type: " << std::endl;
+        globalVar->type->pretty_print();
+        std::cout << "******************* End of Global *******************" << std::endl;
+    }
+
     Variable *globalVar;
 };
 
@@ -184,13 +248,18 @@ class Global{
 class ExternalFunction {
     public:
     ExternalFunction(json ext_func_json) {
-
-        std::cout << "External Function" << std::endl;
-        std::cout << ext_func_json << std::endl;
-
         name = ext_func_json.begin().key();
         funcType = new Type::FunctionType(ext_func_json.begin().value());
     };
+
+    void pretty_print() {
+        std::cout << "******************* External Function *******************" << std::endl;
+        std::cout << "Name: " << name << std::endl;
+        std::cout << "Type: " << std::endl;
+        funcType->pretty_print();
+        std::cout << "******************* End of External Function *******************" << std::endl;
+    }
+
     std::string name;
     Type::FunctionType *funcType;
 };
@@ -198,13 +267,29 @@ class ExternalFunction {
 /*
  * Instruction base class
 */
-class Instruction{};
+class Instruction{
+    public:
+        virtual void pretty_print() {};
+};
 
 class Operand {
     public:
         Operand() {};
         Operand(Variable *var) : var(var), val(0) {};
-        Operand(int val) : var(nullptr), val(val) {};
+        Operand(int val) : var(nullptr), val(val) {std::cout<<"Inside CInt const"<<std::endl;};
+
+        void pretty_print() {
+            std::cout << "******************* Operand *******************" << std::endl;
+            if (var != nullptr) {
+                std::cout << "Variable: " << std::endl;
+                var->pretty_print();
+            }
+            else {
+                std::cout << "Value: " << val << std::endl;
+            }
+            std::cout << "******************* End of Operand *******************" << std::endl;
+        }
+
         Variable *var;
         int val;
 };
@@ -218,8 +303,9 @@ class Operand {
 class AddrofInstruction : public Instruction{
     public:
         AddrofInstruction(json inst_val) {
-            std::cout << "Addrof Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            //std::cout << "Addrof Instruction" << std::endl;
+            //std::cout << inst_val << std::endl;
+            
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
@@ -227,6 +313,16 @@ class AddrofInstruction : public Instruction{
                 rhs = new Variable(inst_val["rhs"]["name"], new Type(inst_val["rhs"]["typ"]));
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Addrof Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "RHS: " << std::endl;
+            rhs->pretty_print();
+            std::cout << "******************* End of Addrof Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         Variable *rhs;
 };
@@ -237,21 +333,34 @@ class AddrofInstruction : public Instruction{
 class AllocInstruction : public Instruction{
     public:
         AllocInstruction(json inst_val) {
-            std::cout << "Alloc Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Alloc Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
             if (inst_val["num"] != nullptr) {
                 if (inst_val["num"]["Var"] != nullptr)
                     num = new Operand(new Variable(inst_val["num"]["Var"]["name"], new Type(inst_val["num"]["Var"]["typ"])));
-                else if (inst_val["op"]["CInt"] != nullptr)
+                else if (inst_val["num"]["CInt"] != nullptr)
                     num = new Operand(inst_val["num"]["CInt"]);
             }
             if (inst_val["id"] != nullptr) {
                 id = new Variable(inst_val["id"]["name"], new Type(inst_val["id"]["typ"]));
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Alloc Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "Num: " << std::endl;
+            num->pretty_print();
+            std::cout << "ID: " << std::endl;
+            id->pretty_print();
+            std::cout << "******************* End of Alloc Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         Operand *num;
         Variable *id;
@@ -263,8 +372,8 @@ class AllocInstruction : public Instruction{
 class ArithInstruction : public Instruction{
     public:
         ArithInstruction(json inst_val) {
-            std::cout << "Arith Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Arith Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
 
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
@@ -285,6 +394,19 @@ class ArithInstruction : public Instruction{
                 arith_op = inst_val["aop"].dump();
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Arith Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "Operand 1: " << std::endl;
+            op1->pretty_print();
+            std::cout << "Operand 2: " << std::endl;
+            op2->pretty_print();
+            std::cout << "Arithmetic Operation: " << arith_op << std::endl;
+            std::cout << "******************* End of Arith Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         std::string arith_op;
         Operand *op1;
@@ -297,8 +419,8 @@ class ArithInstruction : public Instruction{
 class CmpInstruction : public Instruction{
     public:
         CmpInstruction(json inst_val) {
-            std::cout << "Cmp Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Cmp Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
@@ -318,6 +440,19 @@ class CmpInstruction : public Instruction{
                 cmp_op = inst_val["rop"].dump();
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Cmp Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "Operand 1: " << std::endl;
+            op1->pretty_print();
+            std::cout << "Operand 2: " << std::endl;
+            op2->pretty_print();
+            std::cout << "Comparison Operation: " << cmp_op << std::endl;
+            std::cout << "******************* End of Cmp Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         std::string cmp_op;
         Operand *op1;
@@ -330,8 +465,9 @@ class CmpInstruction : public Instruction{
 class CopyInstruction : public Instruction{
     public:
         CopyInstruction(json inst_val) {
-            std::cout << "Copy Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Copy Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
@@ -342,6 +478,16 @@ class CopyInstruction : public Instruction{
                     op = new Operand(inst_val["op"]["CInt"]);
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Copy Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "Operand: " << std::endl;
+            op->pretty_print();
+            std::cout << "******************* End of Copy Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         Operand *op;
 };
@@ -352,8 +498,9 @@ class CopyInstruction : public Instruction{
 class GepInstruction : public Instruction{
     public:
         GepInstruction(json inst_val) {
-            std::cout << "Gep Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            //std::cout << "Gep Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
@@ -367,6 +514,18 @@ class GepInstruction : public Instruction{
                     idx = new Operand(inst_val["idx"]["CInt"]);
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Gep Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "Source: " << std::endl;
+            src->pretty_print();
+            std::cout << "Index: " << std::endl;
+            idx->pretty_print();
+            std::cout << "******************* End of Gep Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         Variable *src;
         Operand *idx;
@@ -378,8 +537,8 @@ class GepInstruction : public Instruction{
 class GfpInstruction : public Instruction{
     public:
         GfpInstruction(json inst_val) {
-            std::cout << "Gfp Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Gfp Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
@@ -390,6 +549,18 @@ class GfpInstruction : public Instruction{
                 field = new Variable(inst_val["field"]["name"], new Type(inst_val["field"]["typ"]));
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Gfp Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "Source: " << std::endl;
+            src->pretty_print();
+            std::cout << "Field: " << std::endl;
+            field->pretty_print();
+            std::cout << "******************* End of Gfp Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         Variable *src;
         Variable *field;
@@ -401,8 +572,8 @@ class GfpInstruction : public Instruction{
 class LoadInstruction : public Instruction{
     public:
         LoadInstruction(json inst_val) {
-            std::cout << "Load Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Load Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
@@ -410,6 +581,16 @@ class LoadInstruction : public Instruction{
                 src = new Variable(inst_val["src"]["name"], new Type(inst_val["src"]["typ"]));
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Load Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            lhs->pretty_print();
+            std::cout << "Source: " << std::endl;
+            src->pretty_print();
+            std::cout << "******************* End of Load Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         Variable *src;
 };
@@ -420,8 +601,8 @@ class LoadInstruction : public Instruction{
 class StoreInstruction : public Instruction {
     public:
         StoreInstruction(json inst_val) {
-            std::cout << "Store Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Store Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
             if (inst_val["dst"] != nullptr) {
                 dst = new Variable(inst_val["dst"]["name"], new Type(inst_val["dst"]["typ"]));
             }
@@ -432,6 +613,16 @@ class StoreInstruction : public Instruction {
                         op = new Operand(inst_val["op"]["CInt"]);
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* Store Instruction *******************" << std::endl;
+            std::cout << "Destination: " << std::endl;
+            dst->pretty_print();
+            std::cout << "Operand: " << std::endl;
+            op->pretty_print();
+            std::cout << "******************* End of Store Instruction *******************" << std::endl;
+        }
+
         Variable *dst;
         Operand *op;
 };
@@ -442,8 +633,9 @@ class StoreInstruction : public Instruction {
 class CallExtInstruction : public Instruction{
     public:
         CallExtInstruction(json inst_val) {
-            std::cout << "CallExt Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "CallExt Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             // lhs can be optional
             if (inst_val["lhs"].dump() == "null" || inst_val["lhs"] == nullptr)
                 lhs = nullptr;
@@ -462,6 +654,22 @@ class CallExtInstruction : public Instruction{
                 }
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* CallExt Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            if (lhs != nullptr)
+                lhs->pretty_print();
+            else
+                std::cout << "None" << std::endl;
+            std::cout << "External Function Name: " << extFuncName << std::endl;
+            std::cout << "Arguments: " << std::endl;
+            for (auto arg : args) {
+                arg->pretty_print();
+            }
+            std::cout << "******************* End of CallExt Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         std::string extFuncName;
         std::vector<Operand*> args;
@@ -477,8 +685,9 @@ class CallExtInstruction : public Instruction{
 class BranchInstruction : public Instruction{
     public:
         BranchInstruction(json inst_val) {
-            std::cout << "Branch Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Branch Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             if (inst_val["cond"] != nullptr) {
                 if (inst_val["cond"]["Var"] != nullptr)
                     condition = new Operand(new Variable(inst_val["cond"]["Var"]["name"], new Type(inst_val["cond"]["Var"]["typ"])));
@@ -493,6 +702,15 @@ class BranchInstruction : public Instruction{
             }
         };
 
+        void pretty_print() {
+            std::cout << "******************* Branch Instruction *******************" << std::endl;
+            std::cout << "Condition: " << std::endl;
+            condition->pretty_print();
+            std::cout << "True branch: " << tt << std::endl;
+            std::cout << "False branch: " << ff << std::endl;
+            std::cout << "******************* End of Branch Instruction *******************" << std::endl;
+        }
+
         Operand *condition;
         std::string tt;
         std::string ff;
@@ -504,9 +722,16 @@ class BranchInstruction : public Instruction{
 class JumpInstruction : public Instruction{
     public:
     JumpInstruction(json inst_val) : label(inst_val.dump()) {
-        std::cout << "Jump Instruction" << std::endl;
-        std::cout << inst_val << std::endl;
+        // std::cout << "Jump Instruction" << std::endl;
+        // std::cout << inst_val << std::endl;
     };
+
+    void pretty_print() {
+        std::cout << "******************* Jump Instruction *******************" << std::endl;
+        std::cout << "Label: " << label << std::endl;
+        std::cout << "******************* End of Jump Instruction *******************" << std::endl;
+    }
+
     std::string label;
 };
 
@@ -516,8 +741,9 @@ class JumpInstruction : public Instruction{
 class RetInstruction : public Instruction{
     public:
         RetInstruction(json inst_val) {
-            std::cout << "Ret Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "Ret Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             // When return instruction is null, it means it is a void return
             if (inst_val.dump() == "null" || inst_val == nullptr)
                 op = nullptr;
@@ -527,6 +753,16 @@ class RetInstruction : public Instruction{
             else if (inst_val["CInt"] != nullptr)
                 op = new Operand(inst_val["CInt"]);
         }
+
+        void pretty_print() {
+            std::cout << "******************* Ret Instruction *******************" << std::endl;
+            if (op == nullptr)
+                std::cout << "Operand: " << std::endl;
+            else
+                op->pretty_print();
+            std::cout << "******************* End of Ret Instruction *******************" << std::endl;
+        }
+
         Operand *op;
 };
 
@@ -536,8 +772,9 @@ class RetInstruction : public Instruction{
 class CallDirInstruction : public Instruction{
     public:
         CallDirInstruction(json inst_val) {
-            std::cout << "CallDir Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "CallDir Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             // lhs can be optional
             if (inst_val["lhs"].dump() == "null" || inst_val["lhs"] == nullptr)
                 lhs = nullptr;
@@ -559,6 +796,23 @@ class CallDirInstruction : public Instruction{
                 next_bb = inst_val["next_bb"].dump();
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* CallDir Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            if (lhs != nullptr)
+                lhs->pretty_print();
+            else
+                std::cout << "None" << std::endl;
+            std::cout << "Callee: " << callee << std::endl;
+            std::cout << "Arguments: " << std::endl;
+            for (auto arg : args) {
+                arg->pretty_print();
+            }
+            std::cout << "Next Basic Block: " << next_bb << std::endl;
+            std::cout << "******************* End of CallDir Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         std::string callee;
         std::vector<Operand*> args;
@@ -571,16 +825,17 @@ class CallDirInstruction : public Instruction{
 class CallIdrInstruction : public Instruction{
     public:
         CallIdrInstruction(json inst_val) {
-            std::cout << "CallIdr Instruction" << std::endl;
-            std::cout << inst_val << std::endl;
+            // std::cout << "CallIdr Instruction" << std::endl;
+            // std::cout << inst_val << std::endl;
+            
             // lhs can be optional
             if (inst_val["lhs"].dump() == "null" || inst_val["lhs"] == nullptr)
                 lhs = nullptr;
             else if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
-            if (inst_val["fp"] != nullptr) {
-                fp = new Variable(inst_val["fp"]["name"], new Type(inst_val["fp"]["typ"]));
+            if (inst_val["callee"] != nullptr) {
+                fp = new Variable(inst_val["callee"]["name"], new Type(inst_val["callee"]["typ"]));
             }
             if (inst_val["args"] != nullptr) {
                 for (auto &[arg_key, arg_val] : inst_val["args"].items()) {
@@ -594,6 +849,24 @@ class CallIdrInstruction : public Instruction{
                 next_bb = inst_val["next_bb"].dump();
             }
         }
+
+        void pretty_print() {
+            std::cout << "******************* CallIdr Instruction *******************" << std::endl;
+            std::cout << "LHS: " << std::endl;
+            if (lhs != nullptr)
+                lhs->pretty_print();
+            else
+                std::cout << "None" << std::endl;
+            std::cout << "Function Pointer: " << std::endl;
+            fp->pretty_print();
+            std::cout << "Arguments: " << std::endl;
+            for (auto arg : args) {
+                arg->pretty_print();
+            }
+            std::cout << "Next Basic Block: " << next_bb << std::endl;
+            std::cout << "******************* End of CallIdr Instruction *******************" << std::endl;
+        }
+
         Variable *lhs;
         Variable *fp;
         std::vector<Operand*> args;
@@ -682,6 +955,19 @@ class BasicBlock {
             }
         }
     }
+
+    void pretty_print(json what_to_print) {
+        std::cout << "******************* Basic Block *******************" << std::endl;
+        std::cout << "Label:        " << label << std::endl;
+        if (what_to_print["functions"]["bbs"]["instructions"] != nullptr && what_to_print["functions"]["bbs"]["instructions"] == "true")
+        std::cout << "Instructions: " << std::endl;
+        for (auto inst : instructions) {
+            inst->pretty_print();
+        }
+        std::cout << "Terminal: " << std::endl;
+        terminal->pretty_print();
+        std::cout << "******************* End of Basic Block *******************" << std::endl;
+    }
 };
 
 /*
@@ -696,8 +982,8 @@ class Function {
     public:
     Function(json func_json): params(std::vector<Variable*>()), locals(std::vector<Variable*>()), bbs(std::unordered_map<std::string, BasicBlock*>()) {
 
-        std::cout << "Function" << std::endl;
-        std::cout << func_json << std::endl;
+        // std::cout << "Function" << std::endl;
+        // std::cout << func_json << std::endl;
 
         if (func_json["id"] != nullptr) {
             name = func_json["id"].dump();
@@ -727,6 +1013,31 @@ class Function {
             }
         }
     }
+
+    void print_pretty(json what_to_print) {
+        std::cout << "******************* Function *******************" << std::endl;
+        std::cout << "Name: " << name << std::endl;
+        std::cout << "Parameters: " << std::endl;
+        for (auto param : params) {
+            param->pretty_print();
+        }
+        std::cout << "Return Type: " << std::endl;
+        if (ret != nullptr)
+            ret->pretty_print();
+        else
+            std::cout << "void" << std::endl;
+        std::cout << "Locals: " << std::endl;
+        for (auto local : locals) {
+            local->pretty_print();
+        }
+        if (what_to_print["functions"]["bbs"] != nullptr)
+        std::cout << "Basic Blocks: " << std::endl;
+        for (auto &[bb_key, bb_val] : bbs) {
+            bb_val->pretty_print(what_to_print);
+        }
+        std::cout << "******************* End of Function *******************" << std::endl;
+    }
+
     std::string name;
     std::vector<Variable*> params;
     std::vector<Variable*> locals;
@@ -741,7 +1052,7 @@ class Function {
 class Program {
     public:
         Program(json program_json): structs(std::vector<Struct*>()), globals(std::vector<Global*>()), funcs(std::unordered_map<std::string, Function*>()), ext_funcs(std::vector<ExternalFunction*>()) {
-            std::cout << "Program" << std::endl;
+            // std::cout << "Program" << std::endl;
             
             if (program_json["structs"] != nullptr) {
                 for (auto st : program_json["structs"].items()) {
@@ -765,6 +1076,36 @@ class Program {
                 }
             }
         };
+
+        void print_pretty(json what_to_print) {
+            std::cout << "******************* Program *******************" << std::endl;
+            if (what_to_print["structs"] != nullptr && what_to_print["structs"] == "true") {
+                std::cout << "Structs: " << std::endl;
+                for (auto st : structs) {
+                    st->pretty_print();
+                }
+            }
+            if (what_to_print["globals"] != nullptr && what_to_print["globals"] == "true") {
+                std::cout << "Globals: " << std::endl;
+                for (auto global : globals) {
+                    global->pretty_print();
+                }
+            }
+            if (what_to_print["functions"] != nullptr) {
+                std::cout << "Functions: " << std::endl;
+                for (auto it = funcs.begin(); it != funcs.end(); ++it) {
+                    it->second->print_pretty(what_to_print);
+                }
+            }
+            if (what_to_print["externs"] != nullptr && what_to_print["externs"] == "true") {
+                std::cout << "External Functions: " << std::endl;
+                for (auto ext_func : ext_funcs) {
+                    ext_func->pretty_print();
+                }
+            }
+            std::cout << "******************* End of Program *******************" << std::endl;
+        }
+
         std::vector<Struct*> structs;
         std::vector<Global*> globals;
         std::unordered_map<std::string, Function*> funcs;

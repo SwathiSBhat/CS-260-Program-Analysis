@@ -46,6 +46,13 @@ public:
     }
 
     /*
+     * Empty constructor.
+     */
+    AbstractStore() {
+        abstract_store = std::map<std::string, std::variant<int, AbstractVal>>();
+    }
+
+    /*
      * Join this abstract store with another and store the result into this
      * abstract store.
      */

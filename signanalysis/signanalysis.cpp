@@ -60,6 +60,7 @@ class SignAnalysis {
     /*
         Initialize the abstract store for 'entry' basic block
     */
+    // TODO - Make this generic to work for all basic blocks
     void InitEntryStore() {
         
         std::string bb_name = "entry";

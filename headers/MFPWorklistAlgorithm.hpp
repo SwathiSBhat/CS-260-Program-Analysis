@@ -41,15 +41,13 @@ private:
                 /*
                  * Loop through each instruction in that basic block.
                  */
-                for (const auto &instruction : basic_block.second) {
+                for (const auto &instruction : basic_block.second->instructions) {
 
                     /*
                      * If it's a $addrof instruction, add it to our list.
-                     *
-                     * TODO This is kind of janky.
                      */
-                    if (dynamic_cast<AddrofInstruction>(instruction) != nullptr) {
-                        addrof_ints.push_back(instruction.rhs.name);
+                    if (dynamic_cast<AddrofInstruction*>(instruction) != nullptr) {
+                        addrof_ints.push_back(dynamic_cast<AddrofInstruction*>(instruction)->rhs->name);
                     }
                 }
             }

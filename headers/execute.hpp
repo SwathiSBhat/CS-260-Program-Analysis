@@ -57,19 +57,22 @@ AbstractStore execute(BasicBlock *bb, AbstractStore sigma) {
             {
                 int op1_val = std::get<int>(op1);
                 int op2_val = std::get<int>(op2);
-                if (arith_inst->arith_op == "add")
+                std::cout << "op1_val: " << op1_val << " op2_val: " << op2_val << " aop : " << arith_inst->arith_op << std::endl;
+                if (arith_inst->arith_op == "Add")
                 {
                     sigma_prime.abstract_store[arith_inst->lhs->name] = op1_val + op2_val;
+                    std::cout << "Setting " << arith_inst->lhs->name << " to " << op1_val + op2_val << std::endl;
+                    std:: cout << "sigma_prime.abstract_store[arith_inst->lhs->name]: " << std::get<int>(sigma_prime.abstract_store[arith_inst->lhs->name]) << std::endl;
                 }
-                else if (arith_inst->arith_op == "sub")
+                else if (arith_inst->arith_op == "Subtract")
                 {
                     sigma_prime.abstract_store[arith_inst->lhs->name] = op1_val - op2_val;
                 }
-                else if (arith_inst->arith_op == "mul")
+                else if (arith_inst->arith_op == "Multiply")
                 {
                     sigma_prime.abstract_store[arith_inst->lhs->name] = op1_val * op2_val;
                 }
-                else if (arith_inst->arith_op == "div")
+                else if (arith_inst->arith_op == "Divide")
                 {
                     sigma_prime.abstract_store[arith_inst->lhs->name] = op1_val / op2_val;
                 }

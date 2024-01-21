@@ -285,11 +285,7 @@ class Operand {
         bool IsConstInt() {
             return (var == nullptr);
         }
-
-        int GetInt() {
-            
-        }
-
+        
         void pretty_print() {
             std::cout << "******************* Operand *******************" << std::endl;
             if (var != nullptr) {

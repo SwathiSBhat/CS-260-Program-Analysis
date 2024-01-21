@@ -16,5 +16,5 @@ int main(int argc, char *argv[]) {
      */
     std::ifstream f(argv[1]);
     json lir_json = json::parse(f);
-    MFPWorklistAlgorithm a = MFPWorklistAlgorithm(lir_json);
+    //MFPWorklistAlgorithm a = MFPWorklistAlgorithm(lir_json);
 }

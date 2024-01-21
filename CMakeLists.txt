@@ -18,6 +18,7 @@ ADD_EXECUTABLE(assn1_signanalysis
     signanalysis/signanalysis.cpp
     headers/abstract_store.hpp
     headers/datatypes.h
+	headers/execute.hpp
 )
 
 ADD_EXECUTABLE(test_mfp_worklist

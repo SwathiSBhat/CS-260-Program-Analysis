@@ -23,4 +23,5 @@ ADD_EXECUTABLE(assn1_signanalysis
 ADD_EXECUTABLE(test_mfp_worklist
 	headers/MFPWorklistAlgorithm.hpp
 	tests/test_worklist.cpp
+	headers/json.hpp
 )

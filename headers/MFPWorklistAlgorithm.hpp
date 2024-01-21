@@ -19,7 +19,7 @@ private:
      * using the $addrof command.
      */
     std::vector<std::string> addrof_ints;
-    std::vector<str::string> global_ints;
+    std::vector<std::string> global_ints;
 
     /*
      * Get the list of names of all the int-typed variables whose addresses were
@@ -36,7 +36,7 @@ private:
             /*
              * Loop through each basic block in that function.
              */
-            for (const auto &basic_block : func.second.bbs) {
+            for (const auto &basic_block : func.second->bbs) {
 
                 /*
                  * Loop through each instruction in that basic block.
@@ -48,7 +48,7 @@ private:
                      *
                      * TODO This is kind of janky.
                      */
-                    if (dynamic_cast<AddrOfInstruction>(instruction) != nullptr) {
+                    if (dynamic_cast<AddrofInstruction>(instruction) != nullptr) {
                         addrof_ints.push_back(instruction.rhs.name);
                     }
                 }
@@ -67,8 +67,7 @@ public:
      *
      * TODO Add more constructors for ease of use.
      */
-    MFPWorklistAlgorithm(json j) {
-        p = Program(j);
+    MFPWorklistAlgorithm(json j) : p(Program(j)) {
     }
 
     /*
@@ -79,6 +78,6 @@ public:
         /*
          * First, let's compute our list of addrof_ints.
          */
-        addrof_ints = get_addrof_ints();
+        get_addrof_ints();
     }
 };

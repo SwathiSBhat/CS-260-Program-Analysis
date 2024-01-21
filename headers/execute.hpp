@@ -6,8 +6,17 @@
  * function to be used in the MFP worklist algorithm. I figure this is important
  * and complicated enough to be given its own file, but we can refactor later as
  * needed.
+ *
+ * Our bb2store is an argument because the $jmp and $branch instructions involve
+ * updating the bb2store. Same with the worklist.
  */
-AbstractStore execute(BasicBlock *bb, AbstractStore sigma) {
+AbstractStore execute(
+        BasicBlock *bb,
+        AbstractStore sigma,
+        std::map<std::string,
+        AbstractStore> &bb2store,
+        std::queue<std::string> &worklist
+        ) {
 
     /*
      * Make a copy of sigma that we'll return at the end of this function.
@@ -162,6 +171,20 @@ AbstractStore execute(BasicBlock *bb, AbstractStore sigma) {
              */
             CopyInstruction *copy_inst = dynamic_cast<CopyInstruction*>(*inst);
 
+            /*
+             * If the lhs isn't an int-typed variable, return immediately.
+             */
+            if (!copy_inst->lhs->isIntType()) {
+                return sigma_prime;
+            }
+
+            /*
+             * Copy over the value. We can just do a simple integer copy because
+             * of our constant domain. If we had some other domain, we would
+             * have an alpha function here.
+             */
+            sigma_prime.abstract_store[copy_inst->lhs->name] = copy_inst->op->val;
+
         } else if (dynamic_cast<BranchInstruction*>(*inst) != nullptr) {
 
             /*
@@ -169,6 +192,18 @@ AbstractStore execute(BasicBlock *bb, AbstractStore sigma) {
              */
             BranchInstruction *branch_inst = dynamic_cast<BranchInstruction*>(*inst);
 
+            /*
+             * If op is 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
+             * propagate to both.
+             */
+            if (branch_inst->condition->IsConstInt() && branch_inst->condition->val == 0) {
+                worklist.push(branch_inst->tt);
+            } else if (branch_inst->condition->IsConstInt() && branch_inst->condition->val != 0) {
+                worklist.push(branch_inst->ff);
+            } else {
+                worklist.push(branch_inst->tt);
+                worklist.push(branch_inst->ff);
+            }
         } else if (dynamic_cast<JumpInstruction*>(*inst) != nullptr) {
 
             /*
@@ -176,6 +211,17 @@ AbstractStore execute(BasicBlock *bb, AbstractStore sigma) {
              */
             JumpInstruction *jump_inst = dynamic_cast<JumpInstruction*>(*inst);
 
+            /*
+             * Join sigma_prime with the basic block's abstract store (updating
+             * the basic block's abstract store).
+             */
+            bb2store[jump_inst->label].join(bb2store[bb->label]);
+
+            /*
+             * Push the basic block referred to by the $jmp instruction onto the
+             * worklist.
+             */
+            worklist.push(jump_inst->label);
         }
     }
     return sigma_prime;

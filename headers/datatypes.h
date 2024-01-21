@@ -285,7 +285,7 @@ class Operand {
         bool IsConstInt() {
             return (var == nullptr);
         }
-        
+
         void pretty_print() {
             std::cout << "******************* Operand *******************" << std::endl;
             if (var != nullptr) {
@@ -399,7 +399,7 @@ class ArithInstruction : public Instruction{
                     op2 = new Operand(inst_val["op2"]["CInt"]);
             }
             if (inst_val["aop"] != nullptr) {
-                arith_op = inst_val["aop"].dump();
+                arith_op = inst_val["aop"];
             }
         }
 
@@ -445,7 +445,7 @@ class CmpInstruction : public Instruction{
                     op2 = new Operand(inst_val["op2"]["CInt"]);
             }
             if (inst_val["rop"] != nullptr) {
-                cmp_op = inst_val["rop"].dump();
+                cmp_op = inst_val["rop"];
             }
         }
 
@@ -703,10 +703,10 @@ class BranchInstruction : public Instruction{
                     condition = new Operand(inst_val["cond"]["CInt"]);
             }
             if (inst_val["tt"] != nullptr) {
-                tt = inst_val["tt"].dump();
+                tt = inst_val["tt"];
             }
             if (inst_val["ff"] != nullptr) {
-                ff = inst_val["ff"].dump();
+                ff = inst_val["ff"];
             }
         };
 
@@ -729,7 +729,7 @@ class BranchInstruction : public Instruction{
  */
 class JumpInstruction : public Instruction{
     public:
-    JumpInstruction(json inst_val) : label(inst_val.dump()) {
+    JumpInstruction(json inst_val) : label(inst_val) {
         // std::cout << "Jump Instruction" << std::endl;
         // std::cout << inst_val << std::endl;
     };
@@ -793,7 +793,7 @@ class CallDirInstruction : public Instruction{
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
             if (inst_val["callee"] != nullptr) {
-                callee = inst_val["callee"].dump();
+                callee = inst_val["callee"];
             }
             if (inst_val["args"] != nullptr) {
                 for (auto &[arg_key, arg_val] : inst_val["args"].items()) {
@@ -804,7 +804,7 @@ class CallDirInstruction : public Instruction{
                 }
             }
             if (inst_val["next_bb"] != nullptr) {
-                next_bb = inst_val["next_bb"].dump();
+                next_bb = inst_val["next_bb"];
             }
         }
 
@@ -857,7 +857,7 @@ class CallIdrInstruction : public Instruction{
                 }
             }
             if (inst_val["next_bb"] != nullptr) {
-                next_bb = inst_val["next_bb"].dump();
+                next_bb = inst_val["next_bb"];
             }
         }
 
@@ -997,7 +997,7 @@ class Function {
         // std::cout << func_json << std::endl;
 
         if (func_json["id"] != nullptr) {
-            name = func_json["id"].dump();
+            name = func_json["id"];
         }
         
         if (func_json["params"] != nullptr) {

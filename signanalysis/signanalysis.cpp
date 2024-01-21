@@ -172,11 +172,20 @@ class SignAnalysis {
 
 int main(int argc, char* argv[]) 
 {
-    std::ifstream f(argv[1]);
+    if (argc != 4) {
+        std::cerr << "Usage: signanalysis <lir file path> <lir json filepath> <funcname>" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    std::ifstream f(argv[2]);
     json lir_json = json::parse(f);
+
+    std::string func_name = argv[3];
 
     Program program = Program(lir_json);
     std::cout << "********** Program created **********" << std::endl;
     SignAnalysis signAnalysis = SignAnalysis(program);
-    signAnalysis.AnalyzeFunc("func2");
+    signAnalysis.AnalyzeFunc(func_name);
+
+    return 0;
 }

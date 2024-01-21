@@ -39,13 +39,6 @@ public:
     std::map<std::string, std::variant<int, AbstractVal>> abstract_store;
 
     /*
-     * Default constructor. Doesn't do anything.
-     */
-    AbstractStore() {
-        ;
-    }
-
-    /*
      * Constructor that lets you specify a mapping.
      */
     AbstractStore(std::map<std::string, std::variant<int, AbstractVal>> map) {

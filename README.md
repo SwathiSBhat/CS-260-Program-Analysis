@@ -1,2 +1,10 @@
-# CS-260-Program-Analysis
-Repository for CS 260 related code
+# CS260 Program Analysis
+
+## Build instructions
+
+```
+cmake .
+make
+```
+
+This will generate executables in the `bin` directory.

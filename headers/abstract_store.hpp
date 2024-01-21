@@ -39,6 +39,13 @@ public:
     std::map<std::string, std::variant<int, AbstractVal>> abstract_store;
 
     /*
+     * Default constructor. Doesn't do anything.
+     */
+    AbstractStore() {
+        ;
+    }
+
+    /*
      * Constructor that lets you specify a mapping.
      */
     AbstractStore(std::map<std::string, std::variant<int, AbstractVal>> map) {
@@ -54,9 +61,12 @@ public:
 
     /*
      * Join this abstract store with another and store the result into this
-     * abstract store.
+     * abstract store. Return true if our abstract store changed and false
+     * otherwise.
      */
-    void join(AbstractStore as) {
+    bool join(AbstractStore as) {
+
+        bool store_changed = false;
 
         /*
          * For each key in the incoming abstract store:
@@ -66,6 +76,7 @@ public:
         for (const auto& pair : as.abstract_store) {
             if (abstract_store.count(pair.first) == 0) {
                 abstract_store[pair.first] = pair.second;
+                store_changed = true;
             } else {
 
                 /*
@@ -78,13 +89,17 @@ public:
                  * -> We don't have to worry about BOTTOM because we won't put
                  *    BOTTOM values in our abstract store.
                  */
-                if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "TOP") {
+                if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "TOP" && std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) != "TOP") {
                     abstract_store[pair.first] = TOP;
+                    store_changed = true;
                 } else if (pair.second != abstract_store[pair.first]) {
                     abstract_store[pair.first] = TOP;
+                    store_changed = true;
                 }
             }
         }
+
+        return store_changed;
     }
 
     /*

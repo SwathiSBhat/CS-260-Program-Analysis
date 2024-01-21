@@ -53,6 +53,17 @@ public:
     }
 
     /*
+     * Get the value of a variable from the abstract store.
+     */
+    std::variant<int, AbstractVal> GetValFromStore(std::string var_name) {
+        if (abstract_store.count(var_name) == 0) {
+            return AbstractVal::BOTTOM;
+        } else {
+            return abstract_store[var_name];
+        }
+    }
+
+    /*
      * Join this abstract store with another and store the result into this
      * abstract store. Return true if our abstract store changed and false
      * otherwise.

@@ -279,6 +279,17 @@ class Operand {
         Operand(Variable *var) : var(var), val(0) {};
         Operand(int val) : var(nullptr), val(val) {std::cout<<"Inside CInt const"<<std::endl;};
 
+        /*
+         * Returns true if the operand is a constant integer and false otherwise.
+        */
+        bool IsConstInt() {
+            return (var == nullptr);
+        }
+
+        int GetInt() {
+            
+        }
+
         void pretty_print() {
             std::cout << "******************* Operand *******************" << std::endl;
             if (var != nullptr) {

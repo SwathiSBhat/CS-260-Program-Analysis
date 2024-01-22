@@ -26,6 +26,25 @@ enum TerminalType {
     CallDirect,
     CallIndirect
 };
+
+enum InstructionType {
+    AddrofInstrType = 0,
+    AllocInstrType,
+    ArithInstrType,
+    CmpInstrType,
+    CopyInstrType,
+    GepInstrType,
+    GfpInstrType,
+    LoadInstrType,
+    StoreInstrType,
+    CallExtInstrType,
+    CallIdrInstrType,
+    CallDirInstrType,
+    BranchInstrType,
+    JumpInstrType,
+    RetInstrType
+};
+
 // TODO: Replace all string based index access with constant names
 
 // Forward declaration of Type class to allow usage in Variable class
@@ -271,6 +290,7 @@ class ExternalFunction {
 class Instruction{
     public:
         virtual void pretty_print() {};
+        InstructionType instrType;
 };
 
 class Operand {
@@ -311,8 +331,6 @@ class Operand {
 class AddrofInstruction : public Instruction{
     public:
         AddrofInstruction(json inst_val) {
-            //std::cout << "Addrof Instruction" << std::endl;
-            //std::cout << inst_val << std::endl;
             
             if (inst_val["lhs"] != nullptr) {
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
@@ -324,6 +342,7 @@ class AddrofInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Addrof Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "RHS: " << std::endl;
@@ -360,6 +379,7 @@ class AllocInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Alloc Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "Num: " << std::endl;
@@ -405,6 +425,7 @@ class ArithInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Arith Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "Operand 1: " << std::endl;
@@ -451,6 +472,7 @@ class CmpInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Cmp Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "Operand 1: " << std::endl;
@@ -489,6 +511,7 @@ class CopyInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Copy Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "Operand: " << std::endl;
@@ -525,6 +548,7 @@ class GepInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Gep Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "Source: " << std::endl;
@@ -560,6 +584,7 @@ class GfpInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Gfp Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "Source: " << std::endl;
@@ -592,6 +617,7 @@ class LoadInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Load Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             lhs->pretty_print();
             std::cout << "Source: " << std::endl;
@@ -624,6 +650,7 @@ class StoreInstruction : public Instruction {
 
         void pretty_print() {
             std::cout << "******************* Store Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "Destination: " << std::endl;
             dst->pretty_print();
             std::cout << "Operand: " << std::endl;
@@ -665,6 +692,7 @@ class CallExtInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* CallExt Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             if (lhs != nullptr)
                 lhs->pretty_print();
@@ -712,6 +740,7 @@ class BranchInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Branch Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "Condition: " << std::endl;
             condition->pretty_print();
             std::cout << "True branch: " << tt << std::endl;
@@ -736,6 +765,7 @@ class JumpInstruction : public Instruction{
 
     void pretty_print() {
         std::cout << "******************* Jump Instruction *******************" << std::endl;
+        std::cout << "Instruction type: " << instrType << std::endl;
         std::cout << "Label: " << label << std::endl;
         std::cout << "******************* End of Jump Instruction *******************" << std::endl;
     }
@@ -767,6 +797,7 @@ class RetInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* Ret Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             if (op == nullptr)
                 std::cout << "Operand: " << std::endl;
             else
@@ -810,6 +841,7 @@ class CallDirInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* CallDir Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             if (lhs != nullptr)
                 lhs->pretty_print();
@@ -863,6 +895,7 @@ class CallIdrInstruction : public Instruction{
 
         void pretty_print() {
             std::cout << "******************* CallIdr Instruction *******************" << std::endl;
+            std::cout << "Instruction type: " << instrType << std::endl;
             std::cout << "LHS: " << std::endl;
             if (lhs != nullptr)
                 lhs->pretty_print();
@@ -899,42 +932,52 @@ class BasicBlock {
             for (auto i = inst_val.items().begin(); i != inst_val.items().end(); ++i) {
                 if (i.key() == "Store") {
                     StoreInstruction *store_inst = new StoreInstruction(i.value());
+                    store_inst->instrType = InstructionType::StoreInstrType;
                     instructions.push_back(store_inst);
                 }
                 else if (i.key() == "AddrOf") {
                     AddrofInstruction *addrof_inst = new AddrofInstruction(i.value());
+                    addrof_inst->instrType = InstructionType::AddrofInstrType;
                     instructions.push_back(addrof_inst);
                 }
                 else if (i.key() == "Load") {
                     LoadInstruction *load_inst = new LoadInstruction(i.value());
+                    load_inst->instrType = InstructionType::LoadInstrType;
                     instructions.push_back(load_inst);
                 }
                 else if (i.key() == "Alloc") {
                     AllocInstruction *alloc_inst = new AllocInstruction(i.value());
+                    alloc_inst->instrType = InstructionType::AllocInstrType;
                     instructions.push_back(alloc_inst);
                 }
                 else if (i.key() == "Arith") {
                     ArithInstruction *arith_inst = new ArithInstruction(i.value());
+                    arith_inst->instrType = InstructionType::ArithInstrType;
                     instructions.push_back(arith_inst);
                 }
                 else if (i.key() == "Cmp") {
                     CmpInstruction *cmp_inst = new CmpInstruction(i.value());
+                    cmp_inst->instrType = InstructionType::CmpInstrType;
                     instructions.push_back(cmp_inst);
                 }
                 else if (i.key() == "Copy") {
                     CopyInstruction *copy_inst = new CopyInstruction(i.value());
+                    copy_inst->instrType = InstructionType::CopyInstrType;
                     instructions.push_back(copy_inst);
                 }
                 else if (i.key() == "Gep") {
                     GepInstruction *gep_inst = new GepInstruction(i.value());
+                    gep_inst->instrType = InstructionType::GepInstrType;
                     instructions.push_back(gep_inst);
                 }
                 else if (i.key() == "Gfp") {
                     GfpInstruction *gfp_inst = new GfpInstruction(i.value());
+                    gfp_inst->instrType = InstructionType::GfpInstrType;
                     instructions.push_back(gfp_inst);
                 }
                 else if (i.key() == "CallExt") {
                     CallExtInstruction *call_ext_inst = new CallExtInstruction(i.value());
+                    call_ext_inst->instrType = InstructionType::CallExtInstrType;
                     instructions.push_back(call_ext_inst);
                 }
             }            
@@ -946,22 +989,27 @@ class BasicBlock {
             std::cout << "Terminal type: " << term_type << std::endl;
             if(term_type == "Branch"){
                 BranchInstruction *branch_inst = new BranchInstruction(bb_json["term"]["Branch"]);
+                branch_inst->instrType = InstructionType::BranchInstrType;
                 terminal = branch_inst;
             }
             else if(term_type == "Jump"){
                 JumpInstruction *jump_inst = new JumpInstruction(bb_json["term"]["Jump"]);
+                jump_inst->instrType = InstructionType::JumpInstrType;
                 terminal = jump_inst;
             }
             else if(term_type == "Ret"){
                 RetInstruction *ret_inst = new RetInstruction(bb_json["term"]["Ret"]);
+                ret_inst->instrType = InstructionType::RetInstrType;
                 terminal = ret_inst;
             }
             else if(term_type == "CallDirect"){
                 CallDirInstruction *call_dir_inst = new CallDirInstruction(bb_json["term"]["CallDirect"]);
+                call_dir_inst->instrType = InstructionType::CallDirInstrType;
                 terminal = call_dir_inst;
             }
             else if(term_type == "CallIndirect"){
                 CallIdrInstruction *call_idr_inst = new CallIdrInstruction(bb_json["term"]["CallIndirect"]);
+                call_idr_inst->instrType = InstructionType::CallIdrInstrType;
                 terminal = call_idr_inst;
             }
         }

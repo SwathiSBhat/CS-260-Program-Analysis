@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
 
     Program *p = new Program(lir_json);
-    p->print_pretty(json::parse("{\"structs\": \"true\",\"globals\": \"true\",\"functions\": {\"bbs\": {\"instructions\" : \"true\"}},\"externs\": \"true\"}"));
+    p->print_pretty(json::parse("{\"structs\": \"false\",\"globals\": \"false\",\"functions\": {\"bbs\": {\"instructions\" : \"true\"}},\"externs\": \"false\"}"));
 
     /*
      * Scan through our top-level LIR JSON object.

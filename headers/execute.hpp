@@ -37,7 +37,7 @@ AbstractStore execute(
          * TODO These are only the instructions needed for the very first test
          * TODO suite. We will need to add more later.
          */
-        if (dynamic_cast<ArithInstruction*>(*inst) != nullptr) {
+        if ((*inst)->instrType == InstructionType::ArithInstrType) {
 
             /*
              * Cast it.
@@ -104,7 +104,7 @@ AbstractStore execute(
                 sigma_prime.abstract_store[arith_inst->lhs->name] = AbstractVal::TOP;
             } 
 
-        } else if (dynamic_cast<CmpInstruction*>(*inst) != nullptr) {
+        } else if ((*inst)->instrType == InstructionType::CmpInstrType) {
 
             /*
              * Cast it.
@@ -172,7 +172,7 @@ AbstractStore execute(
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
             } 
 
-        } else if (dynamic_cast<CopyInstruction*>(*inst) != nullptr) {
+        } else if ((*inst)->instrType == InstructionType::CopyInstrType) {
 
             /*
              * Cast it.
@@ -193,7 +193,7 @@ AbstractStore execute(
              */
             sigma_prime.abstract_store[copy_inst->lhs->name] = copy_inst->op->val;
 
-        } else if (dynamic_cast<BranchInstruction*>(*inst) != nullptr) {
+        } else if ((*inst)->instrType == InstructionType::BranchInstrType) {
 
             /*
              * Cast it.
@@ -212,7 +212,7 @@ AbstractStore execute(
                 worklist.push(branch_inst->tt);
                 worklist.push(branch_inst->ff);
             }
-        } else if (dynamic_cast<JumpInstruction*>(*inst) != nullptr) {
+        } else if ((*inst)->instrType == InstructionType::JumpInstrType) {
 
             /*
              * Cast it.

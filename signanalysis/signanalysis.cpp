@@ -45,8 +45,7 @@ class SignAnalysis {
     void get_addr_of_int_types(std::unordered_set<std::string> &addr_of_int_types, const std::string &func_name) {  
         for (auto basic_block : program.funcs[func_name]->bbs) {
             for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
-                if (dynamic_cast<AddrofInstruction*>(*instruction) != nullptr && 
-                    typeid(dynamic_cast<AddrofInstruction*>(*instruction)).name() == typeid(AddrofInstruction*).name()) {
+                if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
                     if (dynamic_cast<AddrofInstruction*>(*instruction)->rhs->isIntType()) { 
                         if (program.funcs[func_name]->locals.count(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != 0) {
                             addr_of_int_types.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name);

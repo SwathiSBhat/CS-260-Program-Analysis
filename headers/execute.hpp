@@ -62,7 +62,7 @@ AbstractStore execute(
             else {
                 op2 = sigma_prime.GetValFromStore(arith_inst->op2->var->name);
             }
-            // TODO: What about division by zero? - it is undefined right so BOTTOM?
+
             if (std::holds_alternative<int>(op1) && std::holds_alternative<int>(op2))
             {
                 int op1_val = std::get<int>(op1);

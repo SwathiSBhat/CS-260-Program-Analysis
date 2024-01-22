@@ -137,7 +137,7 @@ class SignAnalysis {
             // Perform the transfer function on the current basic block
             std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             bb2store[current_bb].print();
-            bb2store[current_bb] = execute(func->bbs[current_bb], bb2store[current_bb], bb2store, worklist);
+            bb2store[current_bb] = execute(func->bbs[current_bb], bb2store[current_bb], bb2store, worklist, addr_of_int_types);
             std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             bb2store[current_bb].print();
 

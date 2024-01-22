@@ -23,7 +23,7 @@ struct AbstractValStringifyVisitor {
         return std::to_string(val);
     }
     std::string operator()(AbstractVal val) {
-        if (val == BOTTOM) {
+        if (val == AbstractVal::BOTTOM) {
             return "BOTTOM";
         } else {
             return "TOP";

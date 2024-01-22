@@ -1,0 +1,69 @@
+struct struct1 {
+    f1:int
+    f2:&int
+  }
+  
+  struct struct2 {
+    f1:struct1
+    f2:&struct1
+  }
+  
+  func1:&() -> int
+  func2:&(int, &int) -> &struct2
+  func3:&(int,&int,&&int,&struct2,int) -> _
+  
+  extern ext1:() -> int
+  extern ext2:(int) -> int
+  extern ext3:(&int, int) -> &int
+  
+  fn func1() -> int {
+  entry:
+    $ret 42
+  }
+  
+  fn func2(p1:int, p2:&int) -> &struct2 {
+  let _t1:&struct2, x:struct2
+  entry:
+    _t1 = $addrof x
+    $ret _t1
+  }
+  
+  fn func3(p1:int, p2:&int, p3:&&int, p4:&struct2, p5:int) -> _ {
+    let _t1:int, _t2:int, _t3:&int, _t4:&struct1, _t5:&&int, x:int, y:int, z:int, a:int, b:int, c:int
+    entry:
+      x = $cmp eq p1 _t1 
+      y = $cmp eq p1 p1
+      z = $cmp lte _t1 10 
+      a = $cmp gt p5 3
+      b = $cmp eq _t1 _t1
+      _t1 = $arith add 1 2
+      c = $cmp neq _t1 3
+      a = $cmp gte c 1
+      _t2 = $cmp neq _t1 a 
+    $ret
+  }
+
+  fn func4(p1:int, p2:&int, p3:&&int, p4:&struct2, p5:int) -> int {
+    let _t1:int, _t2:int, _t3:&int, _t4:&struct1, _t5:&&int, x:int, y:int, z:int, a:int, b:int, c:int
+    entry:
+      x = $arith add p1 _t1 
+      y = $arith sub p1 2
+      z = $arith div _t1 10 
+      a = $arith div 20 0
+      b = $arith mul 1 1
+      c = $arith add b b
+      a = $arith sub c 2
+      p5 = $arith div c 0
+      $ret x
+  }
+  
+  fn main() -> int {
+  let x:int, y:int, z:int, a:int, b:int
+  entry:
+    x = $arith add 0 2
+    y = $arith sub 1 2
+    z = $arith mul 3 4
+    a = $arith div 12 5
+    b = $arith div 14 5
+    $ret x
+  }

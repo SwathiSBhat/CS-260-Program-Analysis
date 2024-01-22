@@ -277,7 +277,7 @@ class Operand {
     public:
         Operand() {};
         Operand(Variable *var) : var(var), val(0) {};
-        Operand(int val) : var(nullptr), val(val) {std::cout<<"Inside CInt const"<<std::endl;};
+        Operand(int val) : var(nullptr), val(val) {};
 
         /*
          * Returns true if the operand is a constant integer and false otherwise.

@@ -54,13 +54,13 @@ AbstractStore execute(
                 op1 = arith_inst->op1->val;
             }
             else {
-                op1 = sigma.GetValFromStore(arith_inst->op1->var->name);
+                op1 = sigma_prime.GetValFromStore(arith_inst->op1->var->name);
             }
             if (arith_inst->op2->IsConstInt()) {
                 op2 = arith_inst->op2->val;
             }
             else {
-                op2 = sigma.GetValFromStore(arith_inst->op2->var->name);
+                op2 = sigma_prime.GetValFromStore(arith_inst->op2->var->name);
             }
             // TODO: What about division by zero? - it is undefined right so BOTTOM?
             if (std::holds_alternative<int>(op1) && std::holds_alternative<int>(op2))
@@ -81,7 +81,14 @@ AbstractStore execute(
                 }
                 else if (arith_inst->arith_op == "Divide")
                 {
-                    sigma_prime.abstract_store[arith_inst->lhs->name] = op1_val / op2_val;
+                    if (op2_val == 0) {
+                        if (sigma_prime.abstract_store.count(arith_inst->lhs->name) != 0) {
+                            sigma_prime.abstract_store.erase(arith_inst->lhs->name);
+                        }
+                    }
+                    else {
+                        sigma_prime.abstract_store[arith_inst->lhs->name] = (int)(op1_val / op2_val);
+                    }
                 }
             }
             else if ((std::holds_alternative<AbstractVal>(op1) && std::get<AbstractVal>(op1) == AbstractVal::BOTTOM) || 
@@ -114,15 +121,15 @@ AbstractStore execute(
                 op1 = cmp_inst->op1->val;
             }
             else {
-                op1 = sigma.GetValFromStore(cmp_inst->op1->var->name);
+                op1 = sigma_prime.GetValFromStore(cmp_inst->op1->var->name);
             }
             if (cmp_inst->op2->IsConstInt()) {
                 op2 = cmp_inst->op2->val;
             }
             else {
-                op2 = sigma.GetValFromStore(cmp_inst->op2->var->name);
+                op2 = sigma_prime.GetValFromStore(cmp_inst->op2->var->name);
             }
-            // TODO: What about division by zero? - it is undefined right so BOTTOM?
+
             if (std::holds_alternative<int>(op1) && std::holds_alternative<int>(op2))
             {
                 int op1_val = std::get<int>(op1);

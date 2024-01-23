@@ -63,8 +63,8 @@ class Type {
             public:
                 FunctionType(json func_type_json) {
                     
-                    std::cout << "Function Type" << std::endl;
-                    std::cout << func_type_json << std::endl;
+                    //std::cout << "Function Type" << std::endl;
+                    //std::cout << func_type_json << std::endl;
 
                     if (func_type_json["ret_ty"].dump() == "null") {
                         ret = nullptr;

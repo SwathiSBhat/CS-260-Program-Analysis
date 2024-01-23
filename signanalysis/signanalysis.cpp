@@ -134,32 +134,32 @@ class SignAnalysis {
             std::string current_bb = worklist.front();
             worklist.pop();
 
+            // Get the successors of the current basic block
+            std::vector<std::string> successors;
+
             // Perform the transfer function on the current basic block
             std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             bb2store[current_bb].print();
-            bb2store[current_bb] = execute(func->bbs[current_bb], bb2store[current_bb], bb2store, worklist);
+            bb2store[current_bb] = execute(func->bbs[current_bb], bb2store[current_bb], bb2store, worklist, addr_of_int_types);
             std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             bb2store[current_bb].print();
 
-            // Get the successors of the current basic block
-            std::vector<std::string> successors; //= GetSuccessors(current_bb);
-
             // For each successor, join the abstract store and check if it has changed
-            for (const auto& successor : successors) {
+            /*for (const auto& successor : successors) {
 
-                /*
-                 * Join abstract stores and check for changes.
-                 */
+                //
+                // Join abstract stores and check for changes.
+                //
                 bool store_changed = bb2store[successor].join(bb2store[current_bb]);
 
-                /*
-                 * If the abstract store of the successor has changed, add it to
-                 * the worklist.
-                 */
+                //
+                // If the abstract store of the successor has changed, add it to
+                // the worklist.
+                
                 if (store_changed) {
                     worklist.push(successor);
                 }
-            }
+            }*/
 }
     }
 

@@ -183,10 +183,10 @@ AbstractStore execute(
             CopyInstruction *copy_inst = dynamic_cast<CopyInstruction*>(*inst);
 
             /*
-             * If the lhs isn't an int-typed variable, return immediately.
+             * If the lhs isn't an int-typed variable, ignore instruction.
              */
             if (!copy_inst->lhs->isIntType()) {
-                return sigma_prime;
+                continue;
             }
 
             /*
@@ -240,10 +240,10 @@ AbstractStore execute(
             LoadInstruction *load_inst = dynamic_cast<LoadInstruction*>(*inst);
 
             /*
-             * If the lhs isn't an int-typed variable, return immediately.
+             * If the lhs isn't an int-typed variable, ignore instruction.
              */
             if (!load_inst->lhs->isIntType()) {
-                return sigma_prime;
+                continue;
             }
             /*
              * We don't know what the value of the rhs is, so we just set the
@@ -256,10 +256,10 @@ AbstractStore execute(
              */
             StoreInstruction *store_inst = dynamic_cast<StoreInstruction*>(*inst);
             /*
-             * If the lhs isn't an int-typed variable, return immediately.
+             * If the lhs isn't an int-typed variable, ignore instruction.
              */
             if (!store_inst->dst->isIntType()) {
-                return sigma_prime;
+                continue;
             }
 
             // Get abstract domain value from op
@@ -278,32 +278,64 @@ AbstractStore execute(
             }
         } else if ((*inst)->instrType == InstructionType::CallDirInstrType || 
                     (*inst)->instrType == InstructionType::CallIdrInstrType || 
-                    (*inst)->instrType == InstructionType::CallExtInstrType) {
+                    (*inst)->instrType == InstructionType::CallExtInstrType) 
+            {
                 // For all ints in globals_ints, update sigma_primt to TOP
                 // TODO: Ignoring global variables for assignment 1
-
+                // TODO: This is a very bad way to write code. Same code has been repeated for instructions
                 if((*inst)->instrType == InstructionType::CallDirInstrType) {
                     CallDirInstruction *call_inst = dynamic_cast<CallDirInstruction*>(*inst);
-                }
-                else if ((*inst)->instrType == InstructionType::CallIdrInstrType) {
-                    CallIdrInstruction *call_inst = dynamic_cast<CallIdrInstruction*>(*inst);
-                }
-                else {
-                    CallExtInstruction *call_inst = dynamic_cast<CallExtInstruction*>(*inst);
-                
-                // If function returns something and it is of int type, update sigma_prime to TOP
-                if (call_inst->lhs && call_inst->lhs->isIntType()) {
-                    sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
-                }
+                    // If function returns something and it is of int type, update sigma_prime to TOP
+                    if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
+                        sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
+                    }
 
-                // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
-                for (auto arg : call_inst->args) {
-                    if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
-                        for(auto addr_of_int : addr_of_int_types) {
-                            sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                    // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+                    for (auto arg : call_inst->args) {
+                        if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                            for(auto addr_of_int : addr_of_int_types) {
+                                sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                            }
                         }
                     }
                 }
+                else if ((*inst)->instrType == InstructionType::CallIdrInstrType) {
+                    CallIdrInstruction *call_inst = dynamic_cast<CallIdrInstruction*>(*inst);
+                    // If function returns something and it is of int type, update sigma_prime to TOP
+                    if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
+                        sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
+                    }
+
+                    // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+                    for (auto arg : call_inst->args) {
+                        if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                            for(auto addr_of_int : addr_of_int_types) {
+                                sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                            }
+                        }
+                    }
+                }
+                else {
+                    CallExtInstruction *call_inst = dynamic_cast<CallExtInstruction*>(*inst);
+                    // If function returns something and it is of int type, update sigma_prime to TOP
+                    if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
+                        sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
+                    }
+
+                    // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+                    for (auto arg : call_inst->args) {
+                        if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                            for(auto addr_of_int : addr_of_int_types) {
+                                sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                            }
+                        }
+                    }
+                }
+            } else {
+                /*
+                * This is a catch-all for instructions we don't have to do anything about for constant analysis.
+                */
+                continue;
             }
     }
     return sigma_prime;

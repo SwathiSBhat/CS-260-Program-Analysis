@@ -194,7 +194,14 @@ AbstractStore execute(
              * of our constant domain. If we had some other domain, we would
              * have an alpha function here.
              */
-            sigma_prime.abstract_store[copy_inst->lhs->name] = copy_inst->op->val;
+            std::variant<int, AbstractVal> op;
+            if (copy_inst->op->IsConstInt()) {
+                op = copy_inst->op->val;
+            }
+            else {
+                op = sigma_prime.GetValFromStore(copy_inst->op->var->name);
+            }
+            sigma_prime.abstract_store[copy_inst->lhs->name] = op;
 
         } else if ((*inst)->instrType == InstructionType::BranchInstrType) {
 

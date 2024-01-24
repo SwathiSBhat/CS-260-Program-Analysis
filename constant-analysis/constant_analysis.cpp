@@ -17,14 +17,13 @@ enum AbsDomain {
 };
 
 /*
-    Class that contains methods to perform sign analysis on function
+    Class that contains methods to perform constant analysis on function
 */
-class SignAnalysis {
-    private:
-    // data structures required for prep stage
-    std::unordered_set<std::string> int_type_globals; // contains names of all global variables of type int
-    std::unordered_set<std::string> addr_of_int_types; // contains names of all variables that are addresses of int types
-    std::string funcname;
+class ConstantAnalysis {
+    public:
+    ConstantAnalysis(Program program) : program(program) {
+    };
+
     /*
     Method to get the set of int-typed global variables
     */
@@ -58,13 +57,10 @@ class SignAnalysis {
         return; 
     }
 
-    public:
-    SignAnalysis(Program program) : program(program) {
-    };
-
     /*
         Initialize the abstract store for 'entry' basic block
     */
+    // TODO - Make this generic to work for all basic blocks
     void InitEntryStore() {
         
         std::string bb_name = "entry";
@@ -107,6 +103,10 @@ class SignAnalysis {
         Function *func = program.funcs[func_name];
         std::cout << "Analyzing function " << func_name << std::endl;
         funcname = func_name;
+        
+        // data structures required for prep stage
+        std::unordered_set<std::string> int_type_globals; // contains names of all global variables of type int
+        std::unordered_set<std::string> addr_of_int_types; // contains names of all variables that are addresses of int types
         
         // Prep steps:
         // 1. Compute set of int-typed global variables
@@ -165,19 +165,22 @@ class SignAnalysis {
 
     Program program;
     /*
-     * Our bb2store is a map from a basic block label to an entry AbstractStore.
+     * Our bb2store is a map from a basic block label to an AbstractStore.
      */
     std::map<std::string, AbstractStore> bb2store;
     /*
      * Our worklist is a queue containing BasicBlock labels.
      */
     std::queue<std::string> worklist;
+
+    private:
+    std::string funcname;
 };
 
 int main(int argc, char* argv[]) 
 {
     if (argc != 4) {
-        std::cerr << "Usage: signanalysis <lir file path> <lir json filepath> <funcname>" << std::endl;
+        std::cerr << "Usage: constant-analysis <lir file path> <lir json filepath> <funcname>" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -188,8 +191,8 @@ int main(int argc, char* argv[])
 
     Program program = Program(lir_json);
     std::cout << "********** Program created **********" << std::endl;
-    SignAnalysis signAnalysis = SignAnalysis(program);
-    signAnalysis.AnalyzeFunc(func_name);
+    ConstantAnalysis constant_analysis = ConstantAnalysis(program);
+    constant_analysis.AnalyzeFunc(func_name);
 
     return 0;
 }

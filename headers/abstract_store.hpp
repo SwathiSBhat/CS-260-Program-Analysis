@@ -113,6 +113,21 @@ public:
      * Pretty-print the abstract store.
      */
     void print() {
+
+        /*
+         * If the abstract store is empty, let's print something out to show
+         * that.
+         */
+        if (abstract_store.empty()) {
+            std::cout << "<Empty abstract store>" << std::endl;
+        }
+
+        /*
+         * Loop through all the entries and print them out.
+         *
+         * TODO Eventually Ben wants us to print these out in alphabetical
+         * TODO order.
+         */
         for (const auto& pair : abstract_store) {
             std::cout << pair.first << " -> " << std::visit(AbstractValStringifyVisitor{}, pair.second) << std::endl;
         }

@@ -48,7 +48,7 @@ __pycache__/
 
 assn0
 test_abstract_store
-signanalysis/signanalysis
+constant-analysis/signanalysis
 mfp_worklist
 assn1_signanalysis
 parser_output.txt

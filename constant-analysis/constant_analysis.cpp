@@ -17,11 +17,11 @@ enum AbsDomain {
 };
 
 /*
-    Class that contains methods to perform sign analysis on function
+    Class that contains methods to perform constant analysis on function
 */
-class SignAnalysis {
+class ConstantAnalysis {
     public:
-    SignAnalysis(Program program) : program(program) {
+    ConstantAnalysis(Program program) : program(program) {
     };
 
     /*
@@ -180,7 +180,7 @@ class SignAnalysis {
 int main(int argc, char* argv[]) 
 {
     if (argc != 4) {
-        std::cerr << "Usage: signanalysis <lir file path> <lir json filepath> <funcname>" << std::endl;
+        std::cerr << "Usage: constant-analysis <lir file path> <lir json filepath> <funcname>" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -191,8 +191,8 @@ int main(int argc, char* argv[])
 
     Program program = Program(lir_json);
     std::cout << "********** Program created **********" << std::endl;
-    SignAnalysis signAnalysis = SignAnalysis(program);
-    signAnalysis.AnalyzeFunc(func_name);
+    ConstantAnalysis constant_analysis = ConstantAnalysis(program);
+    constant_analysis.AnalyzeFunc(func_name);
 
     return 0;
 }

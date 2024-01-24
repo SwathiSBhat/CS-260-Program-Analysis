@@ -29,19 +29,20 @@ AbstractStore execute(
 
     /*
      * Iterate through each instruction in bb.
+     *
+     * TODO I guess we shouldn't care about terminals?
      */
-    for (auto inst = bb->instructions.begin(); inst != bb->instructions.end(); ++inst) {
+    for (const Instruction *inst : bb->instructions) {
 
-        /*
-         * This is the weirdest way of checking the instruction type ever, but
-         * it works for now. I would like to figure out a more elegant solution.
-         */
-        if ((*inst)->instrType == InstructionType::ArithInstrType) {
+        std::cout << "This is the instruction type: " << inst->instrType << std::endl;
+
+        if ((*inst).instrType == InstructionType::ArithInstrType) {
 
             /*
              * Cast it.
              */
-            ArithInstruction *arith_inst = dynamic_cast<ArithInstruction*>(*inst);
+            ArithInstruction *arith_inst = (ArithInstruction *) inst;
+
             /*
              * Since $arith is only done on ints, we know that op1 and op2 are ints
              * the operands can be int typed variables or direct int constants
@@ -103,12 +104,12 @@ AbstractStore execute(
                 sigma_prime.abstract_store[arith_inst->lhs->name] = AbstractVal::TOP;
             } 
 
-        } else if ((*inst)->instrType == InstructionType::CmpInstrType) {
+        } else if ((*inst).instrType == InstructionType::CmpInstrType) {
 
             /*
              * Cast it.
              */
-            CmpInstruction *cmp_inst = dynamic_cast<CmpInstruction*>(*inst);
+            CmpInstruction *cmp_inst = (CmpInstruction *) inst;
             /*
              * Since $cmp is only done on ints, we know that op1 and op2 are ints
              * the operands can be int typed variables or direct int constants
@@ -171,12 +172,12 @@ AbstractStore execute(
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
             } 
 
-        } else if ((*inst)->instrType == InstructionType::CopyInstrType) {
+        } else if ((*inst).instrType == InstructionType::CopyInstrType) {
 
             /*
              * Cast it.
              */
-            CopyInstruction *copy_inst = dynamic_cast<CopyInstruction*>(*inst);
+            CopyInstruction *copy_inst = (CopyInstruction *) inst;
 
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
@@ -199,11 +200,14 @@ AbstractStore execute(
             }
             sigma_prime.abstract_store[copy_inst->lhs->name] = op;
 
-        } else if ((*inst)->instrType == InstructionType::BranchInstrType) {
+        } else if ((*inst).instrType == InstructionType::BranchInstrType) {
+
+            std::cout << "Ok, we're inside $branch" << std::endl;
+
             /*
              * Cast it.
              */
-            BranchInstruction *branch_inst = dynamic_cast<BranchInstruction*>(*inst);
+            BranchInstruction *branch_inst = (BranchInstruction *) inst;
 
             /*
              * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
@@ -224,12 +228,12 @@ AbstractStore execute(
                     worklist.push_back(branch_inst->ff);
                 }
             }
-        } else if ((*inst)->instrType == InstructionType::JumpInstrType) {
+        } else if ((*inst).instrType == InstructionType::JumpInstrType) {
 
             /*
              * Cast it.
              */
-            JumpInstruction *jump_inst = dynamic_cast<JumpInstruction*>(*inst);
+            JumpInstruction *jump_inst = (JumpInstruction *) inst;
 
             /*
              * Join sigma_prime with the basic block's abstract store (updating
@@ -240,11 +244,11 @@ AbstractStore execute(
                 // If the basic block's abstract store changed, add the basic block to the worklist
                 worklist.push_back(jump_inst->label);
             }
-        } else if ((*inst)->instrType == InstructionType::LoadInstrType) {
+        } else if ((*inst).instrType == InstructionType::LoadInstrType) {
             /*
              * Cast it.
              */
-            LoadInstruction *load_inst = dynamic_cast<LoadInstruction*>(*inst);
+            LoadInstruction *load_inst = (LoadInstruction *) inst;
 
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
@@ -257,11 +261,11 @@ AbstractStore execute(
              * lhs to TOP.
             */
             sigma_prime.abstract_store[load_inst->lhs->name] = AbstractVal::TOP;
-        } else if ((*inst)->instrType == InstructionType::StoreInstrType) {
+        } else if ((*inst).instrType == InstructionType::StoreInstrType) {
             /*
              * Cast it.
              */
-            StoreInstruction *store_inst = dynamic_cast<StoreInstruction*>(*inst);
+            StoreInstruction *store_inst = (StoreInstruction *) inst;
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
              */
@@ -283,12 +287,12 @@ AbstractStore execute(
                 opStore.abstract_store[addr_of_int] = op;
                 sigma_prime.join(opStore);
             }
-        } else if ((*inst)->instrType == InstructionType::CallDirInstrType)
+        } else if ((*inst).instrType == InstructionType::CallDirInstrType)
             {
                 // For all ints in globals_ints, update sigma_primt to TOP
                 // TODO: Ignoring global variables for assignment 1
 
-                CallDirInstruction *call_inst = dynamic_cast<CallDirInstruction*>(*inst);
+                CallDirInstruction *call_inst = (CallDirInstruction *) inst;
                 // If function returns something and it is of int type, update sigma_prime to TOP
                 if (call_inst->lhs && call_inst->lhs->isIntType()) {
                     sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
@@ -307,8 +311,8 @@ AbstractStore execute(
                 if (bb2store[call_inst->next_bb].join(sigma_prime)) {
                     worklist.push_back(call_inst->next_bb);
                 }
-            } else if ((*inst)->instrType == InstructionType::CallIdrInstrType ) {
-                CallIdrInstruction *call_inst = dynamic_cast<CallIdrInstruction*>(*inst);
+            } else if ((*inst).instrType == InstructionType::CallIdrInstrType ) {
+                CallIdrInstruction *call_inst = (CallIdrInstruction *) inst;
                 // If function returns something and it is of int type, update sigma_prime to TOP
                 if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
                     sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
@@ -328,8 +332,8 @@ AbstractStore execute(
                     worklist.push_back(call_inst->next_bb);
                 }
             }
-            else if ((*inst)->instrType == InstructionType::CallExtInstrType) {
-                CallExtInstruction *call_inst = dynamic_cast<CallExtInstruction*>(*inst);
+            else if ((*inst).instrType == InstructionType::CallExtInstrType) {
+                CallExtInstruction *call_inst = (CallExtInstruction *) inst;
                 // If function returns something and it is of int type, update sigma_prime to TOP
                 if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
                     sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
@@ -345,11 +349,103 @@ AbstractStore execute(
                 }
             }
             else {
+
+                std::cout << "Found an instruction we don't recognize :(" << std::endl;
                 /*
                 * This is a catch-all for instructions we don't have to do anything about for constant analysis.
                 */
                 continue;
             }
+    }
+
+    /*
+     * Ok, now we've executed the instructions. Now let's look at the terminal
+     * to see what to push onto the worklist and such.
+     *
+     * TODO
+     */
+    Instruction *terminal_instruction = bb->terminal;
+    if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
+        std::cout << "Encountered $branch" << std::endl;
+
+        /*
+             * Cast it.
+             */
+        BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
+
+        /*
+             * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
+             * propagate to both.
+             */
+        if (branch_inst->condition->IsConstInt()) {
+            if (branch_inst->condition->val != 0) {
+                worklist.push_back(branch_inst->tt);
+            } else {
+                worklist.push_back(branch_inst->ff);
+            }
+        }
+        else {
+            // TODO: Check if the bb has to be pushed to worklist even if the store doesn't change
+            std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
+            if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP) {
+                worklist.push_back(branch_inst->tt);
+                worklist.push_back(branch_inst->ff);
+            }
+        }
+    } else if (terminal_instruction->instrType == InstructionType::JumpInstrType) {
+        std::cout << "Encountered $jump" << std::endl;
+
+        /*
+             * Cast it.
+             */
+        JumpInstruction *jump_inst = (JumpInstruction *) terminal_instruction;
+
+        /*
+         * Join sigma_prime with the basic block's abstract store (updating
+         * the basic block's abstract store).
+         */
+        if (bb2store[jump_inst->label].join(bb2store[bb->label]))
+        {
+            // If the basic block's abstract store changed, add the basic block to the worklist
+            worklist.push_back(jump_inst->label);
+        }
+    } else if (terminal_instruction->instrType == InstructionType::RetInstrType) {
+        std::cout << "Encountered $ret" << std::endl;
+
+        /*
+         * TODO
+         */
+    } else if (terminal_instruction->instrType == InstructionType::CallDirInstrType) {
+        std::cout << "Encountered $call_dir" << std::endl;
+
+        // For all ints in globals_ints, update sigma_primt to TOP
+        // TODO: Ignoring global variables for assignment 1
+
+        CallDirInstruction *call_inst = (CallDirInstruction *) terminal_instruction;
+        // If function returns something and it is of int type, update sigma_prime to TOP
+        if (call_inst->lhs && call_inst->lhs->isIntType()) {
+            sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
+        }
+
+        // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+        for (auto arg : call_inst->args) {
+            if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                for(auto addr_of_int : addr_of_int_types) {
+                    sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                }
+            }
+        }
+
+        // If abstract store of next_bb has changed, push it into worklist
+        if (bb2store[call_inst->next_bb].join(sigma_prime)) {
+            worklist.push_back(call_inst->next_bb);
+        }
+    } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType) {
+        std::cout << "Encountered $call_idr" << std::endl;
+
+        /*
+         * TODO
+         */
     }
     return sigma_prime;
 }

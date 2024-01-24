@@ -24,9 +24,9 @@ struct AbstractValStringifyVisitor {
     }
     std::string operator()(AbstractVal val) {
         if (val == AbstractVal::BOTTOM) {
-            return "BOTTOM";
+            return "Bottom";
         } else {
-            return "TOP";
+            return "Top";
         }
     }
 };

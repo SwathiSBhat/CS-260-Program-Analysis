@@ -60,7 +60,6 @@ class ConstantAnalysis {
     /*
         Initialize the abstract store for 'entry' basic block
     */
-    // TODO - Make this generic to work for all basic blocks
     void InitEntryStore() {
         
         std::string bb_name = "entry";
@@ -115,14 +114,6 @@ class ConstantAnalysis {
         get_addr_of_int_types(addr_of_int_types, func_name);
 
         /*
-            Setup steps
-            1. Initialize the abstract store for 'entry' basic block
-            2. Add 'entry' basic block to worklist
-        */
-        InitEntryStore();
-        worklist.push_back("entry");
-
-        /*
          * We also need to initialize bb2store entries for all the basic blocks
          * in the function (I think.)
          */
@@ -130,6 +121,15 @@ class ConstantAnalysis {
             std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
             bb2store[bb_label] = AbstractStore();
         }
+
+        /*
+            Setup steps
+            1. Initialize the abstract store for 'entry' basic block
+            2. Add 'entry' basic block to worklist
+        */
+        InitEntryStore();
+        worklist.push_back("entry");
+
 
         /*
             Worklist algorithm
@@ -160,7 +160,7 @@ class ConstantAnalysis {
             std::cout << std::endl;
 
             // For each successor, join the abstract store and check if it has changed
-            for (const auto& successor : worklist) {
+            /*for (const auto& successor : worklist) {
 
                 //
                 // Join abstract stores and check for changes.
@@ -174,7 +174,7 @@ class ConstantAnalysis {
                 if (store_changed) {
                     worklist.push_back(successor);
                 }
-            }
+            }*/
 }
     }
 

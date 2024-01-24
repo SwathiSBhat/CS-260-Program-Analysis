@@ -2,8 +2,8 @@
 
 #include "abstract_store.hpp"
 #include "datatypes.h"
-#include<queue>
-#include<variant>
+#include <queue>
+#include <variant>
 
 /*
  * Execute a given BasicBlock against a given AbstractStore. This is a helper
@@ -18,7 +18,7 @@ AbstractStore execute(
         BasicBlock *bb,
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
-        std::queue<std::string> &worklist,
+        std::vector<std::string> &worklist,
         std::unordered_set<std::string> addr_of_int_types
         ) {
 
@@ -211,17 +211,17 @@ AbstractStore execute(
              */
             if (branch_inst->condition->IsConstInt()) {
                 if (branch_inst->condition->val != 0) {
-                    worklist.push(branch_inst->tt);
+                    worklist.push_back(branch_inst->tt);
                 } else {
-                    worklist.push(branch_inst->ff);
+                    worklist.push_back(branch_inst->ff);
                 }
             }
             else {
                 // TODO: Check if the bb has to be pushed to worklist even if the store doesn't change
                 std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
                 if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP) {
-                    worklist.push(branch_inst->tt);
-                    worklist.push(branch_inst->ff);
+                    worklist.push_back(branch_inst->tt);
+                    worklist.push_back(branch_inst->ff);
                 }
             }
         } else if ((*inst)->instrType == InstructionType::JumpInstrType) {
@@ -238,7 +238,7 @@ AbstractStore execute(
             if (bb2store[jump_inst->label].join(bb2store[bb->label]))
             {
                 // If the basic block's abstract store changed, add the basic block to the worklist
-                worklist.push(jump_inst->label);
+                worklist.push_back(jump_inst->label);
             }
         } else if ((*inst)->instrType == InstructionType::LoadInstrType) {
             /*
@@ -305,7 +305,7 @@ AbstractStore execute(
 
                 // If abstract store of next_bb has changed, push it into worklist
                 if (bb2store[call_inst->next_bb].join(sigma_prime)) {
-                    worklist.push(call_inst->next_bb);
+                    worklist.push_back(call_inst->next_bb);
                 }
             } else if ((*inst)->instrType == InstructionType::CallIdrInstrType ) {
                 CallIdrInstruction *call_inst = dynamic_cast<CallIdrInstruction*>(*inst);
@@ -325,7 +325,7 @@ AbstractStore execute(
 
                 // If abstract store of next_bb has changed, push it into worklist
                 if (bb2store[call_inst->next_bb].join(sigma_prime)) {
-                    worklist.push(call_inst->next_bb);
+                    worklist.push_back(call_inst->next_bb);
                 }
             }
             else if ((*inst)->instrType == InstructionType::CallExtInstrType) {

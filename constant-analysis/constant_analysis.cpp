@@ -1,5 +1,5 @@
 #include <fstream>
-#include <queue>
+#include <vector>
 #include <unordered_set>
 
 #include "../headers/datatypes.h"
@@ -120,14 +120,14 @@ class ConstantAnalysis {
             2. Add 'entry' basic block to worklist
         */
         InitEntryStore();
-        worklist.push("entry");
+        worklist.push_back("entry");
 
         /*
          * We also need to initialize bb2store entries for all the basic blocks
          * in the function (I think.)
          */
         for (const auto &[bb_label, bb] : program.funcs[func_name]->bbs) {
-            std::cout << "Initializing empty abstract store for " << bb_label << std::endl;
+            std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
             bb2store[bb_label] = AbstractStore();
         }
 
@@ -141,7 +141,7 @@ class ConstantAnalysis {
 
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
-            worklist.pop();
+            worklist.pop_back();
 
             // Get the successors of the current basic block
             std::vector<std::string> successors;
@@ -152,6 +152,12 @@ class ConstantAnalysis {
             bb2store[current_bb] = execute(func->bbs[current_bb], bb2store[current_bb], bb2store, worklist, addr_of_int_types);
             std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             bb2store[current_bb].print();
+
+            std::cout << "This is the worklist now:" << std::endl;
+            for (const auto& i : worklist) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
 
             // For each successor, join the abstract store and check if it has changed
             /*for (const auto& successor : successors) {
@@ -178,9 +184,9 @@ class ConstantAnalysis {
      */
     std::map<std::string, AbstractStore> bb2store;
     /*
-     * Our worklist is a queue containing BasicBlock labels.
+     * Our worklist is a vector containing BasicBlock labels.
      */
-    std::queue<std::string> worklist;
+    std::vector<std::string> worklist;
 
     private:
     std::string funcname;

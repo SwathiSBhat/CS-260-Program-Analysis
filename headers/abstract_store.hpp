@@ -41,14 +41,15 @@ public:
     std::map<std::string, std::variant<int, AbstractVal>> abstract_store;
 
     /*
-     * Constructor that lets you specify a mapping.
+     * Constructor that lets you specify a mapping. Note that if you want an
+     * abstract store without any entries, use the other constructor.
      */
     AbstractStore(std::map<std::string, std::variant<int, AbstractVal>> map) {
         abstract_store = map;
     }
 
     /*
-     * Empty constructor.
+     * Constructor for when you want an empty abstract store to start.
      */
     AbstractStore() {
         abstract_store = std::map<std::string, std::variant<int, AbstractVal>>();

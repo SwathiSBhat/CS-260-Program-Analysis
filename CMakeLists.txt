@@ -14,7 +14,7 @@ ADD_EXECUTABLE(test_abstract_store
 	headers/abstract_store.hpp
 )
 
-ADD_EXECUTABLE(assn1_signanalysis
+ADD_EXECUTABLE(assn1_constant_analysis
 	constant-analysis/constant_analysis.cpp
     headers/abstract_store.hpp
     headers/datatypes.h

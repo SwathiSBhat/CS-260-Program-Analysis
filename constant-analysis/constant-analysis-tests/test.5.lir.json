@@ -107,11 +107,7 @@
                     "term": {
                         "Branch": {
                             "cond": {
-                                "Var": {
-                                    "name": "_t3",
-                                    "typ": "Int",
-                                    "scope": "func_test_branch"
-                                }
+                                "CInt": 1
                             },
                             "tt": "bb3",
                             "ff": "bb5"

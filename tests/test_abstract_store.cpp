@@ -32,5 +32,18 @@ int main() {
     std::cout << "After join:" << std::endl;
     as1.print();
 
+    /*
+     * Now let's try joining a populated abstract store with an empty abstract
+     * store and see what happens.
+     */
+    AbstractStore as3 = AbstractStore();
+    bool as3_changed = as3.join(as1);
+    if (as3_changed) {
+        std::cout << "Yep! as3 changed" << std::endl;
+    } else {
+        std::cout << "What! as3 didn't change" << std::endl;
+    }
+    as3.print();
+
     return EXIT_SUCCESS;
 }

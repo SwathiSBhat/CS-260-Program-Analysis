@@ -1,0 +1,15 @@
+func_test_load:&(int, &int) -> int
+
+fn func_test_load(p1:int, p2:&int, p3: int) -> int {
+    let _t1:int, x:int, _t2:int, _t3:&int, _t4:&&&&int, _t5:int
+    entry:
+    x = $load p2
+    $ret _t1
+}
+
+fn main() -> int {
+    let x:int, y:int, z:int, a:int, b:int
+    entry:
+    x = $arith add 0 2
+    $ret x
+}

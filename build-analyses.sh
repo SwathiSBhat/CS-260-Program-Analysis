@@ -1,6 +1,6 @@
 #!/bin/bash
 
 set -e
-cd /autograder/submission
+#cd /autograder/submission
 cmake .
 make

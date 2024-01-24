@@ -123,6 +123,15 @@ class ConstantAnalysis {
         worklist.push("entry");
 
         /*
+         * We also need to initialize bb2store entries for all the basic blocks
+         * in the function (I think.)
+         */
+        for (const auto &[bb_label, bb] : program.funcs[func_name]->bbs) {
+            std::cout << "Initializing empty abstract store for " << bb_label << std::endl;
+            bb2store[bb_label] = AbstractStore();
+        }
+
+        /*
             Worklist algorithm
             1. Pop a basic block from the worklist
             2. Perform the transfer function on the basic block

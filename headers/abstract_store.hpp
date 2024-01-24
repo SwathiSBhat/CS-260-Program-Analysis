@@ -24,9 +24,9 @@ struct AbstractValStringifyVisitor {
     }
     std::string operator()(AbstractVal val) {
         if (val == AbstractVal::BOTTOM) {
-            return "BOTTOM";
+            return "Bottom";
         } else {
-            return "TOP";
+            return "Top";
         }
     }
 };
@@ -45,14 +45,14 @@ public:
      * abstract store without any entries, use the other constructor.
      */
     AbstractStore(std::map<std::string, std::variant<int, AbstractVal>> map) {
-        abstract_store = map;
+        this->abstract_store = map;
     }
 
     /*
      * Constructor for when you want an empty abstract store to start.
      */
     AbstractStore() {
-        abstract_store = std::map<std::string, std::variant<int, AbstractVal>>();
+        this->abstract_store = std::map<std::string, std::variant<int, AbstractVal>>();
     }
 
     /*
@@ -62,6 +62,7 @@ public:
         if (abstract_store.count(var_name) == 0) {
             return AbstractVal::BOTTOM;
         } else {
+            //std::cout << "Returning " << std::visit(AbstractValStringifyVisitor{}, abstract_store[var_name]) << " for " << var_name << std::endl;
             return abstract_store[var_name];
         }
     }
@@ -81,6 +82,7 @@ public:
          * -> If the key is present, join the values.
          */
         for (const auto& pair : as.abstract_store) {
+            // std::cout << "Joining " << pair.first << " -> " << std::visit(AbstractValStringifyVisitor{}, pair.second) << " with " << std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) << std::endl;
             if (abstract_store.count(pair.first) == 0) {
                 abstract_store[pair.first] = pair.second;
                 store_changed = true;
@@ -96,7 +98,7 @@ public:
                  * -> We don't have to worry about BOTTOM because we won't put
                  *    BOTTOM values in our abstract store.
                  */
-                if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "TOP" && std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) != "TOP") {
+                if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "Top" && std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) != "Top") {
                     abstract_store[pair.first] = TOP;
                     store_changed = true;
                 } else if (pair.second != abstract_store[pair.first]) {

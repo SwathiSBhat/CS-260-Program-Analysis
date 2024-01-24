@@ -1,0 +1,227 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "func_test_jump": {
+            "id": "func_test_jump",
+            "ret_ty": "Int",
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func_test_jump"
+                },
+                {
+                    "name": "p2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_jump"
+                },
+                {
+                    "name": "p3",
+                    "typ": "Int",
+                    "scope": "func_test_jump"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": "Int",
+                    "scope": "func_test_jump"
+                },
+                {
+                    "name": "_t2",
+                    "typ": "Int",
+                    "scope": "func_test_jump"
+                },
+                {
+                    "name": "_t3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_jump"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": {
+                                    "Pointer": "Int"
+                                }
+                            }
+                        }
+                    },
+                    "scope": "func_test_jump"
+                },
+                {
+                    "name": "_t5",
+                    "typ": "Int",
+                    "scope": "func_test_jump"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_jump"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": "Int",
+                                    "scope": "func_test_jump"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "Var": {
+                                        "name": "x",
+                                        "typ": "Int",
+                                        "scope": "func_test_jump"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "p3",
+                                    "typ": "Int",
+                                    "scope": "func_test_jump"
+                                },
+                                "aop": "Multiply",
+                                "op1": {
+                                    "CInt": 3
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "func_test_jump"
+                            }
+                        }
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_jump"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_t1",
+                                    "typ": "Int",
+                                    "scope": "func_test_jump"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "x",
+                                        "typ": "Int",
+                                        "scope": "func_test_jump"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": "Int",
+                                    "scope": "func_test_jump"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p3",
+                                        "typ": "Int",
+                                        "scope": "func_test_jump"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "main"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

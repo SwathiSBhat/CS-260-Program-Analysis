@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_set>
+#include<deque>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
@@ -60,7 +61,6 @@ class ConstantAnalysis {
     /*
         Initialize the abstract store for 'entry' basic block
     */
-    // TODO - Make this generic to work for all basic blocks
     void InitEntryStore() {
         
         std::string bb_name = "entry";
@@ -115,14 +115,6 @@ class ConstantAnalysis {
         get_addr_of_int_types(addr_of_int_types, func_name);
 
         /*
-            Setup steps
-            1. Initialize the abstract store for 'entry' basic block
-            2. Add 'entry' basic block to worklist
-        */
-        InitEntryStore();
-        worklist.push_back("entry");
-
-        /*
          * We also need to initialize bb2store entries for all the basic blocks
          * in the function (I think.)
          */
@@ -130,6 +122,15 @@ class ConstantAnalysis {
             std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
             bb2store[bb_label] = AbstractStore();
         }
+
+        /*
+            Setup steps
+            1. Initialize the abstract store for 'entry' basic block
+            2. Add 'entry' basic block to worklist
+        */
+        InitEntryStore();
+        worklist.push_back("entry");
+
 
         /*
             Worklist algorithm
@@ -141,7 +142,7 @@ class ConstantAnalysis {
 
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
-            worklist.pop_back();
+            worklist.pop_front();
 
             // Get the successors of the current basic block
             std::vector<std::string> successors;
@@ -154,13 +155,13 @@ class ConstantAnalysis {
             bb2store[current_bb].print();
 
             std::cout << "This is the worklist now:" << std::endl;
-            for (const auto& i : worklist) {
+            for (const auto &i : worklist){
                 std::cout << i << " ";
             }
             std::cout << std::endl;
 
             // For each successor, join the abstract store and check if it has changed
-            for (const auto& successor : worklist) {
+            /*for (const auto& successor : worklist) {
 
                 //
                 // Join abstract stores and check for changes.
@@ -174,7 +175,7 @@ class ConstantAnalysis {
                 if (store_changed) {
                     worklist.push_back(successor);
                 }
-            }
+            }*/
 }
     }
 
@@ -184,9 +185,9 @@ class ConstantAnalysis {
      */
     std::map<std::string, AbstractStore> bb2store;
     /*
-     * Our worklist is a vector containing BasicBlock labels.
+     * Our worklist is a queue containing BasicBlock labels.
      */
-    std::vector<std::string> worklist;
+    std::deque<std::string> worklist;
 
     private:
     std::string funcname;

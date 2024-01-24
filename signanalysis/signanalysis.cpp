@@ -20,10 +20,11 @@ enum AbsDomain {
     Class that contains methods to perform sign analysis on function
 */
 class SignAnalysis {
-    public:
-    SignAnalysis(Program program) : program(program) {
-    };
-
+    private:
+    // data structures required for prep stage
+    std::unordered_set<std::string> int_type_globals; // contains names of all global variables of type int
+    std::unordered_set<std::string> addr_of_int_types; // contains names of all variables that are addresses of int types
+    std::string funcname;
     /*
     Method to get the set of int-typed global variables
     */
@@ -57,10 +58,13 @@ class SignAnalysis {
         return; 
     }
 
+    public:
+    SignAnalysis(Program program) : program(program) {
+    };
+
     /*
         Initialize the abstract store for 'entry' basic block
     */
-    // TODO - Make this generic to work for all basic blocks
     void InitEntryStore() {
         
         std::string bb_name = "entry";
@@ -103,10 +107,6 @@ class SignAnalysis {
         Function *func = program.funcs[func_name];
         std::cout << "Analyzing function " << func_name << std::endl;
         funcname = func_name;
-        
-        // data structures required for prep stage
-        std::unordered_set<std::string> int_type_globals; // contains names of all global variables of type int
-        std::unordered_set<std::string> addr_of_int_types; // contains names of all variables that are addresses of int types
         
         // Prep steps:
         // 1. Compute set of int-typed global variables
@@ -165,16 +165,13 @@ class SignAnalysis {
 
     Program program;
     /*
-     * Our bb2store is a map from a basic block label to an AbstractStore.
+     * Our bb2store is a map from a basic block label to an entry AbstractStore.
      */
     std::map<std::string, AbstractStore> bb2store;
     /*
      * Our worklist is a queue containing BasicBlock labels.
      */
     std::queue<std::string> worklist;
-
-    private:
-    std::string funcname;
 };
 
 int main(int argc, char* argv[]) 

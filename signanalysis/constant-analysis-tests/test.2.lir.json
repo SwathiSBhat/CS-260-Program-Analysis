@@ -1,0 +1,383 @@
+{
+    "structs": {
+        "struct1": [
+            {
+                "name": "f1",
+                "typ": "Int"
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": "Int"
+                }
+            }
+        ],
+        "struct2": [
+            {
+                "name": "f1",
+                "typ": {
+                    "Struct": "struct1"
+                }
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": {
+                        "Struct": "struct1"
+                    }
+                }
+            }
+        ]
+    },
+    "globals": [
+        {
+            "name": "func1",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": "Int",
+                        "param_ty": []
+                    }
+                }
+            },
+            "scope": null
+        },
+        {
+            "name": "func3",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": null,
+                        "param_ty": [
+                            "Int",
+                            {
+                                "Pointer": "Int"
+                            },
+                            {
+                                "Pointer": {
+                                    "Pointer": "Int"
+                                }
+                            },
+                            {
+                                "Pointer": {
+                                    "Struct": "struct2"
+                                }
+                            },
+                            "Int"
+                        ]
+                    }
+                }
+            },
+            "scope": null
+        },
+        {
+            "name": "func_test_copy",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": {
+                            "Pointer": {
+                                "Struct": "struct2"
+                            }
+                        },
+                        "param_ty": [
+                            "Int",
+                            {
+                                "Pointer": "Int"
+                            }
+                        ]
+                    }
+                }
+            },
+            "scope": null
+        }
+    ],
+    "functions": {
+        "func1": {
+            "id": "func1",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 42
+                        }
+                    }
+                }
+            }
+        },
+        "func_test_copy": {
+            "id": "func_test_copy",
+            "ret_ty": {
+                "Pointer": {
+                    "Struct": "struct2"
+                }
+            },
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func_test_copy"
+                },
+                {
+                    "name": "p2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_copy"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct2"
+                        }
+                    },
+                    "scope": "func_test_copy"
+                },
+                {
+                    "name": "_t2",
+                    "typ": "Int",
+                    "scope": "func_test_copy"
+                },
+                {
+                    "name": "_t3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_copy"
+                },
+                {
+                    "name": "_t4",
+                    "typ": "Int",
+                    "scope": "func_test_copy"
+                },
+                {
+                    "name": "_t5",
+                    "typ": "Int",
+                    "scope": "func_test_copy"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_copy"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_copy"
+                                },
+                                "op": {
+                                    "CInt": 10
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": "Int",
+                                    "scope": "func_test_copy"
+                                },
+                                "op": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_t3",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_copy"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "p2",
+                                        "typ": {
+                                            "Pointer": "Int"
+                                        },
+                                        "scope": "func_test_copy"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_t4",
+                                    "typ": "Int",
+                                    "scope": "func_test_copy"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "x",
+                                        "typ": "Int",
+                                        "scope": "func_test_copy"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "_t1",
+                                "typ": {
+                                    "Pointer": {
+                                        "Struct": "struct2"
+                                    }
+                                },
+                                "scope": "func_test_copy"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 1
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "z",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Multiply",
+                                "op1": {
+                                    "CInt": 3
+                                },
+                                "op2": {
+                                    "CInt": 4
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "CInt": 12
+                                },
+                                "op2": {
+                                    "CInt": 5
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "CInt": 14
+                                },
+                                "op2": {
+                                    "CInt": 5
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "main"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

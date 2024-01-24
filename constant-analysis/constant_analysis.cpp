@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_set>
+#include<deque>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
@@ -141,7 +142,7 @@ class ConstantAnalysis {
 
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
-            worklist.pop_back();
+            worklist.pop_front();
 
             // Get the successors of the current basic block
             std::vector<std::string> successors;
@@ -154,7 +155,7 @@ class ConstantAnalysis {
             bb2store[current_bb].print();
 
             std::cout << "This is the worklist now:" << std::endl;
-            for (const auto& i : worklist) {
+            for (const auto &i : worklist){
                 std::cout << i << " ";
             }
             std::cout << std::endl;
@@ -184,9 +185,9 @@ class ConstantAnalysis {
      */
     std::map<std::string, AbstractStore> bb2store;
     /*
-     * Our worklist is a vector containing BasicBlock labels.
+     * Our worklist is a queue containing BasicBlock labels.
      */
-    std::vector<std::string> worklist;
+    std::deque<std::string> worklist;
 
     private:
     std::string funcname;

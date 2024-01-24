@@ -18,7 +18,7 @@ AbstractStore execute(
         BasicBlock *bb,
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
-        std::vector<std::string> &worklist,
+        std::deque<std::string> &worklist,
         std::unordered_set<std::string> addr_of_int_types
         ) {
 
@@ -198,35 +198,6 @@ AbstractStore execute(
                 op = sigma_prime.GetValFromStore(copy_inst->op->var->name);
             }
             sigma_prime.abstract_store[copy_inst->lhs->name] = op;
-
-        } else if ((*inst).instrType == InstructionType::BranchInstrType) {
-
-            std::cout << "Ok, we're inside $branch" << std::endl;
-
-            /*
-             * Cast it.
-             */
-            BranchInstruction *branch_inst = (BranchInstruction *) inst;
-
-            /*
-             * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
-             * propagate to both.
-             */
-            if (branch_inst->condition->IsConstInt()) {
-                if (branch_inst->condition->val != 0) {
-                    worklist.push_back(branch_inst->tt);
-                } else {
-                    worklist.push_back(branch_inst->ff);
-                }
-            }
-            else {
-                // TODO: Check if the bb has to be pushed to worklist even if the store doesn't change
-                std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
-                if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP) {
-                    worklist.push_back(branch_inst->tt);
-                    worklist.push_back(branch_inst->ff);
-                }
-            }
         } else if ((*inst).instrType == InstructionType::LoadInstrType) {
             /*
              * Cast it.
@@ -323,6 +294,7 @@ AbstractStore execute(
      *
      * TODO
      */
+
     Instruction *terminal_instruction = bb->terminal;
     if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
         std::cout << "Encountered $branch" << std::endl;
@@ -331,36 +303,48 @@ AbstractStore execute(
              * Cast it.
              */
         BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
-
         /*
              * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
              * propagate to both.
              */
         if (branch_inst->condition->IsConstInt()) {
-            std::cout << "Condition is constant: " << branch_inst->condition->val << std::endl;
             if (branch_inst->condition->val != 0) {
-                worklist.push_back(branch_inst->tt);
+                bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
+                if (store_changed_tt)
+                    worklist.push_back(branch_inst->tt);
             } else {
-                worklist.push_back(branch_inst->ff);
+                bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
+                if (store_changed_ff)
+                    worklist.push_back(branch_inst->ff);
             }
         }
         else {
-            std::cout << "Condition is not constant: " << branch_inst->condition->var->name << std::endl;
             // TODO: Check if the bb has to be pushed to worklist even if the store doesn't change
-            std::cout <<" Sigma prime right now is:" << std::endl;
-            sigma_prime.print();
+
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
             if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP) {
+                
                 std::cout << "Pushing both branches to worklist since condition is TOP : " << branch_inst->condition->var->name << std::endl;
-                worklist.push_back(branch_inst->tt);
-                worklist.push_back(branch_inst->ff);
+                
+                bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
+                bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
+                
+                if (store_changed_tt)
+                    worklist.push_back(branch_inst->tt);
+                if (store_changed_ff)
+                    worklist.push_back(branch_inst->ff);
             }
-            else if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::BOTTOM)
+            else if (std:: holds_alternative<int>(absVal))
             {
-                std::cout << "Condition is BOTTOM, so no-op : " << branch_inst->condition->var->name << std::endl;
-            }
-            else {
-                std::cout << "What??? " <<std::endl;
+                if (std::get<int>(absVal) != 0) {
+                    bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
+                    if (store_changed_tt)
+                        worklist.push_back(branch_inst->tt);
+                } else {
+                    bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
+                    if (store_changed_ff)
+                        worklist.push_back(branch_inst->ff);
+                }
             }
         }
     } else if (terminal_instruction->instrType == InstructionType::JumpInstrType) {
@@ -375,7 +359,10 @@ AbstractStore execute(
          * Join sigma_prime with the basic block's abstract store (updating
          * the basic block's abstract store).
          */
+        // bb2store[jump_inst->label].print();
         bool store_changed = bb2store[jump_inst->label].join(sigma_prime);
+        // std::cout << "Store of target block: " << jump_inst->label << std::endl;
+        // bb2store[jump_inst->label].print();
         if (store_changed)
         {
             // If the basic block's abstract store changed, add the basic block to the worklist

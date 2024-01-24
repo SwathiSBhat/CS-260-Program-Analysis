@@ -35,9 +35,6 @@ AbstractStore execute(
         /*
          * This is the weirdest way of checking the instruction type ever, but
          * it works for now. I would like to figure out a more elegant solution.
-         *
-         * TODO These are only the instructions needed for the very first test
-         * TODO suite. We will need to add more later.
          */
         if ((*inst)->instrType == InstructionType::ArithInstrType) {
 

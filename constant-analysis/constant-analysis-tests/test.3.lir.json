@@ -1,0 +1,187 @@
+{
+    "structs": {},
+    "globals": [
+        {
+            "name": "func_test_load",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": "Int",
+                        "param_ty": [
+                            "Int",
+                            {
+                                "Pointer": "Int"
+                            },
+                            "Int"
+                        ]
+                    }
+                }
+            },
+            "scope": null
+        }
+    ],
+    "functions": {
+        "func_test_load": {
+            "id": "func_test_load",
+            "ret_ty": "Int",
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "p2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "p3",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t2",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": {
+                                    "Pointer": "Int"
+                                }
+                            }
+                        }
+                    },
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t5",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_load"
+                                },
+                                "src": {
+                                    "name": "p2",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_load"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "_t1",
+                                "typ": "Int",
+                                "scope": "func_test_load"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "main"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

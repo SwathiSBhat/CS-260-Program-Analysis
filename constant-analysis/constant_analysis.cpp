@@ -160,7 +160,7 @@ class ConstantAnalysis {
             std::cout << std::endl;
 
             // For each successor, join the abstract store and check if it has changed
-            /*for (const auto& successor : successors) {
+            for (const auto& successor : worklist) {
 
                 //
                 // Join abstract stores and check for changes.
@@ -172,9 +172,9 @@ class ConstantAnalysis {
                 // the worklist.
                 
                 if (store_changed) {
-                    worklist.push(successor);
+                    worklist.push_back(successor);
                 }
-            }*/
+            }
 }
     }
 

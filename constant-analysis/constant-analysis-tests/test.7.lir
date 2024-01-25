@@ -1,0 +1,44 @@
+struct struct1 {
+  f1:int
+  f2:&int
+}
+
+fn func_test_store(p1:int, p2:&&&int) -> int {
+    let x:int, y:int, z:int, _t1:int, _t2:&int, _t3:&int, _t4:&int, _t5:&&struct1, _t6:&struct1, _t7:&&&&&&int, _t8: &&&&&int 
+
+    entry:
+    _t1 = $copy 0
+    $store _t3 _t1
+    $store _t2 6
+    $store _t5 _t6
+    $jump bb0 
+
+    bb0:
+    y = $copy p1
+    $jump bb1
+
+    bb1:
+    _t7 = $addrof _t8
+    x = $copy 2
+    y = $arith add 2 x
+    $jump bb2
+
+    bb2:
+    _t2 = $addrof x
+    _t3 = $addrof y
+    $ret 2
+}
+
+fn func_test_addr_taken() -> _ {
+    let x:int, y:int, z:int, _t1:&int, _t2:&int 
+    entry:
+    _t1 = $addrof x
+    _t2 = $addrof y
+    $ret
+}
+
+fn main() -> int {
+    let x:int, y:int, z:int, a:int, b:int
+    entry:
+    $ret x
+}

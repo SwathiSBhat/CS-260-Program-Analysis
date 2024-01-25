@@ -25,7 +25,7 @@ fn func_test_branch(p1:int, p2:&&&int) -> int {
     bb1:
     _t2 = $arith sub x 1 
     _t3 = $cmp lte _t2 x 
-    $branch 1 bb3 bb5
+    $branch -1 bb3 bb5
 
     bb2:
     x = $copy _t1

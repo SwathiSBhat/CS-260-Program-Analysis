@@ -107,7 +107,7 @@
                     "term": {
                         "Branch": {
                             "cond": {
-                                "CInt": 1
+                                "CInt": -1
                             },
                             "tt": "bb3",
                             "ff": "bb5"

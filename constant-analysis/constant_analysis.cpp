@@ -8,15 +8,6 @@
 
 using json = nlohmann::json;
 
-// Define the abstract domain
-enum AbsDomain {
-    absBottom = 0,
-    absPos,
-    absZero,
-    absNeg,
-    absTop
-};
-
 /*
     Class that contains methods to perform constant analysis on function
 */

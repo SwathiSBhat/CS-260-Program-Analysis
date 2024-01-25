@@ -156,12 +156,16 @@ class ConstantAnalysis {
             // Perform the transfer function on the current basic block
             std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             bb2store[current_bb].print();
-            bb2store[current_bb] = execute(func->bbs[current_bb], bb2store[current_bb], bb2store, worklist, addr_of_int_types);
+            bb2store[current_bb] = execute(func->bbs[current_bb],
+                                           bb2store[current_bb],
+                                           bb2store,
+                                           worklist,
+                                           addr_of_int_types);
             std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             bb2store[current_bb].print();
 
             std::cout << "This is the worklist now:" << std::endl;
-            for (const auto &i : worklist){
+            for (const auto &i: worklist) {
                 std::cout << i << " ";
             }
             std::cout << std::endl;
@@ -182,7 +186,35 @@ class ConstantAnalysis {
                     worklist.push_back(successor);
                 }
             }*/
-}
+        }
+
+        /*
+         * Once we've completed the worklist algorithm, let's execute our
+         * transfer function once more on each basic block to get their exit
+         * abstract stores.
+         */
+        for (const auto &[bb_label, abstract_store] : bb2store) {
+            bb2store[bb_label] = execute(func->bbs[bb_label],
+                                         abstract_store,
+                                         bb2store,
+                                         worklist,
+                                         addr_of_int_types);
+        }
+
+        /*
+         * Finally, let's print out the abstract stores of each basic block in
+         * alphabetical order.
+         */
+        std::vector<std::string> sorted_bb_labels;
+        for (const auto &[bb_label, bb] : func->bbs) {
+            sorted_bb_labels.push_back(bb_label);
+        }
+        std::sort(sorted_bb_labels.begin(), sorted_bb_labels.end());
+        std::cout << "Constant analysis results:" << std::endl;
+        for (const auto &bb_label : sorted_bb_labels) {
+            std::cout << "\t" << bb_label << ":" << std::endl;
+            bb2store[bb_label].print();
+        }
     }
 
     Program program;

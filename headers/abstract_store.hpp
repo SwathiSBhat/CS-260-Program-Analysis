@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <variant>
+#include <algorithm>
 
 /*
  * These are the only abstract values we care about because constants are just
@@ -126,12 +127,27 @@ public:
 
         /*
          * Loop through all the entries and print them out.
-         *
-         * TODO Eventually Ben wants us to print these out in alphabetical
-         * TODO order.
          */
+
+        /*
+         * First, let's make a vector of variable names that we can then sort.
+         */
+        std::vector<std::string> var_names;
         for (const auto& pair : abstract_store) {
-            std::cout << pair.first << " -> " << std::visit(AbstractValStringifyVisitor{}, pair.second) << std::endl;
+            //std::cout << pair.first << " -> " << std::visit(AbstractValStringifyVisitor{}, pair.second) << std::endl;
+            var_names.push_back(pair.first);
+        }
+
+        /*
+         * Sort the vector of variable names.
+         */
+        std::sort(var_names.begin(), var_names.end());
+
+        /*
+         * Pretty-print the abstract store in alphabetical order.
+         */
+        for (const auto &var : var_names) {
+            std::cout << var << "->" << std::visit(AbstractValStringifyVisitor{}, abstract_store[var]) << std::endl;
         }
     }
 };

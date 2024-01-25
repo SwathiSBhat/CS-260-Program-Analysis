@@ -114,6 +114,12 @@ class ConstantAnalysis {
         // 2. Compute set of variables that are addresses of int-typed variables
         get_addr_of_int_types(addr_of_int_types, func_name);
 
+        std::cout << "Priting addr taken int types: " <<std::endl;
+        for (auto i : addr_of_int_types) {
+            std::cout << i << " ";
+        }
+        std::cout << std::endl;
+
         /*
          * We also need to initialize bb2store entries for all the basic blocks
          * in the function (I think.)

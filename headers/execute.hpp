@@ -197,7 +197,10 @@ AbstractStore execute(
             else {
                 op = sigma_prime.GetValFromStore(copy_inst->op->var->name);
             }
-            sigma_prime.abstract_store[copy_inst->lhs->name] = op;
+            if (std::holds_alternative<AbstractVal>(op) && std::get<AbstractVal>(op) == AbstractVal::BOTTOM)
+                continue;
+            else
+                sigma_prime.abstract_store[copy_inst->lhs->name] = op;
         } else if ((*inst).instrType == InstructionType::LoadInstrType) {
             /*
              * Cast it.
@@ -297,7 +300,7 @@ AbstractStore execute(
 
     Instruction *terminal_instruction = bb->terminal;
     if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
-        std::cout << "Encountered $branch" << std::endl;
+        // std::cout << "Encountered $branch" << std::endl;
 
         /*
              * Cast it.

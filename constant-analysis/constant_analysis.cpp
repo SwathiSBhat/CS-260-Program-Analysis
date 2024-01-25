@@ -141,9 +141,6 @@ class ConstantAnalysis {
             std::string current_bb = worklist.front();
             worklist.pop_front();
 
-            // Get the successors of the current basic block
-            std::vector<std::string> successors;
-
             // Perform the transfer function on the current basic block
             std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             bb2store[current_bb].print();
@@ -160,23 +157,6 @@ class ConstantAnalysis {
                 std::cout << i << " ";
             }
             std::cout << std::endl;
-
-            // For each successor, join the abstract store and check if it has changed
-            /*for (const auto& successor : worklist) {
-
-                //
-                // Join abstract stores and check for changes.
-                //
-                bool store_changed = bb2store[successor].join(bb2store[current_bb]);
-
-                //
-                // If the abstract store of the successor has changed, add it to
-                // the worklist.
-                
-                if (store_changed) {
-                    worklist.push_back(successor);
-                }
-            }*/
         }
 
         /*

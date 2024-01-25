@@ -198,7 +198,11 @@ AbstractStore execute(
                 op = sigma_prime.GetValFromStore(copy_inst->op->var->name);
             }
             if (std::holds_alternative<AbstractVal>(op) && std::get<AbstractVal>(op) == AbstractVal::BOTTOM)
-                continue;
+            {
+                if (sigma_prime.abstract_store.count(copy_inst->lhs->name) != 0) {
+                    sigma_prime.abstract_store.erase(copy_inst->lhs->name);
+                }
+            }
             else
                 sigma_prime.abstract_store[copy_inst->lhs->name] = op;
         } else if ((*inst).instrType == InstructionType::LoadInstrType) {

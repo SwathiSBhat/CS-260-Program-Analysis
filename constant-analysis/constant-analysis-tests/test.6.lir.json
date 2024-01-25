@@ -1,0 +1,221 @@
+{
+    "structs": {
+        "struct1": [
+            {
+                "name": "f1",
+                "typ": "Int"
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": "Int"
+                }
+            }
+        ]
+    },
+    "globals": [],
+    "functions": {
+        "func_test_load": {
+            "id": "func_test_load",
+            "ret_ty": "Int",
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "p2",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t2",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": {
+                                    "Pointer": "Int"
+                                }
+                            }
+                        }
+                    },
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t5",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t6",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "struct1"
+                            }
+                        }
+                    },
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "_t7",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct1"
+                        }
+                    },
+                    "scope": "func_test_load"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_load"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_load"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "func_test_load"
+                            }
+                        }
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_load"
+                                },
+                                "src": {
+                                    "name": "_t3",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_load"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t7",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "struct1"
+                                        }
+                                    },
+                                    "scope": "func_test_load"
+                                },
+                                "src": {
+                                    "name": "_t6",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "struct1"
+                                            }
+                                        }
+                                    },
+                                    "scope": "func_test_load"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "main"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

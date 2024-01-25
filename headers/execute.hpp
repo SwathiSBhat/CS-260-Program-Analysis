@@ -49,7 +49,7 @@ AbstractStore execute(
              */
             std::variant<int, AbstractVal> op1;
             std::variant<int, AbstractVal> op2;
-            int op1_val, op2_val;
+
             if (arith_inst->op1->IsConstInt()) {
                 op1 = arith_inst->op1->val;
             }
@@ -115,7 +115,7 @@ AbstractStore execute(
              */
             std::variant<int, AbstractVal> op1;
             std::variant<int, AbstractVal> op2;
-            int op1_val, op2_val;
+
             if (cmp_inst->op1->IsConstInt()) {
                 op1 = cmp_inst->op1->val;
             }

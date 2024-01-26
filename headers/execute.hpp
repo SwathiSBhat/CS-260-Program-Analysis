@@ -197,11 +197,13 @@ AbstractStore execute(
              * Cast it.
              */
             CopyInstruction *copy_inst = (CopyInstruction *) inst;
+            std::cout << copy_inst->lhs->name << std::endl;
 
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
              */
             if (!copy_inst->lhs->isIntType()) {
+                std::cout << copy_inst->lhs->name << " is not an int, skipping $copy" << std::endl;
                 continue;
             }
 
@@ -212,7 +214,10 @@ AbstractStore execute(
              */
             std::variant<int, AbstractVal> op;
             if (copy_inst->op->IsConstInt()) {
+                std::cout << "Doing a normal copy" << std::endl;
                 op = copy_inst->op->val;
+                std::cout << std::get<int>(op) << std::endl;
+                sigma_prime.abstract_store[copy_inst->lhs->name] = op;
             }
             else {
                 op = sigma_prime.GetValFromStore(copy_inst->op->var->name);
@@ -223,8 +228,9 @@ AbstractStore execute(
                     sigma_prime.abstract_store.erase(copy_inst->lhs->name);
                 }
             }
-            else
+            else {
                 sigma_prime.abstract_store[copy_inst->lhs->name] = op;
+            }
         } else if ((*inst).instrType == InstructionType::LoadInstrType) {
             /*
              * Cast it.

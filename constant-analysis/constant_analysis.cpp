@@ -159,17 +159,32 @@ class ConstantAnalysis {
             std::cout << std::endl;
         }
 
+        std::cout << "bb1 before" << std::endl;
+        bb2store["bb1"].print();
+        std::cout << std::endl;
+
         /*
          * Once we've completed the worklist algorithm, let's execute our
          * transfer function once more on each basic block to get their exit
          * abstract stores.
          */
         for (const auto &[bb_label, abstract_store] : bb2store) {
+            std::cout << "Doing one final execution of " << bb_label << std::endl;
+
+            /*
+             * TODO I don't think this updates the abstract stores correctly. I
+             * TODO think this changes the other bbs when we don't want it to.
+             * TODO How should we execute without updating?
+             */
             bb2store[bb_label] = execute(func->bbs[bb_label],
                                          abstract_store,
                                          bb2store,
                                          worklist,
                                          addr_of_int_types);
+
+            std::cout << "bb1" << std::endl;
+            bb2store["bb1"].print();
+            std::cout << std::endl;
         }
 
         /*

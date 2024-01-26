@@ -194,6 +194,8 @@ AbstractStore execute(
 
         } else if ((*inst).instrType == InstructionType::CopyInstrType) {
 
+            std::cout << "Encountered $copy" << std::endl;
+
             /*
              * Cast it.
              */
@@ -207,6 +209,9 @@ AbstractStore execute(
                 continue;
             }
 
+            std::cout << "lhs is definitely int-typed" << std::endl;
+            //copy_inst->pretty_print();
+
             /*
              * Copy over the value. We can just do a simple integer copy because
              * of our constant domain. If we had some other domain, we would
@@ -219,16 +224,21 @@ AbstractStore execute(
                 sigma_prime.abstract_store[copy_inst->lhs->name] = op;
             }
             else {
+                std::cout << "Alright are we segfaulting here?" << std::endl;
                 op = sigma_prime.GetValFromStore(copy_inst->op->var->name);
+                std::cout << "Breakpoint 1?" << std::endl;
             }
             if (std::holds_alternative<AbstractVal>(op) && std::get<AbstractVal>(op) == AbstractVal::BOTTOM)
             {
+                std::cout << "Breakpoint 2?" << std::endl;
                 if (sigma_prime.abstract_store.count(copy_inst->lhs->name) != 0) {
                     sigma_prime.abstract_store.erase(copy_inst->lhs->name);
                 }
             }
             else {
+                std::cout << "Breakpoint 3?" << std::endl;
                 sigma_prime.abstract_store[copy_inst->lhs->name] = op;
+                std::cout << "Breakpoint 4?" << std::endl;
             }
         } else if ((*inst).instrType == InstructionType::LoadInstrType) {
             /*
@@ -309,16 +319,25 @@ AbstractStore execute(
     Instruction *terminal_instruction = bb->terminal;
     if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
 
+
+        if (!update_bb2store) {
+            return sigma_prime;
+        }
+
+        std::cout << "Breakpoint 5?" << std::endl;
+        std::cout << update_bb2store << std::endl;
+
         /*
          * Cast it.
          */
         BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
 
+
         /*
              * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
              * propagate to both.
              */
-        if (update_bb2store && branch_inst->condition->IsConstInt()) {
+        if (branch_inst->condition->IsConstInt()) {
             if (branch_inst->condition->val != 0) {
                 bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
                 if (store_changed_tt)

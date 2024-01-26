@@ -1,7 +1,6 @@
 #include <fstream>
 #include <vector>
 #include <unordered_set>
-#include<deque>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
@@ -159,6 +158,8 @@ class ConstantAnalysis {
             }
             std::cout << std::endl;
         }
+
+        std::cout << "DONE WITH LOOP" << std::endl;
 
         /*
          * Once we've completed the worklist algorithm, let's execute our

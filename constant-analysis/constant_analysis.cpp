@@ -190,16 +190,6 @@ class ConstantAnalysis {
             }
             std::cout << std::endl;
         }
-        /*std::vector<std::string> sorted_bb_labels;
-        for (const auto &[bb_label, bb] : func->bbs) {
-            sorted_bb_labels.push_back(bb_label);
-        }
-        std::sort(sorted_bb_labels.begin(), sorted_bb_labels.end());
-        for (const auto &bb_label : sorted_bb_labels) {
-            std::cout << bb_label << ":" << std::endl;
-            bb2store[bb_label].print();
-            std::cout << std::endl;
-        }*/
     }
 
     Program program;

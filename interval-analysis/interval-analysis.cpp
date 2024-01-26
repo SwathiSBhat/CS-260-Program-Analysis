@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_set>
 #include<deque>
+#include<set>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
@@ -52,13 +53,11 @@ class IntervalAnalysis {
     /*
      * Get the list of loop headers through post order traversal of all basic blocks in the function
     */
-    void get_loop_headers(std::unordered_set<std::string> &loop_headers, const std::string &func_name) {
+    void get_loop_headers(std::set<std::string> &loop_headers, const std::string &func_name) {
         
         std::unordered_set<std::string> visited;
         std::vector<std::string> post_order;
-        std::vector<std::string> loop_headers_vec;
         std::string entry_bb = "entry";
-        std::string exit_bb = "exit";
         std::string current_bb = entry_bb;
         std::stack<std::string> stack;
 
@@ -88,18 +87,21 @@ class IntervalAnalysis {
                     stack.push(call_idr_instr->next_bb);
                 } else if (instr->instrType == InstructionType::RetInstrType) {
                     // No-op 
-                    std::cout << "Ret instruction type" << std::endl;
                 }
                 else {
                     std::cout << "Terminal instruction type not found" << std::endl;
                 }
             }
+            else {
+                loop_headers.insert(current_bb);
+            }
         }
         std::reverse(post_order.begin(), post_order.end());
-        std::cout << "Printing post order" << std::endl;
+        /*std::cout << "Printing post order" << std::endl;
         for (auto bb : post_order) {
             std::cout << bb << " ";
         }
+        std::cout << std::endl;*/
         return;
     }
 
@@ -147,16 +149,17 @@ class IntervalAnalysis {
         
         // Prep steps:
         // 1. Compute set of int-typed global variables
-        // get_int_type_globals(int_type_globals);
+        get_int_type_globals(int_type_globals);
         // 2. Compute set of variables that are addresses of int-typed variables
-        /*get_addr_of_int_types(addr_of_int_types, func_name);
+        get_addr_of_int_types(addr_of_int_types, func_name);
 
-        std::cout << "Priting addr taken int types: " <<std::endl;
+        /*std::cout << "Priting addr taken int types: " <<std::endl;
         for (auto i : addr_of_int_types) {
             std::cout << i << " ";
         }
         std::cout << std::endl;*/
 
+        std::set<std::string> loop_headers;
         // Populate the set of loop headers for which widening will be performed
         get_loop_headers(loop_headers, func_name);
 
@@ -208,40 +211,6 @@ class IntervalAnalysis {
             std::cout << std::endl;
         }*/
 
-        /*
-         * Once we've completed the worklist algorithm, let's execute our
-         * transfer function once more on each basic block to get their exit
-         * abstract stores.
-         */
-        //for (const auto &[bb_label, abstract_store] : bb2store) {
-        //    std::cout << "Doing one final execution of " << bb_label << std::endl;
-
-            /*
-             * TODO I don't think this updates the abstract stores correctly. I
-             * TODO think this changes the other bbs when we don't want it to.
-             * TODO How should we execute without updating?
-             */
-        /*    bb2store[bb_label] = execute(func->bbs[bb_label],
-                                         abstract_store,
-                                         bb2store,
-                                         worklist,
-                                         addr_of_int_types);
-        }*/
-
-        /*
-         * Finally, let's print out the abstract stores of each basic block in
-         * alphabetical order.
-         */
-        /*std::vector<std::string> sorted_bb_labels;
-        for (const auto &[bb_label, bb] : func->bbs) {
-            sorted_bb_labels.push_back(bb_label);
-        }
-        std::sort(sorted_bb_labels.begin(), sorted_bb_labels.end());
-        std::cout << "Interval analysis results:" << std::endl;
-        for (const auto &bb_label : sorted_bb_labels) {
-            std::cout << bb_label << ":" << std::endl;
-            bb2store[bb_label].print();
-        }*/
     }
 
     Program program;

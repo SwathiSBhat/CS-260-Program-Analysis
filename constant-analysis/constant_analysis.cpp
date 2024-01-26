@@ -42,6 +42,10 @@ public:
      * TODO: This should also include addrof of global variables but we are not doing it for assignment 1
     */
     void get_addr_of_int_types(std::unordered_set<std::string> &addr_of_int_types, const std::string &func_name) {  
+        //program.funcs[func_name]->bbs["entry"]->pretty_print(json::parse("{\"structs\": \"false\",\"globals\": \"false\",\"functions\": {\"bbs\": {\"instructions\" : \"true\"}},\"externs\": \"false\"}"));
+        for(auto it = program.funcs[func_name]->bbs.begin(); it != program.funcs[func_name]->bbs.end(); ++it) {
+            std::cout<<it->first<<std::endl;
+        }
         for (auto basic_block : program.funcs[func_name]->bbs) {
             for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
                 if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
@@ -108,15 +112,15 @@ public:
         
         // Prep steps:
         // 1. Compute set of int-typed global variables
-        get_int_type_globals(int_type_globals);
+        // get_int_type_globals(int_type_globals);
         // 2. Compute set of variables that are addresses of int-typed variables
-        get_addr_of_int_types(addr_of_int_types, func_name);
+        // get_addr_of_int_types(addr_of_int_types, func_name);
 
-        //std::cout << "Priting addr taken int types: " <<std::endl;
-        //for (auto i : addr_of_int_types) {
-        //    std::cout << i << " ";
-        //}
-        //std::cout << std::endl;
+        /*std::cout << "Printing addr taken int types: " <<std::endl;
+        for (auto i : addr_of_int_types) {
+            std::cout << i << " ";
+        }
+        std::cout << std::endl;*/
 
         /*
          * We also need to initialize bb2store entries for all the basic blocks
@@ -201,7 +205,7 @@ public:
             std::cout << std::endl;
         }*/
 
-        //std::cout << "START OF ACTUAL OUTPUT" << std::endl;
+        std::cout << "START OF ACTUAL OUTPUT" << std::endl;
 
         for (const auto &bb_label : bbs_to_output) {
             std::cout << bb_label << ":" << std::endl;

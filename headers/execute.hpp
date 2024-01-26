@@ -19,7 +19,7 @@ AbstractStore execute(
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
         std::deque<std::string> &worklist,
-        std::unordered_set<std::string> addr_of_int_types) {
+        std::unordered_set<std::string> addr_of_int_types)  {
 
     /*
      * Make a copy of sigma that we'll return at the end of this function.
@@ -106,7 +106,7 @@ AbstractStore execute(
         } else if ((*inst).instrType == InstructionType::CmpInstrType) {
             
             CmpInstruction *cmp_inst = (CmpInstruction *) inst;
-            
+
             if ((cmp_inst->op1->var && !(cmp_inst->op1->var->isIntType())) || (cmp_inst->op1->var && !(cmp_inst->op2->var->isIntType()))) {
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
             } 
@@ -124,7 +124,7 @@ AbstractStore execute(
             if (cmp_inst->op2->IsConstInt()) {
                 op2 = cmp_inst->op2->val;
             }
-            else {
+            else if (cmp_inst->op2->var){
                 op2 = sigma_prime.GetValFromStore(cmp_inst->op2->var->name);
             }
 
@@ -162,7 +162,8 @@ AbstractStore execute(
             else
             {
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-            } }
+            } 
+            }
 
         } else if ((*inst).instrType == InstructionType::CopyInstrType) {
 

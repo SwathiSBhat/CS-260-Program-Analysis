@@ -166,7 +166,6 @@ class ConstantAnalysis {
          * abstract stores.
          */
         for (const auto &[bb_label, abstract_store] : bb2store) {
-            std::cout << "Doing one final execution of " << bb_label << std::endl;
 
             /*
              * TODO I don't think this updates the abstract stores correctly. I
@@ -190,10 +189,10 @@ class ConstantAnalysis {
             sorted_bb_labels.push_back(bb_label);
         }
         std::sort(sorted_bb_labels.begin(), sorted_bb_labels.end());
-        std::cout << "Constant analysis results:" << std::endl;
         for (const auto &bb_label : sorted_bb_labels) {
-            std::cout << "\t" << bb_label << ":" << std::endl;
+            std::cout << bb_label << ":" << std::endl;
             bb2store[bb_label].print();
+            std::cout << std::endl;
         }
     }
 
@@ -224,7 +223,6 @@ int main(int argc, char* argv[])
     std::string func_name = argv[3];
 
     Program program = Program(lir_json);
-    std::cout << "********** Program created **********" << std::endl;
     ConstantAnalysis constant_analysis = ConstantAnalysis(program);
     constant_analysis.AnalyzeFunc(func_name);
 

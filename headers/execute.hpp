@@ -204,7 +204,6 @@ AbstractStore execute(
              * If the lhs isn't an int-typed variable, ignore instruction.
              */
             if (!copy_inst->lhs->isIntType()) {
-                std::cout << copy_inst->lhs->name << " is not an int, skipping $copy" << std::endl;
                 continue;
             }
 
@@ -215,7 +214,6 @@ AbstractStore execute(
              */
             std::variant<int, AbstractVal> op;
             if (copy_inst->op->IsConstInt()) {
-                std::cout << "Doing a normal copy" << std::endl;
                 op = copy_inst->op->val;
                 std::cout << std::get<int>(op) << std::endl;
                 sigma_prime.abstract_store[copy_inst->lhs->name] = op;
@@ -310,14 +308,11 @@ AbstractStore execute(
 
     Instruction *terminal_instruction = bb->terminal;
     if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
-        std::cout << "Encountered $branch" << std::endl;
 
         /*
-             * Cast it.
-             */
+         * Cast it.
+         */
         BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
-
-        std::cout << "Branching to " << branch_inst->tt << " or " << branch_inst->ff << std::endl;
 
         /*
              * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
@@ -339,9 +334,6 @@ AbstractStore execute(
 
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
             if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP){
-                
-                std::cout << "Pushing both branches to worklist since condition is TOP : " << branch_inst->condition->var->name << std::endl;
-
                 if (update_bb2store) {
                     bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
                     bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);

@@ -147,7 +147,7 @@ public:
          * Pretty-print the abstract store in alphabetical order.
          */
         for (const auto &var : var_names) {
-            std::cout << var << "->" << std::visit(AbstractValStringifyVisitor{}, abstract_store[var]) << std::endl;
+            std::cout << var << " -> " << std::visit(AbstractValStringifyVisitor{}, abstract_store[var]) << std::endl;
         }
     }
 };

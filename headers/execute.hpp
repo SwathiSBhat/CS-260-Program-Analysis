@@ -19,9 +19,7 @@ AbstractStore execute(
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
         std::deque<std::string> &worklist,
-        std::unordered_set<std::string> addr_of_int_types,
-        bool update_bb2store
-        ) {
+        std::unordered_set<std::string> addr_of_int_types) {
 
     /*
      * Make a copy of sigma that we'll return at the end of this function.
@@ -35,7 +33,7 @@ AbstractStore execute(
      */
     for (const Instruction *inst : bb->instructions) {
 
-        //std::cout << "This is the instruction type: " << inst->instrType << std::endl;
+        std::cout << "This is the instruction type: " << inst->instrType << std::endl;
 
         if ((*inst).instrType == InstructionType::ArithInstrType) {
 
@@ -321,13 +319,7 @@ AbstractStore execute(
     Instruction *terminal_instruction = bb->terminal;
     if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
 
-
-        if (!update_bb2store) {
-            return sigma_prime;
-        }
-
         std::cout << "Breakpoint 5?" << std::endl;
-        std::cout << update_bb2store << std::endl;
 
         /*
          * Cast it.
@@ -355,7 +347,6 @@ AbstractStore execute(
 
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
             if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP){
-                if (update_bb2store) {
                     bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
                     bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
 
@@ -363,9 +354,9 @@ AbstractStore execute(
                         worklist.push_back(branch_inst->tt);
                     if (store_changed_ff)
                         worklist.push_back(branch_inst->ff);
-                }
+
             }
-            else if (std:: holds_alternative<int>(absVal) && update_bb2store)
+            else if (std:: holds_alternative<int>(absVal))
             {
                 if (std::get<int>(absVal) != 0) {
                     bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
@@ -390,7 +381,6 @@ AbstractStore execute(
          * Join sigma_prime with the basic block's abstract store (updating
          * the basic block's abstract store).
          */
-        if (update_bb2store) {
             bool store_changed = bb2store[jump_inst->label].join(sigma_prime);
 
             if (store_changed)
@@ -398,7 +388,6 @@ AbstractStore execute(
                 // If the basic block's abstract store changed, add the basic block to the worklist
                 worklist.push_back(jump_inst->label);
             }
-        }
     } else if (terminal_instruction->instrType == InstructionType::RetInstrType) {
         std::cout << "Encountered $ret" << std::endl;
 

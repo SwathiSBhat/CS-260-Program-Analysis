@@ -147,8 +147,7 @@ class ConstantAnalysis {
                                            bb2store[current_bb],
                                            bb2store,
                                            worklist,
-                                           addr_of_int_types,
-                                           true);
+                                           addr_of_int_types);
             std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             bb2store[current_bb].print();
 
@@ -177,8 +176,7 @@ class ConstantAnalysis {
                                          abstract_store,
                                          bb2store,
                                          worklist,
-                                         addr_of_int_types,
-                                         false);
+                                         addr_of_int_types);
         }
 
         /*

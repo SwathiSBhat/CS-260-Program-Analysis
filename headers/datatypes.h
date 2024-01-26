@@ -210,8 +210,8 @@ class Struct{
     public:
     Struct(json struct_json) {
 
-        std::cout << "Struct" << std::endl;
-        std::cout << struct_json << std::endl;
+        //std::cout << "Struct" << std::endl;
+        //std::cout << struct_json << std::endl;
         
         if (struct_json.begin() != struct_json.end()) {
             name = struct_json.begin().key();

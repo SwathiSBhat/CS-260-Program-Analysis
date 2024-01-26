@@ -33,7 +33,7 @@ AbstractStore execute(
      */
     for (const Instruction *inst : bb->instructions) {
 
-        std::cout << "This is the instruction type: " << inst->instrType << std::endl;
+        //std::cout << "This is the instruction type: " << inst->instrType << std::endl;
 
         if ((*inst).instrType == InstructionType::ArithInstrType) {
 
@@ -172,7 +172,7 @@ AbstractStore execute(
              * Cast it.
              */
             CopyInstruction *copy_inst = (CopyInstruction *) inst;
-            std::cout << copy_inst->lhs->name << std::endl;
+            //std::cout << copy_inst->lhs->name << std::endl;
 
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
@@ -181,7 +181,7 @@ AbstractStore execute(
                 continue;
             }
 
-            std::cout << "lhs is definitely int-typed" << std::endl;
+            //std::cout << "lhs is definitely int-typed" << std::endl;
             //copy_inst->pretty_print();
 
             /*

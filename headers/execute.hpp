@@ -166,7 +166,7 @@ AbstractStore execute(
 
         } else if ((*inst).instrType == InstructionType::CopyInstrType) {
 
-            std::cout << "Encountered $copy" << std::endl;
+            //std::cout << "Encountered $copy" << std::endl;
 
             /*
              * Cast it.
@@ -285,7 +285,7 @@ AbstractStore execute(
     Instruction *terminal_instruction = bb->terminal;
     if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
 
-        std::cout << "Breakpoint 5?" << std::endl;
+        //std::cout << "Breakpoint 5?" << std::endl;
 
         /*
          * Cast it.
@@ -355,13 +355,13 @@ AbstractStore execute(
                 worklist.push_back(jump_inst->label);
             }
     } else if (terminal_instruction->instrType == InstructionType::RetInstrType) {
-        std::cout << "Encountered $ret" << std::endl;
+        //std::cout << "Encountered $ret" << std::endl;
 
         /*
          * No-op. We don't have to do anything here.
          */
     } else if (terminal_instruction->instrType == InstructionType::CallDirInstrType) {
-        std::cout << "Encountered $call_dir" << std::endl;
+        //std::cout << "Encountered $call_dir" << std::endl;
 
         // For all ints in globals_ints, update sigma_primt to TOP
         // TODO: Ignoring global variables for assignment 1

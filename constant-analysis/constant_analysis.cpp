@@ -150,17 +150,17 @@ public:
             worklist.pop_front();
 
             // Perform the transfer function on the current basic block
-            std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
+            //std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             bb2store[current_bb].print();
             bb2store[current_bb] = execute(func->bbs[current_bb],
                                            bb2store[current_bb],
                                            bb2store,
                                            worklist,
                                            addr_of_int_types);
-            std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
+            //std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             bb2store[current_bb].print();
 
-            std::cout << "This is the worklist now:" << std::endl;
+            //std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {
                 std::cout << i << " ";
                 bbs_to_output.insert(i);
@@ -168,7 +168,7 @@ public:
             std::cout << std::endl;
         }
 
-        std::cout << "DONE WITH LOOP" << std::endl;
+        //std::cout << "DONE WITH LOOP" << std::endl;
 
         /*
          * Once we've completed the worklist algorithm, let's execute our

@@ -106,10 +106,11 @@ AbstractStore execute(
         } else if ((*inst).instrType == InstructionType::CmpInstrType) {
             
             CmpInstruction *cmp_inst = (CmpInstruction *) inst;
-            
-            if ((cmp_inst->op1->var && !(cmp_inst->op1->var->isIntType())) || (cmp_inst->op1->var && !(cmp_inst->op2->var->isIntType()))) {
+            //std::cout << "Inside $cmp" << std::endl;
+            if ((cmp_inst->op1->var && !(cmp_inst->op1->var->isIntType())) || (cmp_inst->op2->var && !(cmp_inst->op2->var->isIntType()))) {
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-            } 
+                //std::cout << cmp_inst->op1->var->name << std::endl;
+            }
             else {
             
             std::variant<int, AbstractVal> op1;

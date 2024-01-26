@@ -76,20 +76,13 @@ public:
         }*/
 
         for (auto param : program.funcs[funcname]->params) {
-            if (param->isIntType()) {
+            if (param && param->isIntType()) {
                 // std::cout << "Setting parameter: " << param->name << " to TOP" << std::endl;
                 store.abstract_store[param->name] = AbstractVal::TOP;
             }  
         }
         bb2store[bb_name] = store;
-        return;
-    }
-
-    /*
-        Clear contents of the abstract store for a basic block
-    */
-    void ClearStore(std::string &bb_name) {
-        bb2store.erase(bb_name);
+        //std::cout << "Initialized entry store" << std::endl;
         return;
     }
 
@@ -99,6 +92,10 @@ public:
     void AnalyzeFunc(const std::string &func_name) {
 
         Function *func = program.funcs[func_name];
+        if (!func) {
+            std::cout << "Func not found" << std::endl;
+            return;
+        }
         //std::cout << "Analyzing function " << func_name << std::endl;
         funcname = func_name;
         
@@ -226,6 +223,7 @@ private:
 
 int main(int argc, char* argv[]) 
 {
+    //std::cout << "Beginning of main" << std::endl;
     if (argc != 4) {
         std::cerr << "Usage: constant-analysis <lir file path> <lir json filepath> <funcname>" << std::endl;
         return EXIT_FAILURE;

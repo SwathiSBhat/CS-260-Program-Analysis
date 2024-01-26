@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_set>
+#include <set>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
@@ -11,9 +12,16 @@ using json = nlohmann::json;
     Class that contains methods to perform constant analysis on function
 */
 class ConstantAnalysis {
-    public:
-    ConstantAnalysis(Program program) : program(program) {
-    };
+public:
+
+    /*
+     * This data structure holds a list of all basic blocks that have ever been
+     * on the worklist. At the end of our analysis, we will only print out the
+     * basic blocks that are on this list.
+     */
+    std::set<std::string> bbs_to_output;
+
+    ConstantAnalysis(Program program) : program(program) {};
 
     /*
     Method to get the set of int-typed global variables
@@ -126,6 +134,7 @@ class ConstantAnalysis {
         */
         InitEntryStore();
         worklist.push_back("entry");
+        bbs_to_output.insert("entry");
 
 
         /*
@@ -154,6 +163,7 @@ class ConstantAnalysis {
             std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {
                 std::cout << i << " ";
+                bbs_to_output.insert(i);
             }
             std::cout << std::endl;
         }
@@ -183,23 +193,19 @@ class ConstantAnalysis {
          * Finally, let's print out the abstract stores of each basic block in
          * alphabetical order.
          */
-        for (auto it = bb2store.begin(); it != bb2store.end(); ++it) {
+        /*for (auto it = bb2store.begin(); it != bb2store.end(); ++it) {
             if ((*it).second.abstract_store.size() > 0) {
                 std::cout << (*it).first << ":" << std::endl;
                 (*it).second.print();
             }
             std::cout << std::endl;
-        }
-        /*std::vector<std::string> sorted_bb_labels;
-        for (const auto &[bb_label, bb] : func->bbs) {
-            sorted_bb_labels.push_back(bb_label);
-        }
-        std::sort(sorted_bb_labels.begin(), sorted_bb_labels.end());
-        for (const auto &bb_label : sorted_bb_labels) {
+        }*/
+
+        for (const auto &bb_label : bbs_to_output) {
             std::cout << bb_label << ":" << std::endl;
             bb2store[bb_label].print();
             std::cout << std::endl;
-        }*/
+        }
     }
 
     Program program;
@@ -212,7 +218,7 @@ class ConstantAnalysis {
      */
     std::deque<std::string> worklist;
 
-    private:
+private:
     std::string funcname;
 };
 

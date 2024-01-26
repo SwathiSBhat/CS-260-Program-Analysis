@@ -143,12 +143,14 @@ class ConstantAnalysis {
             // Perform the transfer function on the current basic block
             std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             bb2store[current_bb].print();
+            std::cout << "About to call execute()" << std::endl;
             bb2store[current_bb] = execute(func->bbs[current_bb],
                                            bb2store[current_bb],
                                            bb2store,
                                            worklist,
                                            addr_of_int_types,
                                            true);
+            std::cout << "Done calling execute()" << std::endl;
             std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             bb2store[current_bb].print();
 

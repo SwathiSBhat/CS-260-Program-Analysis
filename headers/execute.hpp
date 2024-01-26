@@ -35,7 +35,7 @@ AbstractStore execute(
      */
     for (const Instruction *inst : bb->instructions) {
 
-        //std::cout << "This is the instruction type: " << inst->instrType << std::endl;
+        std::cout << "This is the instruction type: " << inst->instrType << std::endl;
 
         if ((*inst).instrType == InstructionType::ArithInstrType) {
 
@@ -107,33 +107,43 @@ AbstractStore execute(
 
         } else if ((*inst).instrType == InstructionType::CmpInstrType) {
 
-            /*
-             * TODO It looks like Ben's solution allows $cmp with a pointer? I
-             * TODO will change our code to match this behavior but we might
-             * TODO have to change it back later.
-             */
+            std::cout << "Encountered $cmp" << std::endl;
 
             /*
              * Cast it.
              */
             CmpInstruction *cmp_inst = (CmpInstruction *) inst;
 
-            std::cout << "Comparing " << cmp_inst->op1->var->name << " and " << cmp_inst->op2->var->name << std::endl;
+            std::cout << "Didn't get here, eh?" << std::endl;
+
+            /*
+             * TODO So this is the problem.
+             */
+            //std::cout << "Comparing " << cmp_inst->op1->var->name << " and " << cmp_inst->op2->var->name << std::endl;
 
             /*
              * If op1 or op2 are not ints, then lhs immediately gets TOP.
              *
-             * TODO
+             * TODO Why is this so hard???
              */
-            if (!(cmp_inst->op1->var->isIntType()) || !(cmp_inst->op2->var->isIntType())) {
+            if (cmp_inst->op1->var) {
+                if (cmp_inst->op1->var->type->indirection != 0) {
+                    std::cout << "op1 is a pointer" << std::endl;
+                    sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
+                    return sigma_prime;
+                }
+            }
+            if (cmp_inst->op2->var) {
+                if (cmp_inst->op2->var->type->indirection != 0) {
+                    std::cout << "op2 is a pointer" << std::endl;
+                    sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
+                    return sigma_prime;
+                }
+            }
+            /*if (!(cmp_inst->op1->var->isIntType()) || !(cmp_inst->op2->var->isIntType())) {
                 std::cout << "Mwahaha tricky tricky" << std::endl;
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-            } else {
-
-            /*
-             * Since $cmp is only done on ints, we know that op1 and op2 are ints
-             * the operands can be int typed variables or direct int constants
-             */
+            } else {*/
             std::variant<int, AbstractVal> op1;
             std::variant<int, AbstractVal> op2;
 
@@ -190,7 +200,7 @@ AbstractStore execute(
             else
             {
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-            } }
+            } /*}*/
 
         } else if ((*inst).instrType == InstructionType::CopyInstrType) {
 

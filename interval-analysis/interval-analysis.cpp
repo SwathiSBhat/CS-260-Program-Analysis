@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_set>
+#include<deque>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
@@ -8,11 +9,11 @@
 using json = nlohmann::json;
 
 /*
-    Class that contains methods to perform constant analysis on function
+    Class that contains methods to perform Interval analysis on function
 */
-class ConstantAnalysis {
+class IntervalAnalysis {
     public:
-    ConstantAnalysis(Program program) : program(program) {
+    IntervalAnalysis(Program program) : program(program) {
     };
 
     /*
@@ -49,6 +50,60 @@ class ConstantAnalysis {
     }
 
     /*
+     * Get the list of loop headers through post order traversal of all basic blocks in the function
+    */
+    void get_loop_headers(std::unordered_set<std::string> &loop_headers, const std::string &func_name) {
+        
+        std::unordered_set<std::string> visited;
+        std::vector<std::string> post_order;
+        std::vector<std::string> loop_headers_vec;
+        std::string entry_bb = "entry";
+        std::string exit_bb = "exit";
+        std::string current_bb = entry_bb;
+        std::stack<std::string> stack;
+
+        stack.push(current_bb);
+        
+        while (!stack.empty()) {
+            current_bb = stack.top();
+            stack.pop();
+
+            if (visited.count(current_bb) == 0) {
+                visited.insert(current_bb);
+                post_order.push_back(current_bb);
+                Instruction *instr = program.funcs[func_name]->bbs[current_bb]->terminal;
+                // Check instruction type to get next basic block
+                if (instr->instrType == InstructionType::BranchInstrType) {
+                    BranchInstruction *branch_instr = dynamic_cast<BranchInstruction*>(instr);
+                    stack.push(branch_instr->tt);
+                    stack.push(branch_instr->ff);
+                } else if (instr->instrType == InstructionType::JumpInstrType) {
+                    JumpInstruction *jump_instr = dynamic_cast<JumpInstruction*>(instr);
+                    stack.push(jump_instr->label);
+                } else if (instr->instrType == InstructionType::CallDirInstrType) {
+                    CallDirInstruction *call_dir_instr = dynamic_cast<CallDirInstruction*>(instr);
+                    stack.push(call_dir_instr->next_bb);
+                } else if (instr->instrType == InstructionType::CallIdrInstrType) {
+                    CallIdrInstruction *call_idr_instr = dynamic_cast<CallIdrInstruction*>(instr);
+                    stack.push(call_idr_instr->next_bb);
+                } else if (instr->instrType == InstructionType::RetInstrType) {
+                    // No-op 
+                    std::cout << "Ret instruction type" << std::endl;
+                }
+                else {
+                    std::cout << "Terminal instruction type not found" << std::endl;
+                }
+            }
+        }
+        std::reverse(post_order.begin(), post_order.end());
+        std::cout << "Printing post order" << std::endl;
+        for (auto bb : post_order) {
+            std::cout << bb << " ";
+        }
+        return;
+    }
+
+    /*
         Initialize the abstract store for 'entry' basic block
     */
     void InitEntryStore() {
@@ -58,18 +113,10 @@ class ConstantAnalysis {
 
         // Initialize all globals and parameters in function to TOP
 
-        // TODO: Ignoring global variables for assignment 1
-        /*for (auto global_var : program.globals) {
-            Variable *global_var_ptr = global_var->globalVar;
-            if (global_var_ptr->isIntType()) {
-                // std::cout << "Setting global: " << global_var_ptr->name << " to TOP" << std::endl;
-                store.abstract_store[global_var_ptr->name] = AbstractVal::TOP;
-            }  
-        }*/
+        // Skipping globals' initialization for assignment 1
 
         for (auto param : program.funcs[funcname]->params) {
             if (param->isIntType()) {
-                // std::cout << "Setting parameter: " << param->name << " to TOP" << std::endl;
                 store.abstract_store[param->name] = AbstractVal::TOP;
             }  
         }
@@ -100,32 +147,35 @@ class ConstantAnalysis {
         
         // Prep steps:
         // 1. Compute set of int-typed global variables
-        get_int_type_globals(int_type_globals);
+        // get_int_type_globals(int_type_globals);
         // 2. Compute set of variables that are addresses of int-typed variables
-        get_addr_of_int_types(addr_of_int_types, func_name);
+        /*get_addr_of_int_types(addr_of_int_types, func_name);
 
         std::cout << "Priting addr taken int types: " <<std::endl;
         for (auto i : addr_of_int_types) {
             std::cout << i << " ";
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
+
+        // Populate the set of loop headers for which widening will be performed
+        get_loop_headers(loop_headers, func_name);
 
         /*
          * We also need to initialize bb2store entries for all the basic blocks
          * in the function (I think.)
          */
-        for (const auto &[bb_label, bb] : program.funcs[func_name]->bbs) {
+        /*for (const auto &[bb_label, bb] : program.funcs[func_name]->bbs) {
             std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
             bb2store[bb_label] = AbstractStore();
-        }
+        }*/
 
         /*
             Setup steps
             1. Initialize the abstract store for 'entry' basic block
             2. Add 'entry' basic block to worklist
         */
-        InitEntryStore();
-        worklist.push_back("entry");
+        //InitEntryStore();
+        //worklist.push_back("entry");
 
 
         /*
@@ -136,7 +186,7 @@ class ConstantAnalysis {
             4. If the abstract store of the successor has changed, add the successor to the worklist
         */
 
-        while (!worklist.empty()) {
+        /*while (!worklist.empty()) {
             std::string current_bb = worklist.front();
             worklist.pop_front();
 
@@ -156,9 +206,7 @@ class ConstantAnalysis {
                 std::cout << i << " ";
             }
             std::cout << std::endl;
-        }
-
-        std::cout << "DONE WITH LOOP" << std::endl;
+        }*/
 
         /*
          * Once we've completed the worklist algorithm, let's execute our
@@ -166,13 +214,14 @@ class ConstantAnalysis {
          * abstract stores.
          */
         //for (const auto &[bb_label, abstract_store] : bb2store) {
+        //    std::cout << "Doing one final execution of " << bb_label << std::endl;
 
             /*
              * TODO I don't think this updates the abstract stores correctly. I
              * TODO think this changes the other bbs when we don't want it to.
              * TODO How should we execute without updating?
              */
-            /*bb2store[bb_label] = execute(func->bbs[bb_label],
+        /*    bb2store[bb_label] = execute(func->bbs[bb_label],
                                          abstract_store,
                                          bb2store,
                                          worklist,
@@ -183,22 +232,15 @@ class ConstantAnalysis {
          * Finally, let's print out the abstract stores of each basic block in
          * alphabetical order.
          */
-        for (auto it = bb2store.begin(); it != bb2store.end(); ++it) {
-            if ((*it).second.abstract_store.size() > 0) {
-                std::cout << (*it).first << ":" << std::endl;
-                (*it).second.print();
-            }
-            std::cout << std::endl;
-        }
         /*std::vector<std::string> sorted_bb_labels;
         for (const auto &[bb_label, bb] : func->bbs) {
             sorted_bb_labels.push_back(bb_label);
         }
         std::sort(sorted_bb_labels.begin(), sorted_bb_labels.end());
+        std::cout << "Interval analysis results:" << std::endl;
         for (const auto &bb_label : sorted_bb_labels) {
             std::cout << bb_label << ":" << std::endl;
             bb2store[bb_label].print();
-            std::cout << std::endl;
         }*/
     }
 
@@ -211,6 +253,10 @@ class ConstantAnalysis {
      * Our worklist is a queue containing BasicBlock labels.
      */
     std::deque<std::string> worklist;
+    /*
+     * Maintain the list of loop headers
+    */
+   std::unordered_set<std::string> loop_headers;
 
     private:
     std::string funcname;
@@ -219,7 +265,7 @@ class ConstantAnalysis {
 int main(int argc, char* argv[]) 
 {
     if (argc != 4) {
-        std::cerr << "Usage: constant-analysis <lir file path> <lir json filepath> <funcname>" << std::endl;
+        std::cerr << "Usage: interval-analysis <lir file path> <lir json filepath> <funcname>" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -229,8 +275,9 @@ int main(int argc, char* argv[])
     std::string func_name = argv[3];
 
     Program program = Program(lir_json);
-    ConstantAnalysis constant_analysis = ConstantAnalysis(program);
-    constant_analysis.AnalyzeFunc(func_name);
+    std::cout << "********** Program created **********" << std::endl;
+    IntervalAnalysis interval_analysis = IntervalAnalysis(program);
+    interval_analysis.AnalyzeFunc(func_name);
 
     return 0;
 }

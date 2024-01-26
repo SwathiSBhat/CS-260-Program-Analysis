@@ -159,10 +159,6 @@ class ConstantAnalysis {
             std::cout << std::endl;
         }
 
-        std::cout << "bb1 before" << std::endl;
-        bb2store["bb1"].print();
-        std::cout << std::endl;
-
         /*
          * Once we've completed the worklist algorithm, let's execute our
          * transfer function once more on each basic block to get their exit
@@ -181,10 +177,6 @@ class ConstantAnalysis {
                                          bb2store,
                                          worklist,
                                          addr_of_int_types);
-
-            std::cout << "bb1" << std::endl;
-            bb2store["bb1"].print();
-            std::cout << std::endl;
         }
 
         /*

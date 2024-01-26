@@ -8,11 +8,6 @@
 
 using json = nlohmann::json;
 
-#define STRUCT "Struct"
-#define FUNCTION "Function"
-#define STORE "Store"
-#define RETURN "Ret"
-
 enum DataType {
     IntType = 0,
     StructType,

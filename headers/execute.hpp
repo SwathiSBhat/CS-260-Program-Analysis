@@ -34,7 +34,7 @@ AbstractStore execute(
      */
     for (const Instruction *inst : bb->instructions) {
 
-        std::cout << "This is the instruction type: " << inst->instrType << std::endl;
+        //std::cout << "This is the instruction type: " << inst->instrType << std::endl;
 
         if ((*inst).instrType == InstructionType::ArithInstrType) {
 
@@ -105,10 +105,30 @@ AbstractStore execute(
             } 
 
         } else if ((*inst).instrType == InstructionType::CmpInstrType) {
+
+            /*
+             * TODO It looks like Ben's solution allows $cmp with a pointer? I
+             * TODO will change our code to match this behavior but we might
+             * TODO have to change it back later.
+             */
+
             /*
              * Cast it.
              */
             CmpInstruction *cmp_inst = (CmpInstruction *) inst;
+
+            std::cout << "Comparing " << cmp_inst->op1->var->name << " and " << cmp_inst->op2->var->name << std::endl;
+
+            /*
+             * If op1 or op2 are not ints, then lhs immediately gets TOP.
+             *
+             * TODO
+             */
+            if (!(cmp_inst->op1->var->isIntType()) || !(cmp_inst->op2->var->isIntType())) {
+                std::cout << "Mwahaha tricky tricky" << std::endl;
+                sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
+            } else {
+
             /*
              * Since $cmp is only done on ints, we know that op1 and op2 are ints
              * the operands can be int typed variables or direct int constants
@@ -169,7 +189,7 @@ AbstractStore execute(
             else
             {
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-            } 
+            } }
 
         } else if ((*inst).instrType == InstructionType::CopyInstrType) {
 
@@ -177,11 +197,13 @@ AbstractStore execute(
              * Cast it.
              */
             CopyInstruction *copy_inst = (CopyInstruction *) inst;
+            std::cout << copy_inst->lhs->name << std::endl;
 
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
              */
             if (!copy_inst->lhs->isIntType()) {
+                std::cout << copy_inst->lhs->name << " is not an int, skipping $copy" << std::endl;
                 continue;
             }
 
@@ -192,7 +214,10 @@ AbstractStore execute(
              */
             std::variant<int, AbstractVal> op;
             if (copy_inst->op->IsConstInt()) {
+                std::cout << "Doing a normal copy" << std::endl;
                 op = copy_inst->op->val;
+                std::cout << std::get<int>(op) << std::endl;
+                sigma_prime.abstract_store[copy_inst->lhs->name] = op;
             }
             else {
                 op = sigma_prime.GetValFromStore(copy_inst->op->var->name);
@@ -203,8 +228,9 @@ AbstractStore execute(
                     sigma_prime.abstract_store.erase(copy_inst->lhs->name);
                 }
             }
-            else
+            else {
                 sigma_prime.abstract_store[copy_inst->lhs->name] = op;
+            }
         } else if ((*inst).instrType == InstructionType::LoadInstrType) {
             /*
              * Cast it.
@@ -246,7 +272,7 @@ AbstractStore execute(
             for(auto addr_of_int : addr_of_int_types) {
                 AbstractStore opStore = AbstractStore();
                 opStore.abstract_store[addr_of_int] = op;
-                sigma_prime.join(opStore);
+                //sigma_prime.join(opStore);
             }
         }
             else if ((*inst).instrType == InstructionType::CallExtInstrType) {
@@ -269,7 +295,7 @@ AbstractStore execute(
             }
             else {
 
-                std::cout << "Found an instruction we don't recognize :(" << std::endl;
+                //std::cout << "Found an instruction we don't recognize :(" << std::endl;
                 /*
                 * This is a catch-all for instructions we don't have to do anything about for constant analysis.
                 */
@@ -284,12 +310,15 @@ AbstractStore execute(
 
     Instruction *terminal_instruction = bb->terminal;
     if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
-        // std::cout << "Encountered $branch" << std::endl;
+        std::cout << "Encountered $branch" << std::endl;
 
         /*
              * Cast it.
              */
         BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
+
+        std::cout << "Branching to " << branch_inst->tt << " or " << branch_inst->ff << std::endl;
+
         /*
              * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
              * propagate to both.

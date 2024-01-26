@@ -99,7 +99,7 @@ public:
     void AnalyzeFunc(const std::string &func_name) {
 
         Function *func = program.funcs[func_name];
-        std::cout << "Analyzing function " << func_name << std::endl;
+        //std::cout << "Analyzing function " << func_name << std::endl;
         funcname = func_name;
         
         // data structures required for prep stage
@@ -112,18 +112,18 @@ public:
         // 2. Compute set of variables that are addresses of int-typed variables
         get_addr_of_int_types(addr_of_int_types, func_name);
 
-        std::cout << "Priting addr taken int types: " <<std::endl;
-        for (auto i : addr_of_int_types) {
-            std::cout << i << " ";
-        }
-        std::cout << std::endl;
+        //std::cout << "Priting addr taken int types: " <<std::endl;
+        //for (auto i : addr_of_int_types) {
+        //    std::cout << i << " ";
+        //}
+        //std::cout << std::endl;
 
         /*
          * We also need to initialize bb2store entries for all the basic blocks
          * in the function (I think.)
          */
         for (const auto &[bb_label, bb] : program.funcs[func_name]->bbs) {
-            std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
+            //std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
             bb2store[bb_label] = AbstractStore();
         }
 
@@ -151,21 +151,21 @@ public:
 
             // Perform the transfer function on the current basic block
             //std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
-            bb2store[current_bb].print();
+            //bb2store[current_bb].print();
             bb2store[current_bb] = execute(func->bbs[current_bb],
                                            bb2store[current_bb],
                                            bb2store,
                                            worklist,
                                            addr_of_int_types);
             //std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
-            bb2store[current_bb].print();
+            //bb2store[current_bb].print();
 
             //std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {
-                std::cout << i << " ";
+                //std::cout << i << " ";
                 bbs_to_output.insert(i);
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
         }
 
         //std::cout << "DONE WITH LOOP" << std::endl;
@@ -200,6 +200,8 @@ public:
             }
             std::cout << std::endl;
         }*/
+
+        //std::cout << "START OF ACTUAL OUTPUT" << std::endl;
 
         for (const auto &bb_label : bbs_to_output) {
             std::cout << bb_label << ":" << std::endl;

@@ -981,7 +981,7 @@ class BasicBlock {
         if (bb_json["term"] != nullptr)
         {
             std::string term_type = bb_json["term"].begin().key();
-            std::cout << "Terminal type: " << term_type << std::endl;
+            //std::cout << "Terminal type: " << term_type << std::endl;
             if(term_type == "Branch"){
                 BranchInstruction *branch_inst = new BranchInstruction(bb_json["term"]["Branch"]);
                 branch_inst->instrType = InstructionType::BranchInstrType;

@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_set>
+#include <set>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
@@ -11,9 +12,16 @@ using json = nlohmann::json;
     Class that contains methods to perform constant analysis on function
 */
 class ConstantAnalysis {
-    public:
-    ConstantAnalysis(Program program) : program(program) {
-    };
+public:
+
+    /*
+     * This data structure holds a list of all basic blocks that have ever been
+     * on the worklist. At the end of our analysis, we will only print out the
+     * basic blocks that are on this list.
+     */
+    std::set<std::string> bbs_to_output;
+
+    ConstantAnalysis(Program program) : program(program) {};
 
     /*
     Method to get the set of int-typed global variables
@@ -91,7 +99,7 @@ class ConstantAnalysis {
     void AnalyzeFunc(const std::string &func_name) {
 
         Function *func = program.funcs[func_name];
-        std::cout << "Analyzing function " << func_name << std::endl;
+        //std::cout << "Analyzing function " << func_name << std::endl;
         funcname = func_name;
         
         // data structures required for prep stage
@@ -104,18 +112,18 @@ class ConstantAnalysis {
         // 2. Compute set of variables that are addresses of int-typed variables
         get_addr_of_int_types(addr_of_int_types, func_name);
 
-        std::cout << "Priting addr taken int types: " <<std::endl;
-        for (auto i : addr_of_int_types) {
-            std::cout << i << " ";
-        }
-        std::cout << std::endl;
+        //std::cout << "Priting addr taken int types: " <<std::endl;
+        //for (auto i : addr_of_int_types) {
+        //    std::cout << i << " ";
+        //}
+        //std::cout << std::endl;
 
         /*
          * We also need to initialize bb2store entries for all the basic blocks
          * in the function (I think.)
          */
         for (const auto &[bb_label, bb] : program.funcs[func_name]->bbs) {
-            std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
+            //std::cout << "Initializing empty abstract store for " << bb_label << " basic block" << std::endl;
             bb2store[bb_label] = AbstractStore();
         }
 
@@ -126,6 +134,7 @@ class ConstantAnalysis {
         */
         InitEntryStore();
         worklist.push_back("entry");
+        bbs_to_output.insert("entry");
 
 
         /*
@@ -141,24 +150,25 @@ class ConstantAnalysis {
             worklist.pop_front();
 
             // Perform the transfer function on the current basic block
-            std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
-            bb2store[current_bb].print();
+            //std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
+            //bb2store[current_bb].print();
             bb2store[current_bb] = execute(func->bbs[current_bb],
                                            bb2store[current_bb],
                                            bb2store,
                                            worklist,
                                            addr_of_int_types);
-            std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
-            bb2store[current_bb].print();
+            //std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
+            //bb2store[current_bb].print();
 
-            std::cout << "This is the worklist now:" << std::endl;
+            //std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {
-                std::cout << i << " ";
+                //std::cout << i << " ";
+                bbs_to_output.insert(i);
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
         }
 
-        std::cout << "DONE WITH LOOP" << std::endl;
+        //std::cout << "DONE WITH LOOP" << std::endl;
 
         /*
          * Once we've completed the worklist algorithm, let's execute our
@@ -183,11 +193,19 @@ class ConstantAnalysis {
          * Finally, let's print out the abstract stores of each basic block in
          * alphabetical order.
          */
-        for (auto it = bb2store.begin(); it != bb2store.end(); ++it) {
+        /*for (auto it = bb2store.begin(); it != bb2store.end(); ++it) {
             if ((*it).second.abstract_store.size() > 0) {
                 std::cout << (*it).first << ":" << std::endl;
                 (*it).second.print();
             }
+            std::cout << std::endl;
+        }*/
+
+        //std::cout << "START OF ACTUAL OUTPUT" << std::endl;
+
+        for (const auto &bb_label : bbs_to_output) {
+            std::cout << bb_label << ":" << std::endl;
+            bb2store[bb_label].print();
             std::cout << std::endl;
         }
     }
@@ -202,7 +220,7 @@ class ConstantAnalysis {
      */
     std::deque<std::string> worklist;
 
-    private:
+private:
     std::string funcname;
 };
 

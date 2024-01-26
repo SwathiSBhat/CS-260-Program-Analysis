@@ -2,7 +2,7 @@
 
 ```
 rm submission.zip
-zip -r submission.zip assn0.cpp CMakeLists.txt build-analyses.sh run-constants-analysis.sh run-intervals-analysis.sh headers/ constant-analysis/ 
+zip -r submission.zip assn0.cpp CMakeLists.txt build-analyses.sh run-constants-analysis.sh run-intervals-analysis.sh headers/ constant-analysis/ tests/
 ```
 
 ## Build instructions

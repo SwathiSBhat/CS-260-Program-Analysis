@@ -248,26 +248,6 @@ AbstractStore execute(
                 opStore.abstract_store[addr_of_int] = op;
                 sigma_prime.join(opStore);
             }
-        } else if ((*inst).instrType == InstructionType::CallIdrInstrType ) {
-            CallIdrInstruction *call_inst = (CallIdrInstruction *) inst;
-            // If function returns something and it is of int type, update sigma_prime to TOP
-            if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
-                sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
-            }
-
-            // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
-            for (auto arg : call_inst->args) {
-                if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
-                    for(auto addr_of_int : addr_of_int_types) {
-                        sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
-                    }
-                }
-            }
-
-            // If abstract store of next_bb has changed, push it into worklist
-            if (bb2store[call_inst->next_bb].join(sigma_prime)) {
-                worklist.push_back(call_inst->next_bb);
-            }
         }
             else if ((*inst).instrType == InstructionType::CallExtInstrType) {
                 CallExtInstruction *call_inst = (CallExtInstruction *) inst;
@@ -283,6 +263,8 @@ AbstractStore execute(
                             sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
                         }
                     }
+                    // Break out of the loop once we've set all addr_of_int_types to TOP once
+                    break;
                 }
             }
             else {
@@ -298,8 +280,6 @@ AbstractStore execute(
     /*
      * Ok, now we've executed the instructions. Now let's look at the terminal
      * to see what to push onto the worklist and such.
-     *
-     * TODO
      */
 
     Instruction *terminal_instruction = bb->terminal;
@@ -329,7 +309,7 @@ AbstractStore execute(
             // TODO: Check if the bb has to be pushed to worklist even if the store doesn't change
 
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
-            if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP) {
+            if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP){
                 
                 std::cout << "Pushing both branches to worklist since condition is TOP : " << branch_inst->condition->var->name << std::endl;
                 
@@ -355,7 +335,7 @@ AbstractStore execute(
             }
         }
     } else if (terminal_instruction->instrType == InstructionType::JumpInstrType) {
-        std::cout << "Encountered $jump" << std::endl;
+        // std::cout << "Encountered $jump" << std::endl;
 
         /*
              * Cast it.
@@ -366,10 +346,8 @@ AbstractStore execute(
          * Join sigma_prime with the basic block's abstract store (updating
          * the basic block's abstract store).
          */
-        // bb2store[jump_inst->label].print();
         bool store_changed = bb2store[jump_inst->label].join(sigma_prime);
-        // std::cout << "Store of target block: " << jump_inst->label << std::endl;
-        // bb2store[jump_inst->label].print();
+
         if (store_changed)
         {
             // If the basic block's abstract store changed, add the basic block to the worklist
@@ -379,7 +357,7 @@ AbstractStore execute(
         std::cout << "Encountered $ret" << std::endl;
 
         /*
-         * TODO
+         * No-op. We don't have to do anything here.
          */
     } else if (terminal_instruction->instrType == InstructionType::CallDirInstrType) {
         std::cout << "Encountered $call_dir" << std::endl;
@@ -399,6 +377,8 @@ AbstractStore execute(
                 for(auto addr_of_int : addr_of_int_types) {
                     sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
                 }
+                // Break out of the loop once we've set all addr_of_int_types to TOP once
+                break;
             }
         }
 
@@ -406,11 +386,33 @@ AbstractStore execute(
         if (bb2store[call_inst->next_bb].join(sigma_prime)) {
             worklist.push_back(call_inst->next_bb);
         }
-    } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType) {
-        std::cout << "Encountered $call_idr" << std::endl;
+    } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType ) {
+            CallIdrInstruction *call_inst = (CallIdrInstruction *) terminal_instruction;
+            // If function returns something and it is of int type, update sigma_prime to TOP
+            if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
+                sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
+            }
 
+            // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+            for (auto arg : call_inst->args) {
+                if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                    for(auto addr_of_int : addr_of_int_types) {
+                        sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                    }
+                    // Break out of the loop once we've set all addr_of_int_types to TOP once
+                    break;
+                }
+            }
+
+            // If abstract store of next_bb has changed, push it into worklist
+            if (bb2store[call_inst->next_bb].join(sigma_prime)) {
+                worklist.push_back(call_inst->next_bb);
+            }
+        }
+    else {
+        std::cout << "Found a terminal we don't recognize :(" << std::endl;
         /*
-         * TODO
+         * This is a catch-all for instructions we don't have to do anything about for constant analysis.
          */
     }
     return sigma_prime;

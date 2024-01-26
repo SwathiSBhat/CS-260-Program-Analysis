@@ -13,6 +13,24 @@ fn func_test_jump(p1:int, p2:&int, p3: int) -> int {
     $ret x
 }
 
+fn func_test_branch2() -> _ {
+    let x:int
+    entry:
+    $branch -2 bb1 bb2
+
+    bb1:
+    x = $arith add 0 2
+    $jump exit
+
+    bb2:
+    x = $arith add 0 1
+    $jump exit
+
+    exit:
+    $ret 
+
+}
+
 fn func_test_branch(p1:int, p2:&&&int) -> int {
     let x:int, y:int, z:int, _t1:int, _t2:int, _t3:int
 

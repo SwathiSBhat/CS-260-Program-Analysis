@@ -20,6 +20,14 @@ struct struct1 {
   entry:
     $ret 42
   }
+
+  fn func_test_cmp() -> _ {
+    let x:int, y:int, a:int, b:int
+    entry:
+    x = $cmp eq a b
+    y = $arith sub 0 x 
+    $ret
+  }
   
   fn func2(p1:int, p2:&int) -> &struct2 {
   let _t1:&struct2, x:struct2

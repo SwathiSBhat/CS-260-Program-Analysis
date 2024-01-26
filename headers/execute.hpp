@@ -118,13 +118,15 @@ AbstractStore execute(
              */
             CmpInstruction *cmp_inst = (CmpInstruction *) inst;
 
-            std::cout << "Comparing " << cmp_inst->op1->var->name << " and " << cmp_inst->op2->var->name << std::endl;
 
             /*
              * If op1 or op2 are not ints, then lhs immediately gets TOP.
              *
-             * TODO
+             * TODO The issue is that if op1 or op2 is a constant, the
+             * TODO conditional of the if-statement below fails. However, I have
+             * TODO done enough damage to this poor codebase already.
              */
+            std::cout << "Segfault on following line" << std::endl;
             if (!(cmp_inst->op1->var->isIntType()) || !(cmp_inst->op2->var->isIntType())) {
                 std::cout << "Mwahaha tricky tricky" << std::endl;
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;

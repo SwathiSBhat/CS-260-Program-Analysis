@@ -104,39 +104,14 @@ AbstractStore execute(
             } 
 
         } else if ((*inst).instrType == InstructionType::CmpInstrType) {
-
-            /*
-             * TODO It looks like Ben's solution allows $cmp with a pointer? I
-             * TODO will change our code to match this behavior but we might
-             * TODO have to change it back later.
-             */
-
-            /*
-             * Cast it.
-             */
             CmpInstruction *cmp_inst = (CmpInstruction *) inst;
-
-
-            /*
-             * If op1 or op2 are not ints, then lhs immediately gets TOP.
-             *
-             * TODO The issue is that if op1 or op2 is a constant, the
-             * TODO conditional of the if-statement below fails. However, I have
-             * TODO done enough damage to this poor codebase already.
-             */
             std::cout << "Segfault on following line" << std::endl;
             if (!(cmp_inst->op1->var->isIntType()) || !(cmp_inst->op2->var->isIntType())) {
                 std::cout << "Mwahaha tricky tricky" << std::endl;
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
             } else {
-
-            /*
-             * Since $cmp is only done on ints, we know that op1 and op2 are ints
-             * the operands can be int typed variables or direct int constants
-             */
             std::variant<int, AbstractVal> op1;
             std::variant<int, AbstractVal> op2;
-
             if (cmp_inst->op1->IsConstInt()) {
                 op1 = cmp_inst->op1->val;
             }
@@ -154,28 +129,22 @@ AbstractStore execute(
             {
                 int op1_val = std::get<int>(op1);
                 int op2_val = std::get<int>(op2);
-                if (cmp_inst->cmp_op == "Eq")
-                {
+                if (cmp_inst->cmp_op == "Eq") {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val == op2_val);
                 }
-                else if (cmp_inst->cmp_op == "Neq")
-                {
+                else if (cmp_inst->cmp_op == "Neq") {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val != op2_val);
                 }
-                else if (cmp_inst->cmp_op == "Less")
-                {
+                else if (cmp_inst->cmp_op == "Less") {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val < op2_val);
                 }
-                else if (cmp_inst->cmp_op == "LessEq")
-                {
+                else if (cmp_inst->cmp_op == "LessEq") {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val <= op2_val);
                 }
-                else if (cmp_inst->cmp_op == "Greater")
-                {
+                else if (cmp_inst->cmp_op == "Greater") {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val > op2_val);
                 }
-                else if (cmp_inst->cmp_op == "GreaterEq")
-                {
+                else if (cmp_inst->cmp_op == "GreaterEq") {
                     sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val >= op2_val);
                 }
             }

@@ -95,6 +95,15 @@ AbstractStore execute(
             {
                 // No-op since the result will always be BOTTOM
             }
+            // If either op1 or op2 is 0, then the result is 0 for multiply and divide
+            else if ((arith_inst->arith_op == "Multiply" || arith_inst->arith_op == "Divide") && 
+            ((arith_inst->op1->IsConstInt() && arith_inst->op1->val == 0) || 
+            (arith_inst->op2->IsConstInt() && arith_inst->op2->val == 0) ||
+            (std::holds_alternative<int>(op1) && std::get<int>(op1) == 0) ||
+            (std::holds_alternative<int>(op2) && std::get<int>(op2) == 0)))
+            {
+                sigma_prime.abstract_store[arith_inst->lhs->name] = 0;
+            }
             /*
             * This means that either op1 or op2 is TOP and neither of them is BOTTOM => result is TOP
             */

@@ -102,7 +102,10 @@ public:
                 if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "Top" && std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) != "Top") {
                     abstract_store[pair.first] = TOP;
                     store_changed = true;
-                } else if (pair.second != abstract_store[pair.first]) {
+                } else if (std::holds_alternative<int>(pair.second) && std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) == "Top") {
+                    // no-op for top + constant = top
+                }
+                else if (pair.second != abstract_store[pair.first]) {
                     abstract_store[pair.first] = TOP;
                     store_changed = true;
                 }
@@ -122,7 +125,7 @@ public:
          * that.
          */
         if (abstract_store.empty()) {
-            std::cout << "<Empty abstract store>" << std::endl;
+            // std::cout << "<Empty abstract store>" << std::endl;
         }
 
         /*

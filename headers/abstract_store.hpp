@@ -84,36 +84,28 @@ public:
          */
         for (const auto& pair : as.abstract_store) {
             // std::cout << "Joining " << pair.first << " -> " << std::visit(AbstractValStringifyVisitor{}, pair.second) << " with " << std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) << std::endl;
-            if (abstract_store.count(pair.first) == 0)
-            {
-                // Takes care of case when lhs is bottom and rhs is constant => lhs = constant
-                if (std::holds_alternative<int>(pair.second))
-                {
-                    abstract_store[pair.first] = pair.second;
-                    store_changed = true;
-                }
-                // If rhs is top, no-op since join still remains as bottom
-            }
-            else if (std::holds_alternative<int>(abstract_store[pair.first]))
-            {
-                if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "Top") {
-                    abstract_store[pair.first] = TOP;
-                    store_changed = true;
-                }
-                else if (std::get<int>(pair.second) != std::get<int>(abstract_store[pair.first]))
-                {
-                    abstract_store[pair.first] = TOP;
-                    store_changed = true;
-                }
-            }
-        }
-
-        for(const auto &a : abstract_store)
-        {
-            if (as.abstract_store.count(a.first) == 0 && std::visit(AbstractValStringifyVisitor{}, a.second) == "Top")
-            {
-                abstract_store.erase(a.first); 
+            if (abstract_store.count(pair.first) == 0) {
+                abstract_store[pair.first] = pair.second;
                 store_changed = true;
+            } else {
+
+                /*
+                 * TODO Double-check me on this logic.
+                 *
+                 * Rules for joining:
+                 * -> Anything joined with TOP is TOP.
+                 * -> Joining any two unequal constants gives TOP.
+                 * -> Joining two equal constants gives that same constant
+                 * -> We don't have to worry about BOTTOM because we won't put
+                 *    BOTTOM values in our abstract store.
+                 */
+                if (std::visit(AbstractValStringifyVisitor{}, pair.second) == "Top" && std::visit(AbstractValStringifyVisitor{}, abstract_store[pair.first]) != "Top") {
+                    abstract_store[pair.first] = TOP;
+                    store_changed = true;
+                } else if (pair.second != abstract_store[pair.first]) {
+                    abstract_store[pair.first] = TOP;
+                    store_changed = true;
+                }
             }
         }
 

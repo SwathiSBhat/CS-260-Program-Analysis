@@ -19,7 +19,8 @@ AbstractStore execute(
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
         std::deque<std::string> &worklist,
-        std::unordered_set<std::string> addr_of_int_types) {
+        std::unordered_set<std::string> addr_of_int_types,
+        std::set<std::string> bbs_to_output) {
 
     /*
      * Make a copy of sigma that we'll return at the end of this function.
@@ -310,25 +311,24 @@ AbstractStore execute(
         if (branch_inst->condition->IsConstInt()) {
             if (branch_inst->condition->val != 0) {
                 bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
-                if (store_changed_tt)
+                // If store has changed or this is the first time the block is being visited, push it into worklist
+                if (store_changed_tt || bbs_to_output.count(branch_inst->tt) == 0)
                     worklist.push_back(branch_inst->tt);
             } else {
                 bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
-                if (store_changed_ff)
+                if (store_changed_ff || bbs_to_output.count(branch_inst->ff) == 0)
                     worklist.push_back(branch_inst->ff);
             }
         }
         else {
-            // TODO: Check if the bb has to be pushed to worklist even if the store doesn't change
-
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
             if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP){
                     bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
                     bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
 
-                    if (store_changed_tt)
+                    if (store_changed_tt || bbs_to_output.count(branch_inst->tt) == 0)
                         worklist.push_back(branch_inst->tt);
-                    if (store_changed_ff)
+                    if (store_changed_ff || bbs_to_output.count(branch_inst->ff) == 0)
                         worklist.push_back(branch_inst->ff);
 
             }
@@ -336,11 +336,11 @@ AbstractStore execute(
             {
                 if (std::get<int>(absVal) != 0) {
                     bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
-                    if (store_changed_tt)
+                    if (store_changed_tt || bbs_to_output.count(branch_inst->tt) == 0)
                         worklist.push_back(branch_inst->tt);
                 } else {
                     bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
-                    if (store_changed_ff)
+                    if (store_changed_ff || bbs_to_output.count(branch_inst->ff) == 0)
                         worklist.push_back(branch_inst->ff);
                 }
             }
@@ -359,7 +359,7 @@ AbstractStore execute(
          */
             bool store_changed = bb2store[jump_inst->label].join(sigma_prime);
 
-            if (store_changed)
+            if (store_changed || bbs_to_output.count(jump_inst->label) == 0)
             {
                 // If the basic block's abstract store changed, add the basic block to the worklist
                 worklist.push_back(jump_inst->label);
@@ -394,9 +394,10 @@ AbstractStore execute(
         }
 
         // If abstract store of next_bb has changed, push it into worklist
-        if (bb2store[call_inst->next_bb].join(sigma_prime)) {
+        if (bb2store[call_inst->next_bb].join(sigma_prime) || bbs_to_output.count(call_inst->next_bb) == 0) {
             worklist.push_back(call_inst->next_bb);
         }
+
     } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType ) {
             CallIdrInstruction *call_inst = (CallIdrInstruction *) terminal_instruction;
             // If function returns something and it is of int type, update sigma_prime to TOP
@@ -416,7 +417,7 @@ AbstractStore execute(
             }
 
             // If abstract store of next_bb has changed, push it into worklist
-            if (bb2store[call_inst->next_bb].join(sigma_prime)) {
+            if (bb2store[call_inst->next_bb].join(sigma_prime) || bbs_to_output.count(call_inst->next_bb) == 0) {
                 worklist.push_back(call_inst->next_bb);
             }
         }

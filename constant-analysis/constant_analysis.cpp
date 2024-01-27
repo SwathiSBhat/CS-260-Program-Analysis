@@ -153,7 +153,8 @@ public:
                                            bb2store[current_bb],
                                            bb2store,
                                            worklist,
-                                           addr_of_int_types);
+                                           addr_of_int_types,
+                                           bbs_to_output);
             //std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             //bb2store[current_bb].print();
 

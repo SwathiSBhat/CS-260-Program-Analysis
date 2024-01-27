@@ -1,0 +1,1479 @@
+{
+    "structs": {},
+    "globals": [
+        {
+            "name": "test",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": "Int",
+                        "param_ty": []
+                    }
+                }
+            },
+            "scope": null
+        }
+    ],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "test": {
+            "id": "test",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "_lo1",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo2",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo3",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo4",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo5",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo6",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo7",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo8",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t10",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t11",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t12",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t13",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t14",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t15",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t16",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t17",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t18",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t19",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t20",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t21",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t22",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t23",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t24",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t25",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t26",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t27",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t28",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t29",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t30",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t31",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t32",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t9",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id0",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id1",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id2",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id3",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id4",
+                    "typ": "Int",
+                    "scope": "test"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t9",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 10
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t10",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t9",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t10",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb2",
+                            "ff": "bb3"
+                        }
+                    }
+                },
+                "bb10": {
+                    "id": "bb10",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb8"
+                    }
+                },
+                "bb11": {
+                    "id": "bb11",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "CInt": 3
+                            },
+                            "tt": "bb12",
+                            "ff": "bb13"
+                        }
+                    }
+                },
+                "bb12": {
+                    "id": "bb12",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "id4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb15",
+                            "ff": "bb16"
+                        }
+                    }
+                },
+                "bb13": {
+                    "id": "bb13",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t32",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "id2",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t32",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id1",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "id4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb29",
+                            "ff": "bb30"
+                        }
+                    }
+                },
+                "bb14": {
+                    "id": "bb14",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_lo4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb18",
+                            "ff": "bb19"
+                        }
+                    }
+                },
+                "bb15": {
+                    "id": "bb15",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb14"
+                    }
+                },
+                "bb16": {
+                    "id": "bb16",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb14"
+                    }
+                },
+                "bb17": {
+                    "id": "bb17",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t22",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 9
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t23",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "LessEq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_lo5",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t22",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t23",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id2",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb20"
+                    }
+                },
+                "bb18": {
+                    "id": "bb18",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo5",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb17"
+                    }
+                },
+                "bb19": {
+                    "id": "bb19",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo5",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb17"
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id1",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t11",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_lo1",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t11",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb5",
+                            "ff": "bb4"
+                        }
+                    }
+                },
+                "bb20": {
+                    "id": "bb20",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "id2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb21",
+                            "ff": "bb22"
+                        }
+                    }
+                },
+                "bb21": {
+                    "id": "bb21",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "id1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb24",
+                            "ff": "bb25"
+                        }
+                    }
+                },
+                "bb22": {
+                    "id": "bb22",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t28",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 1
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t29",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t28",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t30",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t29",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t31",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t30",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t31",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb11"
+                    }
+                },
+                "bb23": {
+                    "id": "bb23",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id0",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_lo6",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 9
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t24",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo7",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t24",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t25",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_lo7",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t25",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb27",
+                            "ff": "bb26"
+                        }
+                    }
+                },
+                "bb24": {
+                    "id": "bb24",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo6",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb23"
+                    }
+                },
+                "bb25": {
+                    "id": "bb25",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo6",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb23"
+                    }
+                },
+                "bb26": {
+                    "id": "bb26",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t27",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Multiply",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_lo7",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 1
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t27",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb20"
+                    }
+                },
+                "bb27": {
+                    "id": "bb27",
+                    "insts": [
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t26",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Neq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "id4",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 7
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo7",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t26",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb26"
+                    }
+                },
+                "bb28": {
+                    "id": "bb28",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "_lo8",
+                                "typ": "Int",
+                                "scope": "test"
+                            }
+                        }
+                    }
+                },
+                "bb29": {
+                    "id": "bb29",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo8",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb28"
+                    }
+                },
+                "bb3": {
+                    "id": "bb3",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb11"
+                    }
+                },
+                "bb30": {
+                    "id": "bb30",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo8",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb28"
+                    }
+                },
+                "bb4": {
+                    "id": "bb4",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_lo1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb9",
+                            "ff": "bb10"
+                        }
+                    }
+                },
+                "bb5": {
+                    "id": "bb5",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t12",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 8
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t12",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t13",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_lo2",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t13",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb7",
+                            "ff": "bb6"
+                        }
+                    }
+                },
+                "bb6": {
+                    "id": "bb6",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_lo2",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb4"
+                    }
+                },
+                "bb7": {
+                    "id": "bb7",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t14",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 7
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t14",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb6"
+                    }
+                },
+                "bb8": {
+                    "id": "bb8",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id0",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_lo3",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t15",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "GreaterEq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "id3",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "id4",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t16",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Less",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t15",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "id0",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t17",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 1
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t18",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Less",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t16",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t17",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t18",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t19",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t20",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 8
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t21",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t19",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t20",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t21",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id0",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 5
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                },
+                "bb9": {
+                    "id": "bb9",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb8"
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id0",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id0",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id1",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

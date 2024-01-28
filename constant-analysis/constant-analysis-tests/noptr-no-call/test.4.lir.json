@@ -1,0 +1,99 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "execute_once_last": {
+            "id": "execute_once_last",
+            "ret_ty": null,
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "execute_once_last"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "execute_once_last"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "execute_once_last"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "b",
+                                        "typ": "Int",
+                                        "scope": "execute_once_last"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": "Int",
+                                    "scope": "execute_once_last"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "entry"
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "CInt": 1
+                            },
+                            "tt": "bb1",
+                            "ff": "exit"
+                        }
+                    }
+                },
+                "exit": {
+                    "id": "exit",
+                    "insts": [],
+                    "term": {
+                        "Ret": null
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

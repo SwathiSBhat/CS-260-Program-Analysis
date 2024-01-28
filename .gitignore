@@ -56,3 +56,4 @@ test_mfp_worklist
 constant_analysis
 assn1_constant_analysis
 submission.zip
+assn1_interval_analysis

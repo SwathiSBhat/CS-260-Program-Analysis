@@ -1,5 +1,8 @@
 #pragma once
 
+#include <map>
+#include <string>
+
 enum AbstractVals {
     BOTTOM,
     TOP
@@ -8,8 +11,8 @@ enum AbstractVals {
 /*
  * Some typedefs for convenience.
  */
-typedef std::pair<int, int> interval
-typedef std::variant<interval, AbstractVals> abstract_interval
+typedef std::pair<int, int> interval;
+typedef std::variant<interval, AbstractVals> abstract_interval;
 typedef std::map<std::string, abstract_interval> interval_abstract_store;
 
 /*
@@ -17,7 +20,7 @@ typedef std::map<std::string, abstract_interval> interval_abstract_store;
  * the store.
  */
 abstract_interval get_val_from_store(interval_abstract_store m,
-                                     std::string var) {
+                                     const std::string &var) {
     if (m.count(var) == 0) {
         return AbstractVals::BOTTOM;
     }
@@ -27,31 +30,45 @@ abstract_interval get_val_from_store(interval_abstract_store m,
 /*
  * Join b to a and return whether a changed or not.
  */
-bool join(interval_abstract_store &a, interval_abstract_store b) {
-
+bool join(interval_abstract_store &a, const interval_abstract_store &b) {
     bool a_changed = false;
 
+    /*
+     * Loop through each entry in b.
+     */
     for (const auto &[b_key, b_val] : b) {
+        abstract_interval a_val = get_val_from_store(a, b_key);
 
         /*
-         * If this variable isn't present in a, add it and mark it as changed.
+         * If the variable isn't in a, add it and mark the store as changed.
          */
-        if (a.count(b_key) == 0) {
+        if (std::get<AbstractVals>(a_val) == AbstractVals::BOTTOM) {
             a[b_key] = b_val;
-            store_changed = true;
+            a_changed = true;
         }
 
         /*
-         * [x1, y1] JOIN [x2, y2] = [min(x1, x2), max(y1, y2)]
-         */
-
-        /*
-         * Compute min(x1, x2).
+         * If a[b_key] is TOP, the join technically didn't change anything.
          */
         if (
-                std::get<AbstractVals>(a[b_key]) == AbstractVals::TOP
-                || std::get<AbstractVals>(a[b_key]) == AbstractVals::TOP) {
-
+                (std::get<AbstractVals>(b_val) != AbstractVals::TOP) &&
+                (std::get<AbstractVals>(a[b_key]) != AbstractVals::TOP)
+        ) {
+            a[b_key] = AbstractVals::TOP;
         }
+    }
+    return a_changed;
+}
+
+/*
+ * Implement the widening operator Ben discussed in lecture 3.1.
+ */
+bool widen(abstract_interval &a, abstract_interval b) {
+
+    /*
+     * If either a or b are BOTTOM, return BOTTOM.
+     */
+    if (std::get<AbstractVals>(a) == AbstractVals::BOTTOM || std::get<AbstractVals>(b) == AbstractVals::BOTTOM) {
+        return AbstractVals::BOTTOM;
     }
 }

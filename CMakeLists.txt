@@ -29,6 +29,7 @@ ADD_EXECUTABLE(test_mfp_worklist
 
 ADD_EXECUTABLE(assn1_interval_analysis
 	interval-analysis/interval-analysis.cpp
+	interval-analysis/interval_analysis.hpp
 	headers/abstract_store.hpp
 	headers/datatypes.h
 	headers/execute.hpp

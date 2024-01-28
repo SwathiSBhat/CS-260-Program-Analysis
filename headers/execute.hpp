@@ -14,13 +14,16 @@
  * Our bb2store is an argument because the $jmp and $branch instructions involve
  * updating the bb2store. Same with the worklist.
  */
+
 AbstractStore execute(
         BasicBlock *bb,
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
         std::deque<std::string> &worklist,
         std::unordered_set<std::string> addr_of_int_types,
-        std::set<std::string> bbs_to_output) {
+        std::set<std::string> bbs_to_output,
+        // TODO: Execute post with this will work only for no-ptr-no-call instructions
+        bool execute_post = false) {
 
     /*
      * Make a copy of sigma that we'll return at the end of this function.
@@ -294,7 +297,9 @@ AbstractStore execute(
      */
 
     Instruction *terminal_instruction = bb->terminal;
-    if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
+    if (!execute_post) {
+
+        if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
 
         //std::cout << "Breakpoint 5?" << std::endl;
 
@@ -323,9 +328,10 @@ AbstractStore execute(
         else {
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
             if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP){
+                    
                     bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
                     bool store_changed_ff = bb2store[branch_inst->ff].join(sigma_prime);
-
+                    
                     if (store_changed_tt || bbs_to_output.count(branch_inst->tt) == 0)
                         worklist.push_back(branch_inst->tt);
                     if (store_changed_ff || bbs_to_output.count(branch_inst->ff) == 0)
@@ -427,5 +433,8 @@ AbstractStore execute(
          * This is a catch-all for instructions we don't have to do anything about for constant analysis.
          */
     }
+
+    }
+    
     return sigma_prime;
 }

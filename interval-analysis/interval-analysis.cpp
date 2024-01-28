@@ -1,7 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_set>
-#include<deque>
+#include <stack>
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"

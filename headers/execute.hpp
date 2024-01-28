@@ -4,6 +4,7 @@
 #include "datatypes.h"
 #include <queue>
 #include <variant>
+#include <set>
 
 /*
  * Execute a given BasicBlock against a given AbstractStore. This is a helper

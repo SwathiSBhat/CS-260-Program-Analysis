@@ -7,24 +7,15 @@
 #include <set>
 
 /*
- * Execute a given BasicBlock against a given AbstractStore. This is a helper
- * function to be used in the MFP worklist algorithm. I figure this is important
- * and complicated enough to be given its own file, but we can refactor later as
- * needed.
- *
- * Our bb2store is an argument because the $jmp and $branch instructions involve
- * updating the bb2store. Same with the worklist.
+ * Execute the basic blocks we traversed for one last time to get the final exit abstract store
  */
-
-AbstractStore execute(
+AbstractStore executepost(
         BasicBlock *bb,
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
         std::deque<std::string> &worklist,
         std::unordered_set<std::string> addr_of_int_types,
-        std::set<std::string> bbs_to_output,
-        // TODO: Execute post with this will work only for no-ptr-no-call instructions
-        bool execute_post = false) {
+        std::set<std::string> bbs_to_output) {
 
     /*
      * Make a copy of sigma that we'll return at the end of this function.
@@ -33,8 +24,6 @@ AbstractStore execute(
 
     /*
      * Iterate through each instruction in bb.
-     *
-     * TODO I guess we shouldn't care about terminals?
      */
     for (const Instruction *inst : bb->instructions) {
 
@@ -196,9 +185,6 @@ AbstractStore execute(
                 continue;
             }
 
-            //std::cout << "lhs is definitely int-typed" << std::endl;
-            //copy_inst->pretty_print();
-
             /*
              * Copy over the value. We can just do a simple integer copy because
              * of our constant domain. If we had some other domain, we would
@@ -298,11 +284,7 @@ AbstractStore execute(
      */
 
     Instruction *terminal_instruction = bb->terminal;
-    if (!execute_post) {
-
-        if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
-
-        //std::cout << "Breakpoint 5?" << std::endl;
+    if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
 
         /*
          * Cast it.
@@ -311,9 +293,9 @@ AbstractStore execute(
 
 
         /*
-             * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
-             * propagate to both.
-             */
+        * If op is not 0, go to bb1. Otherwise, go to bb2. If op is TOP, then
+        * propagate to both.
+        */
         if (branch_inst->condition->IsConstInt()) {
             if (branch_inst->condition->val != 0) {
                 bool store_changed_tt = bb2store[branch_inst->tt].join(sigma_prime);
@@ -434,8 +416,5 @@ AbstractStore execute(
          * This is a catch-all for instructions we don't have to do anything about for constant analysis.
          */
     }
-
-    }
-    
     return sigma_prime;
 }

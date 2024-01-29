@@ -5,6 +5,7 @@
 
 #include "../headers/datatypes.h"
 #include "../headers/execute.hpp"
+#include "../headers/executepost.hpp"
 
 using json = nlohmann::json;
 
@@ -149,7 +150,8 @@ public:
             // Perform the transfer function on the current basic block
             //std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             //bb2store[current_bb].print();
-            bb2store[current_bb] = execute(func->bbs[current_bb],
+            
+            execute(func->bbs[current_bb],
                                            bb2store[current_bb],
                                            bb2store,
                                            worklist,
@@ -173,19 +175,17 @@ public:
          * transfer function once more on each basic block to get their exit
          * abstract stores.
          */
-        //for (const auto &[bb_label, abstract_store] : bb2store) {
-
-            /*
-             * TODO I don't think this updates the abstract stores correctly. I
-             * TODO think this changes the other bbs when we don't want it to.
-             * TODO How should we execute without updating?
-             */
-            /*bb2store[bb_label] = execute(func->bbs[bb_label],
-                                         abstract_store,
-                                         bb2store,
-                                         worklist,
-                                         addr_of_int_types);
-        }*/
+        for (const auto &it : bbs_to_output) {
+            
+            
+            soln[it] = execute(func->bbs[it],
+                                bb2store[it],
+                                bb2store,
+                                worklist,
+                                addr_of_int_types,
+                                bbs_to_output,
+                                true);
+        }
 
         /*
          * Finally, let's print out the abstract stores of each basic block in
@@ -201,9 +201,17 @@ public:
 
         //std::cout << "START OF ACTUAL OUTPUT" << std::endl;
 
+        /*std::cout<<"--------- bb2store ---------" <<std::endl;
         for (const auto &bb_label : bbs_to_output) {
             std::cout << bb_label << ":" << std::endl;
             bb2store[bb_label].print();
+            std::cout << std::endl;
+        }
+
+        std::cout<<"--------- Final exec ---------" <<std::endl;*/
+        for (const auto &bb_label : bbs_to_output) {
+            std::cout << bb_label << ":" << std::endl;
+            soln[bb_label].print();
             std::cout << std::endl;
         }
     }
@@ -217,6 +225,10 @@ public:
      * Our worklist is a queue containing BasicBlock labels.
      */
     std::deque<std::string> worklist;
+    /*
+     * This is the final solution which we get by running through all the basic blocks one last time
+    */
+    std::map<std::string, AbstractStore> soln;
 
 private:
     std::string funcname;

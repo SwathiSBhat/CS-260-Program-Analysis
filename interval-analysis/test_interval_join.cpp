@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "interval_analysis.hpp"
+#include<variant>
 
 int main() {
 
@@ -11,14 +12,14 @@ int main() {
 
     std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
-    abstract_interval i1;
-    std::get<interval>(i1) = {-10, 5};
+    std::variant<interval, AbstractVals> i1;
+    i1 = std::make_pair(1, 2);
 
-    abstract_interval i2;
-    std::get<AbstractVals>(i2) = TOP;
+    std::variant<interval, AbstractVals> i2;
+    i2 = TOP;
 
-    abstract_interval i3;
-    std::get<interval>(i3) = {11, 45};
+    std::variant<interval, AbstractVals> i3;
+    i3 = std::make_pair(11,45);
 
     std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 

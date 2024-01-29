@@ -160,12 +160,13 @@ public:
             //std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             //bb2store[current_bb].print();
             
-            execute(func->bbs[current_bb],
-                                           bb2store[current_bb],
-                                           bb2store,
-                                           worklist,
-                                           addr_of_int_types,
-                                           bbs_to_output);
+            execute(&program,
+                    func->bbs[current_bb],
+                    bb2store[current_bb],
+                    bb2store,
+                    worklist,
+                    addr_of_int_types,
+                    bbs_to_output);
             //std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             //bb2store[current_bb].print();
 
@@ -187,7 +188,8 @@ public:
         for (const auto &it : bbs_to_output) {
             
             // std::cout << "Executing post transfer function on " << it << std::endl;
-            soln[it] = execute(func->bbs[it],
+            soln[it] = execute(&program,
+                                func->bbs[it],
                                 bb2store[it],
                                 bb2store,
                                 worklist,

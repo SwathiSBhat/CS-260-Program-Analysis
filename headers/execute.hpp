@@ -17,13 +17,13 @@
  */
 
 AbstractStore execute(
+        Program *program,
         BasicBlock *bb,
         AbstractStore sigma,
         std::map<std::string, AbstractStore> &bb2store,
         std::deque<std::string> &worklist,
         std::unordered_set<std::string> addr_of_int_types,
         std::set<std::string> bbs_to_output,
-        // TODO: Execute post with this will work only for no-ptr-no-call instructions
         bool execute_post = false) {
 
     /*
@@ -305,9 +305,43 @@ AbstractStore execute(
                         for(auto addr_of_int : addr_of_int_types) {
                             sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
                         }
+                        // Break out of the loop once we've set all addr_of_int_types to TOP once
+                        break;
                     }
-                    // Break out of the loop once we've set all addr_of_int_types to TOP once
-                    break;
+                    
+                    // If any arg is a struct pointer that has a pointer to an int field. If yes, then for all variables in addr_of_int_types, update sigma_prime to TOP
+                    else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
+                        // Check if struct has a pointer to an int field
+                        bool has_int_field = false;
+                        std::string struct_name = "";
+
+                        Type::StructType *struct_type = (Type::StructType*)(arg->var->type->ptr_type);
+                        if (struct_type)
+                        {
+                            struct_name = struct_type->name;
+                            std::cout << "Struct name: " << struct_name << std::endl;
+                            if (!struct_name.empty())
+                            {
+                                for (auto field : program->structs[struct_name]->fields)
+                                {
+                                    if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                    {
+                                        has_int_field = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (has_int_field)
+                        {
+                            for(auto addr_of_int : addr_of_int_types) {
+                                sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                            }
+                            // Break out of the loop once we've set all addr_of_int_types to TOP once
+                            break;
+                        }
+                    }
                 }
             }
             else {
@@ -411,8 +445,8 @@ AbstractStore execute(
             sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
         }
 
-        // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
         for (auto arg : call_inst->args) {
+            // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
             if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
                 for(auto addr_of_int : addr_of_int_types) {
                     sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
@@ -420,7 +454,41 @@ AbstractStore execute(
                 // Break out of the loop once we've set all addr_of_int_types to TOP once
                 break;
             }
+            // If any arg is a struct pointer that has a pointer to an int field. If yes, then for all variables in addr_of_int_types, update sigma_prime to TOP
+            else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
+                // Check if struct has a pointer to an int field
+                bool has_int_field = false;
+                std::string struct_name = "";
+
+                Type::StructType *struct_type = (Type::StructType*)(arg->var->type->ptr_type);
+                if (struct_type)
+                {
+                    struct_name = struct_type->name;
+                    std::cout << "Struct name: " << struct_name << std::endl;
+                    if (!struct_name.empty())
+                    {
+                        for (auto field : program->structs[struct_name]->fields)
+                        {
+                            if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                            {
+                                has_int_field = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (has_int_field)
+                {
+                    for(auto addr_of_int : addr_of_int_types) {
+                        sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                    }
+                    // Break out of the loop once we've set all addr_of_int_types to TOP once
+                    break;
+                }
+            }
         }
+
 
         if (!execute_post) {
             // If abstract store of next_bb has changed, push it into worklist
@@ -447,6 +515,39 @@ AbstractStore execute(
                     }
                     // Break out of the loop once we've set all addr_of_int_types to TOP once
                     break;
+                }
+                // If any arg is a struct pointer that has a pointer to an int field. If yes, then for all variables in addr_of_int_types, update sigma_prime to TOP
+                else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
+                    // Check if struct has a pointer to an int field
+                    bool has_int_field = false;
+                    std::string struct_name = "";
+
+                    Type::StructType *struct_type = (Type::StructType*)(arg->var->type->ptr_type);
+                    if (struct_type)
+                    {
+                        struct_name = struct_type->name;
+                        std::cout << "Struct name: " << struct_name << std::endl;
+                        if (!struct_name.empty())
+                        {
+                            for (auto field : program->structs[struct_name]->fields)
+                            {
+                                if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                {
+                                    has_int_field = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (has_int_field)
+                    {
+                        for(auto addr_of_int : addr_of_int_types) {
+                            sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                        }
+                        // Break out of the loop once we've set all addr_of_int_types to TOP once
+                        break;
+                    }
                 }
             }
 

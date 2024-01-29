@@ -192,7 +192,8 @@ AbstractStore execute(
             else
             {
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-            } }
+            } 
+            }
 
         } else if ((*inst).instrType == InstructionType::CopyInstrType) {
 
@@ -241,6 +242,9 @@ AbstractStore execute(
              */
             LoadInstruction *load_inst = (LoadInstruction *) inst;
 
+            //if (bb->label == "bb6")
+            //    std::cout << "Encountered $load for " << load_inst->lhs->name << std::endl;
+
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
              */
@@ -258,9 +262,9 @@ AbstractStore execute(
              */
             StoreInstruction *store_inst = (StoreInstruction *) inst;
             /*
-             * If the lhs isn't an int-typed variable, ignore instruction.
+             * If the op isn't an int-typed variable, ignore instruction.
              */
-            if (!store_inst->dst->isIntType()) {
+            if (!(store_inst->op->IsConstInt() || (store_inst->op->var && store_inst->op->var->isIntType()))) {
                 continue;
             }
 
@@ -272,6 +276,7 @@ AbstractStore execute(
             else {
                 op = sigma_prime.GetValFromStore(store_inst->op->var->name);
             }
+
             // For every entry in addr-of-ints, join with op value to get new sigma_prime
             for(auto addr_of_int : addr_of_int_types) {
                 AbstractStore opStore = AbstractStore();
@@ -338,6 +343,8 @@ AbstractStore execute(
             }
         }
         else {
+            //if (bb->label == "bb6")
+            //std::cout << "Encountered $branch for _t37 " << sigma_prime.GetValFromStore("_t37") << std::endl;
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
             if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP){
                     
@@ -415,6 +422,8 @@ AbstractStore execute(
         }
 
     } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType ) {
+            //if (execute_post)
+            //std::cout<< "Encountered $callidr" << std::endl;
             CallIdrInstruction *call_inst = (CallIdrInstruction *) terminal_instruction;
             // If function returns something and it is of int type, update sigma_prime to TOP
             if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
@@ -422,22 +431,26 @@ AbstractStore execute(
             }
 
             
-                // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
-                for (auto arg : call_inst->args) {
-                    if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
-                        for(auto addr_of_int : addr_of_int_types) {
-                            sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
-                        }
-                        // Break out of the loop once we've set all addr_of_int_types to TOP once
-                        break;
+            // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+            for (auto arg : call_inst->args) {
+                if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                    for(auto addr_of_int : addr_of_int_types) {
+                        sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
                     }
+                    // Break out of the loop once we've set all addr_of_int_types to TOP once
+                    break;
                 }
+            }
+
             if (!execute_post) {
                 // If abstract store of next_bb has changed, push it into worklist
                 if (bb2store[call_inst->next_bb].join(sigma_prime) || bbs_to_output.count(call_inst->next_bb) == 0) {
                     worklist.push_back(call_inst->next_bb);
                 }
             }
+            /*if (execute_post) {
+            std::cout <<" Printing sigma prime "<<std::endl;
+            sigma_prime.print();}*/
         }
     else {
         // std::cout << "Found a terminal we don't recognize :(" << std::endl;

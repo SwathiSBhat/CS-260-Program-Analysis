@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <string>
 #include <variant>
@@ -16,6 +17,32 @@ enum AbstractVals {
 typedef std::pair<int, int> interval;
 typedef std::variant<interval, AbstractVals> abstract_interval;
 typedef std::map<std::string, abstract_interval> interval_abstract_store;
+
+/*
+ * This lets us print out our interval abstract store easily.
+ */
+struct IntervalVisitor {
+    std::string operator()(interval val) {
+        std::string return_string = "[" + std::to_string(val.first) + ", " + std::to_string(val.second) + "]";
+        return return_string;
+    }
+    std::string operator()(AbstractVals val) {
+        if (val == AbstractVals::BOTTOM) {
+            return "Bottom";
+        } else {
+            return "Top";
+        }
+    }
+};
+
+/*
+ * Pretty-print an interval abstract store.
+ */
+void print(const interval_abstract_store &store) {
+    for (const auto &[var_name, var_value] : store) {
+        std::cout << var_name << " -> " << std::visit(IntervalVisitor{}, var_value) << std::endl;
+    }
+}
 
 /*
  * If var is not present in the store, return BOTTOM. Else return the value in
@@ -51,13 +78,18 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
 
         abstract_interval new_a;
 
+        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
         /*
          * If either variable is TOP, we know to assign TOP, no questions asked.
          */
         if (
-                (std::get<AbstractVals>(b_val) == AbstractVals::TOP) ||
-                (std::get<AbstractVals>(a_val) == AbstractVals::TOP)
+                ((std::holds_alternative<AbstractVals>(b_val)) && (std::get<AbstractVals>(b_val) == AbstractVals::TOP)) ||
+                ((std::holds_alternative<AbstractVals>(a_val)) && (std::get<AbstractVals>(a_val) == AbstractVals::TOP))
         ) {
+
+            std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
             new_a = AbstractVals::TOP;
 
             /*
@@ -76,8 +108,8 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
              */
             int new_lower_bound = std::min(std::get<interval>(a_val).first,
                                            std::get<interval>(b_val).first);
-            int new_upper_bound = std::max(std::get<interval>(a_val).first,
-                                           std::get<interval>(b_val).first);
+            int new_upper_bound = std::max(std::get<interval>(a_val).second,
+                                           std::get<interval>(b_val).second);
 
             std::get<interval>(new_a) = {new_lower_bound, new_upper_bound};
 

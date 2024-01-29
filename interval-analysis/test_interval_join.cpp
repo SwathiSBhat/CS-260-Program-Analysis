@@ -1,7 +1,7 @@
 #include <iostream>
+#include <variant>
 
 #include "interval_analysis.hpp"
-#include<variant>
 
 int main() {
 
@@ -12,18 +12,23 @@ int main() {
 
     std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
-    std::variant<interval, AbstractVals> i1;
-    i1 = std::make_pair(1, 2);
+    interval_abstract_store s1 = {{"v1", std::make_pair(1, 2)},
+                                 {"v2", TOP},
+                                 {"v3", std::make_pair(11, 45)}};
 
-    std::variant<interval, AbstractVals> i2;
-    i2 = TOP;
-
-    std::variant<interval, AbstractVals> i3;
-    i3 = std::make_pair(11,45);
+    interval_abstract_store s2 = {{"v1", std::make_pair(1, 5)},
+                                 {"v2", BOTTOM},
+                                 {"v3", std::make_pair(-90, 4)}};
 
     std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
-    interval_abstract_store a = {{"v1", i1},
-                               {"v2", i2},
-                               {"v3", i3}};
+    /*
+     * Join s2 to s1, modifying a in-place.
+     */
+    if (join(s1, s2)) {
+        std::cout << "New value of a:" << std::endl;
+        print(s1);
+    } else {
+        std::cout << "No change" << std::endl;
+    }
 }

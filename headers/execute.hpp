@@ -319,16 +319,23 @@ AbstractStore execute(
                         if (struct_type)
                         {
                             struct_name = struct_type->name;
-                            std::cout << "Struct name: " << struct_name << std::endl;
-                            if (!struct_name.empty())
-                            {
-                                for (auto field : program->structs[struct_name]->fields)
+                            //TODO: Change this data structure to map to store structs
+                            if (!struct_name.empty()) {
+                                for (auto st = program->structs.begin(); st != program->structs.end(); ++st)
                                 {
-                                    if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                    if ((*st)->name == struct_name)
                                     {
-                                        has_int_field = true;
-                                        break;
+                                        for (auto field : (*st)->fields)
+                                        {
+                                            if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                            {
+                                                has_int_field = true;
+                                                break;
+                                            }
+                                        }
                                     }
+                                    if (has_int_field)
+                                        break;
                                 }
                             }
                         }
@@ -464,16 +471,23 @@ AbstractStore execute(
                 if (struct_type)
                 {
                     struct_name = struct_type->name;
-                    std::cout << "Struct name: " << struct_name << std::endl;
-                    if (!struct_name.empty())
-                    {
-                        for (auto field : program->structs[struct_name]->fields)
+                    //TODO: Change this data structure to map to store structs
+                    if (!struct_name.empty()) {
+                        for (auto st = program->structs.begin(); st != program->structs.end(); ++st)
                         {
-                            if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                            if ((*st)->name == struct_name)
                             {
-                                has_int_field = true;
-                                break;
+                                for (auto field : (*st)->fields)
+                                {
+                                    if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                    {
+                                        has_int_field = true;
+                                        break;
+                                    }
+                                }
                             }
+                            if (has_int_field)
+                                break;
                         }
                     }
                 }
@@ -526,16 +540,23 @@ AbstractStore execute(
                     if (struct_type)
                     {
                         struct_name = struct_type->name;
-                        std::cout << "Struct name: " << struct_name << std::endl;
-                        if (!struct_name.empty())
-                        {
-                            for (auto field : program->structs[struct_name]->fields)
+                        //TODO: Change this data structure to map to store structs
+                        if (!struct_name.empty()) {
+                            for (auto st = program->structs.begin(); st != program->structs.end(); ++st)
                             {
-                                if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                if ((*st)->name == struct_name)
                                 {
-                                    has_int_field = true;
-                                    break;
+                                    for (auto field : (*st)->fields)
+                                    {
+                                        if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                        {
+                                            has_int_field = true;
+                                            break;
+                                        }
+                                    }
                                 }
+                                if (has_int_field)
+                                    break;
                             }
                         }
                     }

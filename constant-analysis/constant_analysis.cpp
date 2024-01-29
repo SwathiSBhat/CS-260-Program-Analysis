@@ -151,7 +151,7 @@ public:
             3. For each successor of the basic block, join the abstract store of the successor with the abstract store of the current basic block
             4. If the abstract store of the successor has changed, add the successor to the worklist
         */
-
+        //program.print_pretty(json::parse("{\"structs\": \"true\",\"globals\": \"false\",\"functions\": {\"bbs\": {\"instructions\" : \"false\"}},\"externs\": \"false\"}"));
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
             worklist.pop_front();

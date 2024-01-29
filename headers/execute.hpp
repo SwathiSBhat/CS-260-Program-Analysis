@@ -283,6 +283,13 @@ AbstractStore execute(
                 if (!(std::holds_alternative<AbstractVal>(op) && std::get<AbstractVal>(op) == AbstractVal::BOTTOM))
                     opStore.abstract_store[addr_of_int] = op;
                 sigma_prime.join(opStore);
+                /*if (bb->label == "bb33")
+                {
+                    std::cout << "$store for addr of int " << addr_of_int << std::endl;
+                    opStore.print();
+                    std::cout << "After join: "<<std::endl;
+                    sigma_prime.print();
+                }*/
             }
         }
             else if ((*inst).instrType == InstructionType::CallExtInstrType) {

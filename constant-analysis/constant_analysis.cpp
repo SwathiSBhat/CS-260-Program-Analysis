@@ -38,7 +38,7 @@ public:
     }
 
     /*
-     * Get the list of names of all the int-typed local variables whose addresses were
+     * Get the list of names of all the int-typed local variables + function parameters whose addresses were
      * taken using the $addrof command.
      * TODO: This should also include addrof of global variables but we are not doing it for assignment 1
     */
@@ -47,13 +47,23 @@ public:
             for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
                 if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
                     if (dynamic_cast<AddrofInstruction*>(*instruction)->rhs->isIntType()) { 
-                        if (program.funcs[func_name]->locals.count(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != 0) {
+                        if (program.funcs[func_name]->locals.count(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != 0)
+                        {
                             addr_of_int_types.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name);
-                    }
+                        }
+                        else
+                        {
+                            for (auto param : program.funcs[func_name]->params) {
+                                if (param && param->name == dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) {
+                                    addr_of_int_types.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name);
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+
         return; 
     }
 
@@ -83,7 +93,6 @@ public:
             }  
         }
         bb2store[bb_name] = store;
-        //std::cout << "Initialized entry store" << std::endl;
         return;
     }
 
@@ -97,7 +106,7 @@ public:
             std::cout << "Func not found" << std::endl;
             return;
         }
-        //std::cout << "Analyzing function " << func_name << std::endl;
+
         funcname = func_name;
         
         // data structures required for prep stage
@@ -110,11 +119,11 @@ public:
         // 2. Compute set of variables that are addresses of int-typed variables
         get_addr_of_int_types(addr_of_int_types, func_name);
 
-        //std::cout << "Priting addr taken int types: " <<std::endl;
-        //for (auto i : addr_of_int_types) {
-        //    std::cout << i << " ";
-        //}
-        //std::cout << std::endl;
+        /*std::cout << "Printing addr taken int types: " <<std::endl;
+        for (auto i : addr_of_int_types) {
+            std::cout << i << " ";
+        }
+        std::cout << std::endl;*/
 
         /*
          * We also need to initialize bb2store entries for all the basic blocks

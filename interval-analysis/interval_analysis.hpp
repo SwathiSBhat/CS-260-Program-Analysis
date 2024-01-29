@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <map>
 #include <string>
 
@@ -42,19 +43,51 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
         /*
          * If the variable isn't in a, add it and mark the store as changed.
          */
-        if (std::get<AbstractVals>(a_val) == AbstractVals::BOTTOM) {
+        if (std::holds_alternative<AbstractVals>(a_val) && std::get<AbstractVals>(a_val) == AbstractVals::BOTTOM) {
             a[b_key] = b_val;
             a_changed = true;
         }
 
+        abstract_interval new_a;
+
         /*
-         * If a[b_key] is TOP, the join technically didn't change anything.
+         * If either variable is TOP, we know to assign TOP, no questions asked.
          */
         if (
-                (std::get<AbstractVals>(b_val) != AbstractVals::TOP) &&
-                (std::get<AbstractVals>(a[b_key]) != AbstractVals::TOP)
+                (std::get<AbstractVals>(b_val) == AbstractVals::TOP) ||
+                (std::get<AbstractVals>(a_val) == AbstractVals::TOP)
         ) {
-            a[b_key] = AbstractVals::TOP;
+            new_a = AbstractVals::TOP;
+
+            /*
+             * Check whether this actually changes things. If so, assign the new
+             * value.
+             */
+            if (a_val != new_a) {
+                a_changed = true;
+                a[b_key] = new_a;
+            }
+        } else {
+
+            /*
+             * The new lower bound is the minimum of the two lower bounds. The
+             * new upper bound is the maximum of the two upper bounds.
+             */
+            int new_lower_bound = std::min(std::get<interval>(a_val).first,
+                                           std::get<interval>(b_val).first);
+            int new_upper_bound = std::max(std::get<interval>(a_val).first,
+                                           std::get<interval>(b_val).first);
+
+            std::get<interval>(new_a) = {new_lower_bound, new_upper_bound};
+
+            /*
+             * Check whether this actually changes things. If so, assign the new
+             * value.
+             */
+            if (std::get<interval>(new_a) != std::get<interval>(a_val)) {
+                a_changed = true;
+                a[b_key] = new_a;
+            }
         }
     }
     return a_changed;
@@ -71,4 +104,9 @@ bool widen(abstract_interval &a, abstract_interval b) {
     if (std::get<AbstractVals>(a) == AbstractVals::BOTTOM || std::get<AbstractVals>(b) == AbstractVals::BOTTOM) {
         return AbstractVals::BOTTOM;
     }
+
+    /*
+     * TODO
+     */
+    return true;
 }

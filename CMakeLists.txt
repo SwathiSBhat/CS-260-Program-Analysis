@@ -34,3 +34,8 @@ ADD_EXECUTABLE(assn1_interval_analysis
 	headers/datatypes.h
 	headers/execute.hpp
 )
+
+ADD_EXECUTABLE(test_interval_join
+	interval-analysis/test_interval_join.cpp
+	interval-analysis/interval_analysis.hpp
+)

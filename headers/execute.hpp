@@ -283,8 +283,6 @@ AbstractStore execute(
                 }
             }
             else {
-
-                //std::cout << "Found an instruction we don't recognize :(" << std::endl;
                 /*
                 * This is a catch-all for instructions we don't have to do anything about for constant analysis.
                 */

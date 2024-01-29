@@ -110,7 +110,7 @@
             "params": [],
             "locals": [
                 {
-                    "name": "_lo1",
+                    "name": "_t1",
                     "typ": "Int",
                     "scope": "test"
                 },
@@ -178,34 +178,17 @@
                                 },
                                 "op": {
                                     "Var": {
-                                        "name": "_t2",
+                                        "name": "_t5",
                                         "typ": "Int",
                                         "scope": "test"
                                     }
                                 }
                             }
-                        }
-                    ],
-                    "term": {
-                        "CallDirect": {
-                            "lhs": {
-                                "name": "_t3",
-                                "typ": "Int",
-                                "scope": "test"
-                            },
-                            "callee": "f1",
-                            "args": [],
-                            "next_bb": "bb2"
-                        }
-                    }
-                },
-                "bb2": {
-                    "id": "bb2",
-                    "insts": [
+                        },
                         {
                             "Arith": {
                                 "lhs": {
-                                    "name": "_t4",
+                                    "name": "_t6",
                                     "typ": "Int",
                                     "scope": "test"
                                 },
@@ -214,52 +197,18 @@
                                     "CInt": 0
                                 },
                                 "op2": {
-                                    "Var": {
-                                        "name": "_t3",
-                                        "typ": "Int",
-                                        "scope": "test"
-                                    }
+                                    "CInt": 8
                                 }
                             }
                         },
                         {
-                            "Copy": {
-                                "lhs": {
-                                    "name": "id2",
-                                    "typ": "Int",
-                                    "scope": "test"
-                                },
-                                "op": {
-                                    "Var": {
-                                        "name": "_t4",
-                                        "typ": "Int",
-                                        "scope": "test"
-                                    }
-                                }
-                            }
-                        }
-                    ],
-                    "term": {
-                        "Branch": {
-                            "cond": {
-                                "CInt": 9
-                            },
-                            "tt": "bb4",
-                            "ff": "bb5"
-                        }
-                    }
-                },
-                "bb3": {
-                    "id": "bb3",
-                    "insts": [
-                        {
                             "Arith": {
                                 "lhs": {
-                                    "name": "_t5",
+                                    "name": "_t7",
                                     "typ": "Int",
                                     "scope": "test"
                                 },
-                                "aop": "Divide",
+                                "aop": "Subtract",
                                 "op1": {
                                     "Var": {
                                         "name": "id2",
@@ -269,30 +218,10 @@
                                 },
                                 "op2": {
                                     "Var": {
-                                        "name": "_lo1",
+                                        "name": "_t6",
                                         "typ": "Int",
                                         "scope": "test"
                                     }
-                                }
-                            }
-                        },
-                        {
-                            "Cmp": {
-                                "lhs": {
-                                    "name": "_t6",
-                                    "typ": "Int",
-                                    "scope": "test"
-                                },
-                                "rop": "LessEq",
-                                "op1": {
-                                    "Var": {
-                                        "name": "_t5",
-                                        "typ": "Int",
-                                        "scope": "test"
-                                    }
-                                },
-                                "op2": {
-                                    "CInt": 4
                                 }
                             }
                         },
@@ -305,26 +234,36 @@
                                 },
                                 "op": {
                                     "Var": {
-                                        "name": "_t6",
+                                        "name": "_t7",
                                         "typ": "Int",
                                         "scope": "test"
                                     }
                                 }
                             }
-                        },
+                        }
+                    ],
+                    "term": {
+                        "CallDirect": {
+                            "lhs": null,
+                            "callee": "test",
+                            "args": [],
+                            "next_bb": "bb2"
+                        }
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [
                         {
-                            "CallExt": {
+                            "Copy": {
                                 "lhs": {
-                                    "name": "_t7",
+                                    "name": "id0",
                                     "typ": "Int",
                                     "scope": "test"
                                 },
-                                "ext_callee": "e2",
-                                "args": [
-                                    {
-                                        "CInt": 0
-                                    }
-                                ]
+                                "op": {
+                                    "CInt": 10
+                                }
                             }
                         },
                         {
@@ -338,7 +277,7 @@
                                 "args": [
                                     {
                                         "Var": {
-                                            "name": "_t7",
+                                            "name": "id0",
                                             "typ": "Int",
                                             "scope": "test"
                                         }
@@ -349,7 +288,7 @@
                         {
                             "Copy": {
                                 "lhs": {
-                                    "name": "id0",
+                                    "name": "id1",
                                     "typ": "Int",
                                     "scope": "test"
                                 },
@@ -365,66 +304,118 @@
                     ],
                     "term": {
                         "Ret": {
-                            "Var": {
-                                "name": "id1",
-                                "typ": "Int",
-                                "scope": "test"
-                            }
+                            "CInt": 5
                         }
-                    }
-                },
-                "bb4": {
-                    "id": "bb4",
-                    "insts": [
-                        {
-                            "Copy": {
-                                "lhs": {
-                                    "name": "_lo1",
-                                    "typ": "Int",
-                                    "scope": "test"
-                                },
-                                "op": {
-                                    "CInt": 0
-                                }
-                            }
-                        }
-                    ],
-                    "term": {
-                        "Jump": "bb3"
-                    }
-                },
-                "bb5": {
-                    "id": "bb5",
-                    "insts": [
-                        {
-                            "Copy": {
-                                "lhs": {
-                                    "name": "_lo1",
-                                    "typ": "Int",
-                                    "scope": "test"
-                                },
-                                "op": {
-                                    "CInt": 1
-                                }
-                            }
-                        }
-                    ],
-                    "term": {
-                        "Jump": "bb3"
                     }
                 },
                 "entry": {
                     "id": "entry",
-                    "insts": [],
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "id0",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Neq",
+                                "op1": {
+                                    "CInt": 4
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "id0",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "LessEq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t2",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 9
+                                }
+                            }
+                        }
+                    ],
                     "term": {
                         "CallDirect": {
                             "lhs": {
-                                "name": "_t2",
+                                "name": "_t5",
                                 "typ": "Int",
                                 "scope": "test"
                             },
-                            "callee": "f1",
-                            "args": [],
+                            "callee": "f2",
+                            "args": [
+                                {
+                                    "Var": {
+                                        "name": "_t3",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                {
+                                    "Var": {
+                                        "name": "_t4",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            ],
                             "next_bb": "bb1"
                         }
                     }

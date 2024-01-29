@@ -18,14 +18,15 @@ int main() {
 
     interval_abstract_store s2 = {{"v1", std::make_pair(1, 5)},
                                  {"v2", BOTTOM},
-                                 {"v3", std::make_pair(-90, 4)}};
+                                 {"v4", std::make_pair(-90, 4)}};
 
     std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
     /*
      * Join s2 to s1, modifying s1 in-place.
      */
-    if (join(s1, s2)) {
+    bool changed = join(s1, s2);
+    if (changed) {
         std::cout << "New value of s1:" << std::endl;
         print(s1);
     } else {

@@ -15,6 +15,11 @@
 #define INTERVAL_NEG_INFINITY   std::numeric_limits<int>::min()
 
 /*
+ * String representation of TOP for my convenience.
+ */
+#define TOP_STR                 "[-INF, INF]"
+
+/*
  * For interval analysis, we are defining TOP as [-INF, INF].
  *
  * I realize that for interval analysis this is kind of stupid, but rewriting
@@ -52,7 +57,7 @@ struct IntervalVisitor {
         if (val == AbstractVals::BOTTOM) {
             return "Bottom";
         } else {
-            return "[-INF, INF]";
+            return TOP_STR;
         }
     }
 };
@@ -93,21 +98,26 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
         /*
          * If the variable isn't in a, add it and mark the store as changed.
          */
-        if (std::holds_alternative<AbstractVals>(a_val) && std::get<AbstractVals>(a_val) == AbstractVals::BOTTOM) {
+        if (std::holds_alternative<AbstractVals>(a_val) && std::visit(IntervalVisitor{}, a_val) == "Bottom") {
             a[b_key] = b_val;
             a_changed = true;
+            continue;
         }
 
         abstract_interval new_a;
 
         std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
+        if (std::holds_alternative<AbstractVals>(b_val)) {
+            std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        }
+
         /*
          * If either variable is TOP, we know to assign TOP, no questions asked.
          */
         if (
-                ((std::holds_alternative<AbstractVals>(b_val)) && (std::get<AbstractVals>(b_val) == AbstractVals::TOP)) ||
-                ((std::holds_alternative<AbstractVals>(a_val)) && (std::get<AbstractVals>(a_val) == AbstractVals::TOP))
+                ((std::holds_alternative<AbstractVals>(b_val)) && (std::visit(IntervalVisitor{}, b_val) == TOP_STR)) ||
+                ((std::holds_alternative<AbstractVals>(a_val)) && (std::visit(IntervalVisitor{}, a_val) == TOP_STR))
         ) {
 
             std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
@@ -165,13 +175,21 @@ bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
         /*
          * If the variable isn't in a, add it and mark the store as changed.
          */
-        if (std::holds_alternative<AbstractVals>(a_val) && std::get<AbstractVals>(a_val) == AbstractVals::BOTTOM) {
+        if (std::holds_alternative<AbstractVals>(a_val) && std::visit(IntervalVisitor{}, a_val) == "Bottom") {
             a[b_key] = b_val;
             a_changed = true;
+            continue;
         }
 
         abstract_interval new_a;
 
+        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        std::cout << std::visit(IntervalVisitor{}, b_val) << std::endl;
+        if (std::holds_alternative<AbstractVals>(b_val)) {
+            std::cout << "AbstractVals" << std::endl;
+        } else {
+            std::cout << "interval" << std::endl;
+        }
         std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
         /*
@@ -181,8 +199,8 @@ bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
          * TODO how else am I supposed to check if something is TOP?
          */
         if (
-                ((std::holds_alternative<AbstractVals>(b_val)) && (std::get<AbstractVals>(b_val) == AbstractVals::TOP)) ||
-                ((std::holds_alternative<AbstractVals>(a_val)) && (std::get<AbstractVals>(a_val) == AbstractVals::TOP))
+                ((std::holds_alternative<AbstractVals>(b_val)) && (std::visit(IntervalVisitor{}, b_val) == TOP_STR)) ||
+                ((std::holds_alternative<AbstractVals>(a_val)) && (std::visit(IntervalVisitor{}, a_val) == TOP_STR))
                 ) {
 
             std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;

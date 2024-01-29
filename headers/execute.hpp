@@ -280,7 +280,8 @@ AbstractStore execute(
             // For every entry in addr-of-ints, join with op value to get new sigma_prime
             for(auto addr_of_int : addr_of_int_types) {
                 AbstractStore opStore = AbstractStore();
-                opStore.abstract_store[addr_of_int] = op;
+                if (!(std::holds_alternative<AbstractVal>(op) && std::get<AbstractVal>(op) == AbstractVal::BOTTOM))
+                    opStore.abstract_store[addr_of_int] = op;
                 sigma_prime.join(opStore);
             }
         }

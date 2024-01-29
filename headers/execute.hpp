@@ -296,11 +296,9 @@ AbstractStore execute(
      */
 
     Instruction *terminal_instruction = bb->terminal;
-    if (!execute_post) {
+    //if (!execute_post) {
 
-        if (terminal_instruction->instrType == InstructionType::BranchInstrType) {
-
-        //std::cout << "Breakpoint 5?" << std::endl;
+        if (!execute_post && terminal_instruction->instrType == InstructionType::BranchInstrType) {
 
         /*
          * Cast it.
@@ -350,8 +348,7 @@ AbstractStore execute(
                 }
             }
         }
-    } else if (terminal_instruction->instrType == InstructionType::JumpInstrType) {
-        // std::cout << "Encountered $jump" << std::endl;
+    } else if (!execute_post && terminal_instruction->instrType == InstructionType::JumpInstrType) {
 
         /*
              * Cast it.
@@ -370,45 +367,21 @@ AbstractStore execute(
                 worklist.push_back(jump_inst->label);
             }
     } else if (terminal_instruction->instrType == InstructionType::RetInstrType) {
-        //std::cout << "Encountered $ret" << std::endl;
-
         /*
          * No-op. We don't have to do anything here.
          */
     } else if (terminal_instruction->instrType == InstructionType::CallDirInstrType) {
-        //std::cout << "Encountered $call_dir" << std::endl;
 
         // For all ints in globals_ints, update sigma_primt to TOP
         // TODO: Ignoring global variables for assignment 1
 
+        if (execute_post)
+            std::cout << "Call dir execute post " << std::endl;
         CallDirInstruction *call_inst = (CallDirInstruction *) terminal_instruction;
         // If function returns something and it is of int type, update sigma_prime to TOP
         if (call_inst->lhs && call_inst->lhs->isIntType()) {
             sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
         }
-
-        // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
-        for (auto arg : call_inst->args) {
-            if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
-                for(auto addr_of_int : addr_of_int_types) {
-                    sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
-                }
-                // Break out of the loop once we've set all addr_of_int_types to TOP once
-                break;
-            }
-        }
-
-        // If abstract store of next_bb has changed, push it into worklist
-        if (bb2store[call_inst->next_bb].join(sigma_prime) || bbs_to_output.count(call_inst->next_bb) == 0) {
-            worklist.push_back(call_inst->next_bb);
-        }
-
-    } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType ) {
-            CallIdrInstruction *call_inst = (CallIdrInstruction *) terminal_instruction;
-            // If function returns something and it is of int type, update sigma_prime to TOP
-            if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
-                sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
-            }
 
             // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
             for (auto arg : call_inst->args) {
@@ -421,9 +394,36 @@ AbstractStore execute(
                 }
             }
 
+            if (!execute_post) {
             // If abstract store of next_bb has changed, push it into worklist
             if (bb2store[call_inst->next_bb].join(sigma_prime) || bbs_to_output.count(call_inst->next_bb) == 0) {
                 worklist.push_back(call_inst->next_bb);
+            }
+        }
+
+    } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType ) {
+            CallIdrInstruction *call_inst = (CallIdrInstruction *) terminal_instruction;
+            // If function returns something and it is of int type, update sigma_prime to TOP
+            if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
+                sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
+            }
+
+            
+                // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+                for (auto arg : call_inst->args) {
+                    if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                        for(auto addr_of_int : addr_of_int_types) {
+                            sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                        }
+                        // Break out of the loop once we've set all addr_of_int_types to TOP once
+                        break;
+                    }
+                }
+            if (!execute_post) {
+                // If abstract store of next_bb has changed, push it into worklist
+                if (bb2store[call_inst->next_bb].join(sigma_prime) || bbs_to_output.count(call_inst->next_bb) == 0) {
+                    worklist.push_back(call_inst->next_bb);
+                }
             }
         }
     else {
@@ -433,7 +433,7 @@ AbstractStore execute(
          */
     }
 
-    }
+    //}
     
     return sigma_prime;
 }

@@ -298,7 +298,7 @@ AbstractStore execute(
     Instruction *terminal_instruction = bb->terminal;
     //if (!execute_post) {
 
-        if (!execute_post && terminal_instruction->instrType == InstructionType::BranchInstrType) {
+        if (terminal_instruction->instrType == InstructionType::BranchInstrType && !execute_post) {
 
         /*
          * Cast it.
@@ -348,7 +348,7 @@ AbstractStore execute(
                 }
             }
         }
-    } else if (!execute_post && terminal_instruction->instrType == InstructionType::JumpInstrType) {
+    } else if (terminal_instruction->instrType == InstructionType::JumpInstrType && !execute_post) {
 
         /*
              * Cast it.
@@ -375,8 +375,6 @@ AbstractStore execute(
         // For all ints in globals_ints, update sigma_primt to TOP
         // TODO: Ignoring global variables for assignment 1
 
-        if (execute_post)
-            std::cout << "Call dir execute post " << std::endl;
         CallDirInstruction *call_inst = (CallDirInstruction *) terminal_instruction;
         // If function returns something and it is of int type, update sigma_prime to TOP
         if (call_inst->lhs && call_inst->lhs->isIntType()) {

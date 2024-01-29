@@ -174,12 +174,11 @@ bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
 
         std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
-        std::cout << std::get<AbstractVals>(b_val) << std::endl;
-
-        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-
         /*
          * If either variable is TOP, we know to assign TOP, no questions asked.
+         *
+         * TODO This if-statement is throwing a bad variant access exception but
+         * TODO how else am I supposed to check if something is TOP?
          */
         if (
                 ((std::holds_alternative<AbstractVals>(b_val)) && (std::get<AbstractVals>(b_val) == AbstractVals::TOP)) ||

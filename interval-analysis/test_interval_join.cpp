@@ -23,10 +23,10 @@ int main() {
     std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
     /*
-     * Join s2 to s1, modifying a in-place.
+     * Join s2 to s1, modifying s1 in-place.
      */
     if (join(s1, s2)) {
-        std::cout << "New value of a:" << std::endl;
+        std::cout << "New value of s1:" << std::endl;
         print(s1);
     } else {
         std::cout << "No change" << std::endl;

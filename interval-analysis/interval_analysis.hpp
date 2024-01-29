@@ -2,10 +2,24 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <string>
 #include <variant>
 
+/*
+ * Some macros to represent (+/-) infinity. We need these because I'm a real
+ * idiot in how I decided to code this.
+ */
+#define INTERVAL_INFINITY       std::numeric_limits<int>::max()
+#define INTERVAL_NEG_INFINITY   std::numeric_limits<int>::min()
+
+/*
+ * For interval analysis, we are defining TOP as [-INF, INF].
+ *
+ * I realize that for interval analysis this is kind of stupid, but rewriting
+ * everything would take a lot of time which we do not have...
+ */
 enum AbstractVals {
     BOTTOM,
     TOP
@@ -23,14 +37,22 @@ typedef std::map<std::string, abstract_interval> interval_abstract_store;
  */
 struct IntervalVisitor {
     std::string operator()(interval val) {
-        std::string return_string = "[" + std::to_string(val.first) + ", " + std::to_string(val.second) + "]";
+        std::string lower = std::to_string(val.first);
+        std::string upper = std::to_string(val.second);
+        if (val.first == INTERVAL_NEG_INFINITY) {
+            lower = "-INF";
+        }
+        if (val.second == INTERVAL_INFINITY) {
+            upper = "INF";
+        }
+        std::string return_string = "[" + lower + ", " + upper + "]";
         return return_string;
     }
     std::string operator()(AbstractVals val) {
         if (val == AbstractVals::BOTTOM) {
             return "Bottom";
         } else {
-            return "Top";
+            return "[-INF, INF]";
         }
     }
 };
@@ -128,18 +150,87 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
 
 /*
  * Implement the widening operator Ben discussed in lecture 3.1.
+ *
+ * TODO
  */
-bool widen(abstract_interval &a, abstract_interval b) {
+bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
+    bool a_changed = false;
 
     /*
-     * If either a or b are BOTTOM, return BOTTOM.
+     * Loop through each entry in b.
      */
-    if (std::get<AbstractVals>(a) == AbstractVals::BOTTOM || std::get<AbstractVals>(b) == AbstractVals::BOTTOM) {
-        return AbstractVals::BOTTOM;
+    for (const auto &[b_key, b_val] : b) {
+        abstract_interval a_val = get_val_from_store(a, b_key);
+
+        /*
+         * If the variable isn't in a, add it and mark the store as changed.
+         */
+        if (std::holds_alternative<AbstractVals>(a_val) && std::get<AbstractVals>(a_val) == AbstractVals::BOTTOM) {
+            a[b_key] = b_val;
+            a_changed = true;
+        }
+
+        abstract_interval new_a;
+
+        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+        std::cout << std::get<AbstractVals>(b_val) << std::endl;
+
+        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+        /*
+         * If either variable is TOP, we know to assign TOP, no questions asked.
+         */
+        if (
+                ((std::holds_alternative<AbstractVals>(b_val)) && (std::get<AbstractVals>(b_val) == AbstractVals::TOP)) ||
+                ((std::holds_alternative<AbstractVals>(a_val)) && (std::get<AbstractVals>(a_val) == AbstractVals::TOP))
+                ) {
+
+            std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+            new_a = AbstractVals::TOP;
+
+            /*
+             * Check whether this actually changes things. If so, assign the new
+             * value.
+             */
+            if (a_val != new_a) {
+                a_changed = true;
+                a[b_key] = new_a;
+            }
+        } else {
+
+            /*
+             * If a's lower bound is less than or equal to b's lower bound, the
+             * new lower bound is a's lower bound. Otherwise, the new lower
+             * bound is negative infinity.
+             *
+             * If a's upper bound is greater than or equal to b's upper bound,
+             * the new upper bound is a's upper bound. Otherwise, it's infinity.
+             */
+
+            int new_lower_bound = INTERVAL_NEG_INFINITY;
+            int new_upper_bound = INTERVAL_INFINITY;
+
+            if (std::get<interval>(a_val).first <= std::get<interval>(b_val).first) {
+                new_lower_bound = std::get<interval>(a_val).first;
+            }
+
+            if (std::get<interval>(a_val).second >= std::get<interval>(b_val).second) {
+                new_upper_bound = std::get<interval>(a_val).second;
+            }
+
+            std::get<interval>(new_a) = {new_lower_bound, new_upper_bound};
+
+            /*
+             * Check whether this actually changes things. If so, assign the new
+             * value.
+             */
+            if (std::get<interval>(new_a) != std::get<interval>(a_val)) {
+                a_changed = true;
+                a[b_key] = new_a;
+            }
+        }
     }
-
-    /*
-     * TODO
-     */
-    return true;
+    return a_changed;
 }

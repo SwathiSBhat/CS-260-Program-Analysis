@@ -39,3 +39,8 @@ ADD_EXECUTABLE(test_interval_join
 	interval-analysis/test_interval_join.cpp
 	interval-analysis/interval_analysis.hpp
 )
+
+ADD_EXECUTABLE(test_widen
+	interval-analysis/test_widen.cpp
+	interval-analysis/interval_analysis.hpp
+)

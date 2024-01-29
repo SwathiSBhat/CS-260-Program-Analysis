@@ -177,7 +177,7 @@ public:
          */
         for (const auto &it : bbs_to_output) {
             
-            std::cout << "Executing post transfer function on " << it << std::endl;
+            // std::cout << "Executing post transfer function on " << it << std::endl;
             soln[it] = execute(func->bbs[it],
                                 bb2store[it],
                                 bb2store,

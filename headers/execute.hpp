@@ -381,18 +381,18 @@ AbstractStore execute(
             sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
         }
 
-            // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
-            for (auto arg : call_inst->args) {
-                if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
-                    for(auto addr_of_int : addr_of_int_types) {
-                        sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
-                    }
-                    // Break out of the loop once we've set all addr_of_int_types to TOP once
-                    break;
+        // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+        for (auto arg : call_inst->args) {
+            if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                for(auto addr_of_int : addr_of_int_types) {
+                    sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
                 }
+                // Break out of the loop once we've set all addr_of_int_types to TOP once
+                break;
             }
+        }
 
-            if (!execute_post) {
+        if (!execute_post) {
             // If abstract store of next_bb has changed, push it into worklist
             if (bb2store[call_inst->next_bb].join(sigma_prime) || bbs_to_output.count(call_inst->next_bb) == 0) {
                 worklist.push_back(call_inst->next_bb);
@@ -425,7 +425,7 @@ AbstractStore execute(
             }
         }
     else {
-        std::cout << "Found a terminal we don't recognize :(" << std::endl;
+        // std::cout << "Found a terminal we don't recognize :(" << std::endl;
         /*
          * This is a catch-all for instructions we don't have to do anything about for constant analysis.
          */

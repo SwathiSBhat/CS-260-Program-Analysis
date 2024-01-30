@@ -213,10 +213,43 @@ interval_abstract_store execute(BasicBlock *bb,
 
                         } else if (cmp_instruction->cmp_op == "Less") {
 
+                            /*
+                             * Return [1, 1] if op1_interval is strictly less
+                             * than op2_interval. For example, [1, 4] and
+                             * [6, 8].
+                             *
+                             * Return [0, 0] if op1_interval is strictly greater
+                             * than op2_interval.
+                             *
+                             * Return [0, 1] otherwise.
+                             */
+                            if (op1_interval.second < op2_interval.first) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
+                            } else if (op1_interval.first > op2_interval.second) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
+                            } else {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
+                            }
                         } else if (cmp_instruction->cmp_op == "LessEq") {
 
                         } else if (cmp_instruction->cmp_op == "Greater") {
 
+                            /*
+                             * Return [1, 1] if op1_interval is strictly greater
+                             * than op2_interval (with no overlap).
+                             *
+                             * Return [0, 0] if op1_interval is strictly less
+                             * than op2_interval (with no overlap).
+                             *
+                             * Return [0, 1] otherwise.
+                             */
+                            if (op1_interval.first > op2_interval.second) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
+                            } else if (op1_interval.second < op2_interval.first) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
+                            } else {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
+                            }
                         } else if (cmp_instruction->cmp_op == "GreaterEq") {
 
                         } else {

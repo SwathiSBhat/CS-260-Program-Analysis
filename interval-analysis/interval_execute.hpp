@@ -199,6 +199,36 @@ interval_abstract_store execute(BasicBlock *bb,
                 break;
             } case InstructionType::CopyInstrType: {
                 std::cout << "Encountered $copy " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                CopyInstruction *copy_instruction = (CopyInstruction *) instruction;
+
+                /*
+                 * If the left-hand side isn't an int-typed variable, ignore the
+                 * instruction.
+                 */
+                if (!copy_instruction->lhs->isIntType()) {
+                    continue;
+                }
+
+                /*
+                 * Copy over the value.
+                 */
+                abstract_interval op;
+                if (copy_instruction->op->IsConstInt()) {
+                    op = alpha(copy_instruction->op->val);
+                } else {
+                    op = get_val_from_store(sigma_prime, copy_instruction->op->var->name);
+                }
+
+                /*
+                 * Handle the case where op is BOTTOM.
+                 */
+                if ((std::holds_alternative<AbstractVals>(op)) && (std::visit(IntervalVisitor{}, op) == "Bottom")) {
+                    if (sigma_prime.count(copy_instruction->op->var->name) != 0) {
+                        sigma_prime.erase(copy_instruction->op->var->name);
+                    }
+                } else {
+                    sigma_prime[copy_instruction->lhs->name] = op;
+                }
                 break;
             } case InstructionType::LoadInstrType: {
                 std::cout << "Encountered $load " << __FILE_NAME__ << ":" << __LINE__ << std::endl;

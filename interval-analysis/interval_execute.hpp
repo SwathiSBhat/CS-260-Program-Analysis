@@ -103,11 +103,26 @@ interval_abstract_store execute(BasicBlock *bb,
                         if ((op2_interval.first == 0) && (op2_interval.second == 0)) {
                             sigma_prime[arith_instruction->lhs->name] = AbstractVals::BOTTOM;
                         } else if ((op2_interval.first < 0) && (op2_interval.second > 0)) {
-
+                            std::multiset<int> possible_bounds;
+                            possible_bounds.insert((op1_interval.first) / (-1));
+                            possible_bounds.insert((op1_interval.first) / (1));
+                            possible_bounds.insert((op1_interval.second) / (-1));
+                            possible_bounds.insert((op1_interval.second) / (1));
+                            sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                         } else if (op2_interval.first == 0) {
-
+                            std::multiset<int> possible_bounds;
+                            possible_bounds.insert((op1_interval.first) / (1));
+                            possible_bounds.insert((op1_interval.first) / (op2_interval.second));
+                            possible_bounds.insert((op1_interval.second) / (1));
+                            possible_bounds.insert((op1_interval.second) / (op2_interval.second));
+                            sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                         } else if (op2_interval.second == 0) {
-
+                            std::multiset<int> possible_bounds;
+                            possible_bounds.insert((op1_interval.first) / (op2_interval.first));
+                            possible_bounds.insert((op1_interval.first) / (-1));
+                            possible_bounds.insert((op1_interval.second) / (op2_interval.first));
+                            possible_bounds.insert((op1_interval.second) / (-1));
+                            sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                         } else {
                             std::cout << "Unhandled case in division " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         }

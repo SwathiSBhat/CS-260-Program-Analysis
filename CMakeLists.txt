@@ -26,3 +26,22 @@ ADD_EXECUTABLE(test_mfp_worklist
 	tests/test_worklist.cpp
 	headers/json.hpp
 )
+
+ADD_EXECUTABLE(assn1_interval_analysis
+	#interval-analysis/interval_analysis.cpp
+	interval-analysis/new_interval_analysis.cpp
+	interval-analysis/interval_analysis.hpp
+	interval-analysis/alpha.hpp
+	interval-analysis/interval_execute.hpp
+	headers/datatypes.h
+)
+
+ADD_EXECUTABLE(test_interval_join
+	interval-analysis/test_interval_join.cpp
+	interval-analysis/interval_analysis.hpp
+)
+
+ADD_EXECUTABLE(test_widen
+	interval-analysis/test_widen.cpp
+	interval-analysis/interval_analysis.hpp
+)

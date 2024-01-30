@@ -311,6 +311,7 @@ AbstractStore execute(
                     
                     // If any arg is a struct pointer that has a pointer to an int field. If yes, then for all variables in addr_of_int_types, update sigma_prime to TOP
                     else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
+                        
                         // Check if struct has a pointer to an int field
                         bool has_int_field = false;
                         std::string struct_name = "";
@@ -319,24 +320,35 @@ AbstractStore execute(
                         if (struct_type)
                         {
                             struct_name = struct_type->name;
-                            //TODO: Change this data structure to map to store structs
-                            if (!struct_name.empty()) {
-                                for (auto st = program->structs.begin(); st != program->structs.end(); ++st)
+                            std::queue<std::string> q;
+                            std::unordered_set<std::string> visited;
+                            q.push(struct_name);
+
+                            while(!q.empty())
+                            {
+                                std::string curr = q.front();
+                                q.pop();
+
+                                visited.insert(curr);
+
+                                Struct *st = program->structs[curr];
+                                for(auto field : st->fields)
                                 {
-                                    if ((*st)->name == struct_name)
+                                    if (field->type->indirection > 0 && field->type->type == DataType::IntType)
                                     {
-                                        for (auto field : (*st)->fields)
-                                        {
-                                            if (field->type->indirection > 0 && field->type->type == DataType::IntType)
-                                            {
-                                                has_int_field = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (has_int_field)
+                                        has_int_field = true;
                                         break;
+                                    }
+                                    else if (field->type->indirection > 0 && field->type->type == DataType::StructType)
+                                    {
+                                        Type::StructType *nestedStruct = (Type::StructType*)field->type->ptr_type;
+                                        if (visited.count(nestedStruct->name) == 0)
+                                            q.push(nestedStruct->name);
+                                    }
                                 }
+
+                                if (has_int_field)
+                                    break;
                             }
                         }
 
@@ -471,24 +483,35 @@ AbstractStore execute(
                 if (struct_type)
                 {
                     struct_name = struct_type->name;
-                    //TODO: Change this data structure to map to store structs
-                    if (!struct_name.empty()) {
-                        for (auto st = program->structs.begin(); st != program->structs.end(); ++st)
+                    std::queue<std::string> q;
+                    std::unordered_set<std::string> visited;
+                    q.push(struct_name);
+
+                    while(!q.empty())
+                    {
+                        std::string curr = q.front();
+                        q.pop();
+
+                        visited.insert(curr);
+
+                        Struct *st = program->structs[curr];
+                        for(auto field : st->fields)
                         {
-                            if ((*st)->name == struct_name)
+                            if (field->type->indirection > 0 && field->type->type == DataType::IntType)
                             {
-                                for (auto field : (*st)->fields)
-                                {
-                                    if (field->type->indirection > 0 && field->type->type == DataType::IntType)
-                                    {
-                                        has_int_field = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (has_int_field)
+                                has_int_field = true;
                                 break;
+                            }
+                            else if (field->type->indirection > 0 && field->type->type == DataType::StructType)
+                            {
+                                Type::StructType *nestedStruct = (Type::StructType*)field->type->ptr_type;
+                                if (visited.count(nestedStruct->name) == 0)
+                                    q.push(nestedStruct->name);
+                            }
                         }
+
+                        if (has_int_field)
+                            break;
                     }
                 }
 
@@ -532,6 +555,7 @@ AbstractStore execute(
                 }
                 // If any arg is a struct pointer that has a pointer to an int field. If yes, then for all variables in addr_of_int_types, update sigma_prime to TOP
                 else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
+                    
                     // Check if struct has a pointer to an int field
                     bool has_int_field = false;
                     std::string struct_name = "";
@@ -540,24 +564,35 @@ AbstractStore execute(
                     if (struct_type)
                     {
                         struct_name = struct_type->name;
-                        //TODO: Change this data structure to map to store structs
-                        if (!struct_name.empty()) {
-                            for (auto st = program->structs.begin(); st != program->structs.end(); ++st)
+                        std::queue<std::string> q;
+                        std::unordered_set<std::string> visited;
+                        q.push(struct_name);
+
+                        while(!q.empty())
+                        {
+                            std::string curr = q.front();
+                            q.pop();
+
+                            visited.insert(curr);
+
+                            Struct *st = program->structs[curr];
+                            for(auto field : st->fields)
                             {
-                                if ((*st)->name == struct_name)
+                                if (field->type->indirection > 0 && field->type->type == DataType::IntType)
                                 {
-                                    for (auto field : (*st)->fields)
-                                    {
-                                        if (field->type->indirection > 0 && field->type->type == DataType::IntType)
-                                        {
-                                            has_int_field = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (has_int_field)
+                                    has_int_field = true;
                                     break;
+                                }
+                                else if (field->type->indirection > 0 && field->type->type == DataType::StructType)
+                                {
+                                    Type::StructType *nestedStruct = (Type::StructType*)field->type->ptr_type;
+                                    if (visited.count(nestedStruct->name) == 0)
+                                        q.push(nestedStruct->name);
+                                }
                             }
+
+                            if (has_int_field)
+                                break;
                         }
                     }
 

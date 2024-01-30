@@ -210,14 +210,19 @@ class Struct{
     public:
     Struct(json struct_json) {
 
-        //std::cout << "Struct" << std::endl;
-        //std::cout << struct_json << std::endl;
+        // std::cout << "Struct" << std::endl;
+        // std::cout << struct_json << std::endl;
         
-        if (struct_json.begin() != struct_json.end()) {
+        /*if (struct_json.begin() != struct_json.end()) {
             name = struct_json.begin().key();
             for (auto &[field_key, field_val] : struct_json.begin().value().items()) {
             fields.push_back(new Variable(field_val["name"], new Type(field_val["typ"])));
         }
+        }*/
+
+        for(const auto &field: struct_json.items())
+        {
+            fields.push_back(new Variable(field.value()["name"], new Type(field.value()["typ"])));
         }
     };
 
@@ -1105,12 +1110,15 @@ class Function {
  */
 class Program {
     public:
-        Program(json program_json): structs(std::vector<Struct*>()), globals(std::vector<Global*>()), funcs(std::unordered_map<std::string, Function*>()), ext_funcs(std::vector<ExternalFunction*>()) {
+        Program(json program_json): structs(std::unordered_map<std::string, Struct*>()), globals(std::vector<Global*>()), funcs(std::unordered_map<std::string, Function*>()), ext_funcs(std::vector<ExternalFunction*>()) {
             // std::cout << "Program" << std::endl;
             
             if (program_json["structs"] != nullptr) {
-                for (auto st : program_json["structs"].items()) {
-                    structs.push_back(new Struct(st));
+                for (auto &[st_key, st_val] : program_json["structs"].items()) {
+                    Struct *st = new Struct(st_val);
+                    structs[st_key] = st;
+                    structs[st_key]->name = st_key;
+                    //structs[st_key]->pretty_print();
                 }
             }
             if (program_json["globals"] != nullptr) {
@@ -1135,8 +1143,8 @@ class Program {
             std::cout << "******************* Program *******************" << std::endl;
             if (what_to_print["structs"] != nullptr && what_to_print["structs"] == "true") {
                 std::cout << "Structs: " << std::endl;
-                for (auto st : structs) {
-                    st->pretty_print();
+                for (auto st = structs.begin(); st != structs.end(); ++st) {
+                    st->second->pretty_print();
                 }
             }
             if (what_to_print["globals"] != nullptr && what_to_print["globals"] == "true") {
@@ -1160,7 +1168,7 @@ class Program {
             std::cout << "******************* End of Program *******************" << std::endl;
         }
 
-        std::vector<Struct*> structs;
+        std::unordered_map<std::string, Struct*> structs;
         std::vector<Global*> globals;
         std::unordered_map<std::string, Function*> funcs;
         std::vector<ExternalFunction*> ext_funcs;

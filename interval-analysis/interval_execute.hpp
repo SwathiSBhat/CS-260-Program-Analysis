@@ -81,9 +81,36 @@ interval_abstract_store execute(BasicBlock *bb,
                         std::cout << "Divide " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
                         /*
-                         * TODO I'm not sure how to handle the case where the
-                         * TODO interval contains 0 but isn't [0, 0].
+                         * Get the actual intervals for the operands.
                          */
+                        interval op1_interval = std::get<interval>(op1);
+                        interval op2_interval = std::get<interval>(op2);
+
+                        /*
+                         * This is what we're doing for op1 / op2:
+                         *
+                         * If op2 is [0, 0], the answer is BOTTOM.
+                         *
+                         * If op2.lower is negative and op2.upper is positive,
+                         * compute op1 / [-1, 1] using the min/max method.
+                         *
+                         * If op2.lower is 0, compute op1 / [1, op2.upper] using
+                         * the min/max method.
+                         *
+                         * If op2.upper is 0, compute op1 / [op2.lower, -1]
+                         * using the min/max method.
+                         */
+                        if ((op2_interval.first == 0) && (op2_interval.second == 0)) {
+                            sigma_prime[arith_instruction->lhs->name] = AbstractVals::BOTTOM;
+                        } else if ((op2_interval.first < 0) && (op2_interval.second > 0)) {
+
+                        } else if (op2_interval.first == 0) {
+
+                        } else if (op2_interval.second == 0) {
+
+                        } else {
+                            std::cout << "Unhandled case in division " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        }
                     } else {
                         std::cout << "Unrecognized arithmetic operation " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                     }

@@ -171,8 +171,6 @@ public:
 
             /*
              * Perform our transfer function on the current basic block.
-             *
-             * TODO
              */
             execute(func->bbs[current_bb],
                     bb2store[current_bb],
@@ -187,7 +185,7 @@ public:
              * Keep track of all the basic blocks we add to the worklist.
              */
             for (const auto &i : worklist) {
-                std::cout << "Adding" << i << " to bbs_to_output " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                std::cout << "Adding " << i << " to bbs_to_output " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 bbs_to_output.insert(i);
             }
         }
@@ -198,8 +196,11 @@ public:
          * Once we've completed the worklist algorithm, let's execute our
          * transfer function once more on each basic block to get their exit
          * abstract stores.
+         *
+         * TODO Let's just try this.
          */
-        for (const auto &bb_label : bbs_to_output) {
+        //for (const auto &bb_label : bbs_to_output) {
+        for (const auto &[bb_label, bb_store] : bb2store) {
             solution[bb_label] = execute(func->bbs[bb_label],
                                          bb2store[bb_label],
                                          bb2store,

@@ -125,7 +125,19 @@ interval_abstract_store execute(BasicBlock *bb,
                             possible_bounds.insert((op1_interval.second) / (-1));
                             sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                         } else {
-                            std::cout << "Unhandled case in division " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+                            /*
+                             * TODO I think some cases are trickling through.
+                             */
+                            //std::cout << "Unhandled case in division " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                            //std::cout << std::visit(IntervalVisitor{}, op1) << std::endl;
+                            //std::cout << std::visit(IntervalVisitor{}, op2) << std::endl;
+                            std::multiset<int> possible_bounds;
+                            possible_bounds.insert((op1_interval.first) / (op2_interval.first));
+                            possible_bounds.insert((op1_interval.first) / (op2_interval.second));
+                            possible_bounds.insert((op1_interval.second) / (op2_interval.first));
+                            possible_bounds.insert((op1_interval.second) / (op2_interval.second));
+                            sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                         }
                     } else {
                         std::cout << "Unrecognized arithmetic operation " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
@@ -522,15 +534,16 @@ interval_abstract_store execute(BasicBlock *bb,
                  * Join sigma_prime with the basic block's abstract store
                  * (updating the basic block's abstract store).
                  */
-                //bool store_changed = join(bb2store[jump_instruction->label], sigma_prime);
                 bool store_changed;
                 if (loop_headers.count(jump_instruction->label) != 0) {
-                    store_changed = widen(bb2store[jump_instruction->label], sigma_prime);
+                    store_changed = widen(bb2store[jump_instruction->label],
+                                          sigma_prime);
                 } else {
-                    store_changed = join(bb2store[jump_instruction->label], sigma_prime);
+                    store_changed = join(bb2store[jump_instruction->label],
+                                         sigma_prime);
                 }
-                if (store_changed || bbs_to_output.count(jump_instruction->label) == 0) {
-                    std::cout << "Pushing " << jump_instruction->label << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                if (store_changed || (bbs_to_output.count(jump_instruction->label) == 0)) {
+                    std::cout << "Pushing " << jump_instruction->label << " onto the worklist (from $jump) " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                     worklist.push_back(jump_instruction->label);
                 }
                 break;

@@ -24,6 +24,7 @@ AbstractStore execute(
         std::deque<std::string> &worklist,
         std::unordered_set<std::string> addr_of_int_types,
         std::set<std::string> bbs_to_output,
+        // The below parameter is used to ensure that the final execution of the basic blocks to get exit abstract stores does not perform any join operation
         bool execute_post = false) {
 
     /*
@@ -33,12 +34,8 @@ AbstractStore execute(
 
     /*
      * Iterate through each instruction in bb.
-     *
-     * TODO I guess we shouldn't care about terminals?
      */
     for (const Instruction *inst : bb->instructions) {
-
-        //std::cout << "This is the instruction type: " << inst->instrType << std::endl;
 
         if ((*inst).instrType == InstructionType::ArithInstrType) {
 
@@ -135,75 +132,71 @@ AbstractStore execute(
         } else if ((*inst).instrType == InstructionType::CmpInstrType) {
             
             CmpInstruction *cmp_inst = (CmpInstruction *) inst;
-            //std::cout << "Inside $cmp" << std::endl;
+
             if ((cmp_inst->op1->var && !(cmp_inst->op1->var->isIntType())) || (cmp_inst->op2->var && !(cmp_inst->op2->var->isIntType()))) {
                 sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-                //std::cout << cmp_inst->op1->var->name << std::endl;
             }
             else {
             
-            std::variant<int, AbstractVal> op1;
-            std::variant<int, AbstractVal> op2;
-            
-            if (cmp_inst->op1->IsConstInt()) {
-                op1 = cmp_inst->op1->val;
-            }
-            else {
-                op1 = sigma_prime.GetValFromStore(cmp_inst->op1->var->name);
-            }
-            if (cmp_inst->op2->IsConstInt()) {
-                op2 = cmp_inst->op2->val;
-            }
-            else {
-                op2 = sigma_prime.GetValFromStore(cmp_inst->op2->var->name);
-            }
+                std::variant<int, AbstractVal> op1;
+                std::variant<int, AbstractVal> op2;
+                
+                if (cmp_inst->op1->IsConstInt()) {
+                    op1 = cmp_inst->op1->val;
+                }
+                else {
+                    op1 = sigma_prime.GetValFromStore(cmp_inst->op1->var->name);
+                }
+                if (cmp_inst->op2->IsConstInt()) {
+                    op2 = cmp_inst->op2->val;
+                }
+                else {
+                    op2 = sigma_prime.GetValFromStore(cmp_inst->op2->var->name);
+                }
 
-            if (std::holds_alternative<int>(op1) && std::holds_alternative<int>(op2))
-            {
-                int op1_val = std::get<int>(op1);
-                int op2_val = std::get<int>(op2);
-                if (cmp_inst->cmp_op == "Eq") {
-                    sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val == op2_val);
+                if (std::holds_alternative<int>(op1) && std::holds_alternative<int>(op2))
+                {
+                    int op1_val = std::get<int>(op1);
+                    int op2_val = std::get<int>(op2);
+                    if (cmp_inst->cmp_op == "Eq") {
+                        sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val == op2_val);
+                    }
+                    else if (cmp_inst->cmp_op == "Neq") {
+                        sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val != op2_val);
+                    }
+                    else if (cmp_inst->cmp_op == "Less") {
+                        sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val < op2_val);
+                    }
+                    else if (cmp_inst->cmp_op == "LessEq") {
+                        sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val <= op2_val);
+                    }
+                    else if (cmp_inst->cmp_op == "Greater") {
+                        sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val > op2_val);
+                    }
+                    else if (cmp_inst->cmp_op == "GreaterEq") {
+                        sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val >= op2_val);
+                    }
                 }
-                else if (cmp_inst->cmp_op == "Neq") {
-                    sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val != op2_val);
+                else if ((std::holds_alternative<AbstractVal>(op1) && std::get<AbstractVal>(op1) == AbstractVal::BOTTOM) || 
+                        (std::holds_alternative<AbstractVal>(op2) && std::get<AbstractVal>(op2) == AbstractVal::BOTTOM))
+                {
+                    // No-op since the result will always be BOTTOM
                 }
-                else if (cmp_inst->cmp_op == "Less") {
-                    sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val < op2_val);
-                }
-                else if (cmp_inst->cmp_op == "LessEq") {
-                    sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val <= op2_val);
-                }
-                else if (cmp_inst->cmp_op == "Greater") {
-                    sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val > op2_val);
-                }
-                else if (cmp_inst->cmp_op == "GreaterEq") {
-                    sigma_prime.abstract_store[cmp_inst->lhs->name] = (op1_val >= op2_val);
-                }
-            }
-            else if ((std::holds_alternative<AbstractVal>(op1) && std::get<AbstractVal>(op1) == AbstractVal::BOTTOM) || 
-                    (std::holds_alternative<AbstractVal>(op2) && std::get<AbstractVal>(op2) == AbstractVal::BOTTOM))
-            {
-                // No-op since the result will always be BOTTOM
-            }
-            /*
-            * This means that either op1 or op2 is TOP and neither of them is BOTTOM => result is TOP
-            */
-            else
-            {
-                sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
-            } 
+                /*
+                * This means that either op1 or op2 is TOP and neither of them is BOTTOM => result is TOP
+                */
+                else
+                {
+                    sigma_prime.abstract_store[cmp_inst->lhs->name] = AbstractVal::TOP;
+                } 
             }
 
         } else if ((*inst).instrType == InstructionType::CopyInstrType) {
-
-            //std::cout << "Encountered $copy" << std::endl;
 
             /*
              * Cast it.
              */
             CopyInstruction *copy_inst = (CopyInstruction *) inst;
-            //std::cout << copy_inst->lhs->name << std::endl;
 
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
@@ -211,9 +204,6 @@ AbstractStore execute(
             if (!copy_inst->lhs->isIntType()) {
                 continue;
             }
-
-            //std::cout << "lhs is definitely int-typed" << std::endl;
-            //copy_inst->pretty_print();
 
             /*
              * Copy over the value. We can just do a simple integer copy because
@@ -242,9 +232,6 @@ AbstractStore execute(
              */
             LoadInstruction *load_inst = (LoadInstruction *) inst;
 
-            //if (bb->label == "bb6")
-            //    std::cout << "Encountered $load for " << load_inst->lhs->name << std::endl;
-
             /*
              * If the lhs isn't an int-typed variable, ignore instruction.
              */
@@ -256,6 +243,7 @@ AbstractStore execute(
              * lhs to TOP.
             */
             sigma_prime.abstract_store[load_inst->lhs->name] = AbstractVal::TOP;
+
         } else if ((*inst).instrType == InstructionType::StoreInstrType) {
             /*
              * Cast it.
@@ -283,92 +271,85 @@ AbstractStore execute(
                 if (!(std::holds_alternative<AbstractVal>(op) && std::get<AbstractVal>(op) == AbstractVal::BOTTOM))
                     opStore.abstract_store[addr_of_int] = op;
                 sigma_prime.join(opStore);
-                /*if (bb->label == "bb33")
-                {
-                    std::cout << "$store for addr of int " << addr_of_int << std::endl;
-                    opStore.print();
-                    std::cout << "After join: "<<std::endl;
-                    sigma_prime.print();
-                }*/
             }
-        }
-            else if ((*inst).instrType == InstructionType::CallExtInstrType) {
-                CallExtInstruction *call_inst = (CallExtInstruction *) inst;
-                // If function returns something and it is of int type, update sigma_prime to TOP
-                if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
-                    sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
-                }
 
-                // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
-                for (auto arg : call_inst->args) {
-                    if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+        } else if ((*inst).instrType == InstructionType::CallExtInstrType) {
+            CallExtInstruction *call_inst = (CallExtInstruction *) inst;
+            // If function returns something and it is of int type, update sigma_prime to TOP
+            if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
+                sigma_prime.abstract_store[call_inst->lhs->name] = AbstractVal::TOP;
+            }
+
+            // If any argument is a pointer to an int then for all variables in addr_of_int_types, update sigma_prime to TOP
+            for (auto arg : call_inst->args) {
+                if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType){
+                    for(auto addr_of_int : addr_of_int_types) {
+                        sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
+                    }
+                    // Break out of the loop once we've set all addr_of_int_types to TOP once
+                    break;
+                }
+                
+                // If any arg is a struct pointer that has a pointer to an int field. If yes, then for all variables in addr_of_int_types, update sigma_prime to TOP
+                // The int pointer may be a field of a nested struct
+                else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
+                    
+                    // Check if struct has a pointer to an int field
+                    bool has_int_field = false;
+                    std::string struct_name = "";
+
+                    Type::StructType *struct_type = (Type::StructType*)(arg->var->type->ptr_type);
+                    if (struct_type)
+                    {
+                        struct_name = struct_type->name;
+                        std::queue<std::string> q;
+                        std::unordered_set<std::string> visited;
+                        q.push(struct_name);
+
+                        while(!q.empty())
+                        {
+                            std::string curr = q.front();
+                            q.pop();
+
+                            visited.insert(curr);
+
+                            Struct *st = program->structs[curr];
+                            for(auto field : st->fields)
+                            {
+                                if (field->type->indirection > 0 && field->type->type == DataType::IntType)
+                                {
+                                    has_int_field = true;
+                                    break;
+                                }
+                                else if (field->type->indirection > 0 && field->type->type == DataType::StructType)
+                                {
+                                    Type::StructType *nestedStruct = (Type::StructType*)field->type->ptr_type;
+                                    if (visited.count(nestedStruct->name) == 0)
+                                        q.push(nestedStruct->name);
+                                }
+                            }
+
+                            if (has_int_field)
+                                break;
+                        }
+                    }
+
+                    if (has_int_field)
+                    {
                         for(auto addr_of_int : addr_of_int_types) {
                             sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
                         }
                         // Break out of the loop once we've set all addr_of_int_types to TOP once
                         break;
                     }
-                    
-                    // If any arg is a struct pointer that has a pointer to an int field. If yes, then for all variables in addr_of_int_types, update sigma_prime to TOP
-                    else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
-                        
-                        // Check if struct has a pointer to an int field
-                        bool has_int_field = false;
-                        std::string struct_name = "";
-
-                        Type::StructType *struct_type = (Type::StructType*)(arg->var->type->ptr_type);
-                        if (struct_type)
-                        {
-                            struct_name = struct_type->name;
-                            std::queue<std::string> q;
-                            std::unordered_set<std::string> visited;
-                            q.push(struct_name);
-
-                            while(!q.empty())
-                            {
-                                std::string curr = q.front();
-                                q.pop();
-
-                                visited.insert(curr);
-
-                                Struct *st = program->structs[curr];
-                                for(auto field : st->fields)
-                                {
-                                    if (field->type->indirection > 0 && field->type->type == DataType::IntType)
-                                    {
-                                        has_int_field = true;
-                                        break;
-                                    }
-                                    else if (field->type->indirection > 0 && field->type->type == DataType::StructType)
-                                    {
-                                        Type::StructType *nestedStruct = (Type::StructType*)field->type->ptr_type;
-                                        if (visited.count(nestedStruct->name) == 0)
-                                            q.push(nestedStruct->name);
-                                    }
-                                }
-
-                                if (has_int_field)
-                                    break;
-                            }
-                        }
-
-                        if (has_int_field)
-                        {
-                            for(auto addr_of_int : addr_of_int_types) {
-                                sigma_prime.abstract_store[addr_of_int] = AbstractVal::TOP;
-                            }
-                            // Break out of the loop once we've set all addr_of_int_types to TOP once
-                            break;
-                        }
-                    }
                 }
             }
-            else {
-                /*
-                * This is a catch-all for instructions we don't have to do anything about for constant analysis.
-                */
-                continue;
-            }
+        } else {
+            /*
+            * This is a catch-all for instructions we don't have to do anything about for constant analysis.
+            */
+            continue;
+        }
     }
 
     /*
@@ -377,7 +358,6 @@ AbstractStore execute(
      */
 
     Instruction *terminal_instruction = bb->terminal;
-    //if (!execute_post) {
 
         if (terminal_instruction->instrType == InstructionType::BranchInstrType && !execute_post) {
 
@@ -404,8 +384,7 @@ AbstractStore execute(
             }
         }
         else {
-            //if (bb->label == "bb6")
-            //std::cout << "Encountered $branch for _t37 " << sigma_prime.GetValFromStore("_t37") << std::endl;
+
             std::variant<int,AbstractVal> absVal = sigma_prime.GetValFromStore(branch_inst->condition->var->name);
             if (std::holds_alternative<AbstractVal>(absVal) && std::get<AbstractVal>(absVal) == AbstractVal::TOP){
                     
@@ -535,8 +514,7 @@ AbstractStore execute(
         }
 
     } else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType ) {
-            //if (execute_post)
-            //std::cout<< "Encountered $callidr" << std::endl;
+
             CallIdrInstruction *call_inst = (CallIdrInstruction *) terminal_instruction;
             // If function returns something and it is of int type, update sigma_prime to TOP
             if (call_inst && call_inst->lhs && call_inst->lhs->isIntType()) {
@@ -613,18 +591,12 @@ AbstractStore execute(
                     worklist.push_back(call_inst->next_bb);
                 }
             }
-            /*if (execute_post) {
-            std::cout <<" Printing sigma prime "<<std::endl;
-            sigma_prime.print();}*/
         }
     else {
-        // std::cout << "Found a terminal we don't recognize :(" << std::endl;
         /*
          * This is a catch-all for instructions we don't have to do anything about for constant analysis.
          */
     }
-
-    //}
     
     return sigma_prime;
 }

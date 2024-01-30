@@ -232,6 +232,23 @@ interval_abstract_store execute(BasicBlock *bb,
                             }
                         } else if (cmp_instruction->cmp_op == "LessEq") {
 
+                            /*
+                             * Assign [1, 1] if op1_interval is strictly less
+                             * than op2_interval OR if both op1_interval and
+                             * op2_interval are the same single value.
+                             *
+                             * Assign [0, 0] if op1_interval is strictly greater
+                             * than op2_interval (with no overlap).
+                             *
+                             * Otherwise, assign [0, 1].
+                             */
+                            if ((op1_interval.second < op2_interval.first) || ((op1_interval.first == op1_interval.second) && (op1_interval.first == op2_interval.first) && (op1_interval.first == op2_interval.second))) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
+                            } else if (op1_interval.first > op2_interval.second) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
+                            } else {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
+                            }
                         } else if (cmp_instruction->cmp_op == "Greater") {
 
                             /*
@@ -252,6 +269,24 @@ interval_abstract_store execute(BasicBlock *bb,
                             }
                         } else if (cmp_instruction->cmp_op == "GreaterEq") {
 
+                            /*
+                             * Assign [1, 1] either if op1_interval is strictly
+                             * greater than op2_interval or if op1_interval and
+                             * op2_interval are both exactly the same single
+                             * value.
+                             *
+                             * Assign [0, 0] if op1_interval is strictly less
+                             * than op2_interval (with no overlap).
+                             *
+                             * Otherwise, assign [0, 1].
+                             */
+                            if ((op1_interval.first > op2_interval.second) || ((op1_interval.first == op1_interval.second) && (op1_interval.first == op2_interval.first) && (op1_interval.first == op2_interval.second))) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
+                            } else if (op1_interval.second < op2_interval.first) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
+                            } else {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
+                            }
                         } else {
                             std::cout << "Unrecognized $cmp operation " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         }

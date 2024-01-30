@@ -21,12 +21,6 @@ ADD_EXECUTABLE(assn1_constant_analysis
 	headers/execute.hpp
 )
 
-ADD_EXECUTABLE(test_mfp_worklist
-	headers/MFPWorklistAlgorithm.hpp
-	tests/test_worklist.cpp
-	headers/json.hpp
-)
-
 ADD_EXECUTABLE(assn1_interval_analysis
 	#interval-analysis/interval_analysis.cpp
 	interval-analysis/new_interval_analysis.cpp

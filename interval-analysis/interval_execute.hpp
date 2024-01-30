@@ -16,7 +16,8 @@ interval_abstract_store execute(BasicBlock *bb,
                                 std::deque<std::string> &worklist,
                                 std::unordered_set<std::string> addrof_ints,
                                 std::set<std::string> bbs_to_output,
-                                bool execute_post = false) {
+                                bool execute_post,
+                                std::unordered_set<std::string> loop_headers) {
 
     /*
      * Make a copy of sigma that we'll return at the end of this function.
@@ -61,7 +62,7 @@ interval_abstract_store execute(BasicBlock *bb,
                         std::cout << "Add " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first + std::get<interval>(op2).first, std::get<interval>(op1).second + std::get<interval>(op2).second);
                     } else if (arith_instruction->arith_op == "Subtract") {
-                        std::cout << "Subtract " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        std::cout << "Subtracting " <<  std::visit(IntervalVisitor{}, op1) << " and " << std::visit(IntervalVisitor{}, op2) << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first - std::get<interval>(op2).first, std::get<interval>(op1).second - std::get<interval>(op2).second);
                     } else if (arith_instruction->arith_op == "Multiply") {
                         std::cout << "Multiply " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
@@ -132,9 +133,12 @@ interval_abstract_store execute(BasicBlock *bb,
                 } else if ((std::holds_alternative<AbstractVals>(op1) && std::visit(IntervalVisitor{}, op1) == "Bottom") ||(std::holds_alternative<AbstractVals>(op2) && std::visit(IntervalVisitor{}, op2) == "Bottom")) {
 
                     /*
-                     * Don't do anything because the result will always be
-                     * bottom.
+                     * If either op1 or op2 are BOTTOM, set the left-hand side
+                     * to BOTTOM (erasing it from the store).
                      */
+                    if (sigma_prime.count(arith_instruction->lhs->name) != 0) {
+                        sigma_prime.erase(arith_instruction->lhs->name);
+                    }
                 } else if (false) {
 
                     /*
@@ -212,8 +216,7 @@ interval_abstract_store execute(BasicBlock *bb,
                         interval op2_interval = std::get<interval>(op2);
 
                         /*
-                         * TODO I have to figure out the semantics of this with
-                         * TODO intervals.
+                         * Handle each type of $cmp instruction differently.
                          */
                         if (cmp_instruction->cmp_op == "Eq") {
 
@@ -406,6 +409,7 @@ interval_abstract_store execute(BasicBlock *bb,
 
     Instruction *terminal_instruction = bb->terminal;
     if (!execute_post) {
+        std::cout << "Considering terminals now " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
         switch (terminal_instruction->instrType) {
             case InstructionType::BranchInstrType: {
                 std::cout << "Encountered $branch " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
@@ -417,33 +421,66 @@ interval_abstract_store execute(BasicBlock *bb,
                  */
                 if (branch_instruction->condition->IsConstInt()) {
                     if (branch_instruction->condition->val != 0) {
-                        bool store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+
+                        /*
+                         * TODO I'm just assuming that we widen when the current
+                         * TODO bb is a loop header, but this might be wrong.
+                         */
+                        bool store_changed_tt;
+                        if (loop_headers.count(bb->label) != 0) {
+                            store_changed_tt = widen(bb2store[branch_instruction->tt], sigma_prime);
+                        } else {
+                            store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                        }
                         if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
+                            std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->tt);
                         }
                     } else {
-                        bool store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                        /*
+                         * TODO This logic might be wrong for the same reason.
+                         */
+                        bool store_changed_ff;
+                        if (loop_headers.count(bb->label) != 0) {
+                            store_changed_ff = widen(bb2store[branch_instruction->ff], sigma_prime);
+                        } else {
+                            store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                        }
                         if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
+                            std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->ff);
                         }
                     }
                 } else {
                     abstract_interval abs_val = get_val_from_store(sigma_prime, branch_instruction->condition->var->name);
+                    std::cout << std::visit(IntervalVisitor{}, abs_val) << std::endl;
                     if ((std::holds_alternative<AbstractVals>(abs_val)) && (std::visit(IntervalVisitor{}, abs_val) == TOP_STR)) {
 
                         /*
                          * Consider the "true" branch.
                          */
-                        bool store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                        bool store_changed_tt;
+                        if (loop_headers.count(bb->label) != 0) {
+                            store_changed_tt = widen(bb2store[branch_instruction->tt], sigma_prime);
+                        } else {
+                            store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                        }
                         if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
+                            std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->tt);
                         }
 
                         /*
                          * Consider the "false" branch.
                          */
-                        bool store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                        bool store_changed_ff;
+                        if (loop_headers.count(bb->label) != 0) {
+                            store_changed_ff = widen(bb2store[branch_instruction->ff], sigma_prime);
+                        } else {
+                            store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                        }
                         if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
+                            std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->ff);
                         }
                     } else if (std::holds_alternative<interval>(abs_val)) {
@@ -452,13 +489,25 @@ interval_abstract_store execute(BasicBlock *bb,
                          * TODO I'm not sure about my logic here.
                          */
                         if ((std::get<interval>(abs_val).first != 0) || (std::get<interval>(abs_val).second != 0)) {
-                            bool store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                            bool store_changed_tt;
+                            if (loop_headers.count(bb->label) != 0) {
+                                store_changed_tt = widen(bb2store[branch_instruction->tt], sigma_prime);
+                            } else {
+                                store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                            }
                             if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
+                                std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                                 worklist.push_back(branch_instruction->tt);
                             }
                         } else {
-                            bool store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                            bool store_changed_ff;
+                            if (loop_headers.count(bb->label) != 0) {
+                                store_changed_ff = widen(bb2store[branch_instruction->ff], sigma_prime);
+                            } else {
+                                store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                            }
                             if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
+                                std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                                 worklist.push_back(branch_instruction->ff);
                             }
                         }
@@ -473,8 +522,15 @@ interval_abstract_store execute(BasicBlock *bb,
                  * Join sigma_prime with the basic block's abstract store
                  * (updating the basic block's abstract store).
                  */
-                bool store_changed = join(bb2store[jump_instruction->label], sigma_prime);
+                //bool store_changed = join(bb2store[jump_instruction->label], sigma_prime);
+                bool store_changed;
+                if (loop_headers.count(bb->label) != 0) {
+                    store_changed = widen(bb2store[jump_instruction->label], sigma_prime);
+                } else {
+                    store_changed = join(bb2store[jump_instruction->label], sigma_prime);
+                }
                 if (store_changed || bbs_to_output.count(jump_instruction->label) == 0) {
+                    std::cout << "Pushing " << jump_instruction->label << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                     worklist.push_back(jump_instruction->label);
                 }
                 break;

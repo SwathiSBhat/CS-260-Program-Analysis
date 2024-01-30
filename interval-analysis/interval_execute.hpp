@@ -175,7 +175,41 @@ interval_abstract_store execute(BasicBlock *bb,
                          */
                         if (cmp_instruction->cmp_op == "Eq") {
 
+                            /*
+                             * We will assign [1, 1] only if both intervals are
+                             * a single value and those values equal each other.
+                             * For example, [4, 4] eq [4, 4].
+                             *
+                             * We will assign [0, 0] only if the intervals don't
+                             * overlap at all. In this case, there is no way
+                             * they can be equal. For example, [1, 7] eq [9, 12].
+                             *
+                             * In every other case, we will assign [0, 1].
+                             */
+                            if ((op1_interval.first == op1_interval.second) && (op1_interval.first == op2_interval.first) && (op1_interval.first == op2_interval.second)) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
+                            } else if (op1_interval.second < op2_interval.first) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
+                            } else {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
+                            }
                         } else if (cmp_instruction->cmp_op == "Neq") {
+
+                            /*
+                             * Assign [1, 1] if the intervals don't overlap.
+                             *
+                             * Assign [0, 0] if the intervals are both a single
+                             * value and those values are equal.
+                             *
+                             * Assign [0, 1] otherwise.
+                             */
+                            if (op1_interval.second < op2_interval.first) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
+                            } else if ((op1_interval.first == op1_interval.second) && (op1_interval.first == op2_interval.first) && (op1_interval.first == op2_interval.second)) {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
+                            } else {
+                                sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
+                            }
 
                         } else if (cmp_instruction->cmp_op == "Less") {
 

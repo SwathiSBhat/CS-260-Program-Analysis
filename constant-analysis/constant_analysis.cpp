@@ -38,7 +38,7 @@ public:
     }
 
     /*
-     * Get the list of names of all the int-typed local variables whose addresses were
+     * Get the list of names of all the int-typed local variables + function parameters whose addresses were
      * taken using the $addrof command.
      * TODO: This should also include addrof of global variables but we are not doing it for assignment 1
     */
@@ -47,13 +47,23 @@ public:
             for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
                 if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
                     if (dynamic_cast<AddrofInstruction*>(*instruction)->rhs->isIntType()) { 
-                        if (program.funcs[func_name]->locals.count(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != 0) {
+                        if (program.funcs[func_name]->locals.count(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != 0)
+                        {
                             addr_of_int_types.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name);
-                    }
+                        }
+                        else
+                        {
+                            for (auto param : program.funcs[func_name]->params) {
+                                if (param && param->name == dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) {
+                                    addr_of_int_types.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name);
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+
         return; 
     }
 
@@ -83,7 +93,6 @@ public:
             }  
         }
         bb2store[bb_name] = store;
-        //std::cout << "Initialized entry store" << std::endl;
         return;
     }
 
@@ -97,7 +106,7 @@ public:
             std::cout << "Func not found" << std::endl;
             return;
         }
-        //std::cout << "Analyzing function " << func_name << std::endl;
+
         funcname = func_name;
         
         // data structures required for prep stage
@@ -109,12 +118,6 @@ public:
         get_int_type_globals(int_type_globals);
         // 2. Compute set of variables that are addresses of int-typed variables
         get_addr_of_int_types(addr_of_int_types, func_name);
-
-        //std::cout << "Priting addr taken int types: " <<std::endl;
-        //for (auto i : addr_of_int_types) {
-        //    std::cout << i << " ";
-        //}
-        //std::cout << std::endl;
 
         /*
          * We also need to initialize bb2store entries for all the basic blocks
@@ -142,7 +145,7 @@ public:
             3. For each successor of the basic block, join the abstract store of the successor with the abstract store of the current basic block
             4. If the abstract store of the successor has changed, add the successor to the worklist
         */
-
+        
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
             worklist.pop_front();
@@ -151,12 +154,14 @@ public:
             //std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
             //bb2store[current_bb].print();
             
-            execute(func->bbs[current_bb],
-                                           bb2store[current_bb],
-                                           bb2store,
-                                           worklist,
-                                           addr_of_int_types,
-                                           bbs_to_output);
+            execute(&program,
+                    func->bbs[current_bb],
+                    bb2store[current_bb],
+                    bb2store,
+                    worklist,
+                    addr_of_int_types,
+                    bbs_to_output);
+
             //std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
             //bb2store[current_bb].print();
 
@@ -168,17 +173,14 @@ public:
             //std::cout << std::endl;
         }
 
-        //std::cout << "DONE WITH LOOP" << std::endl;
-
         /*
          * Once we've completed the worklist algorithm, let's execute our
          * transfer function once more on each basic block to get their exit
          * abstract stores.
          */
         for (const auto &it : bbs_to_output) {
-            
-            
-            soln[it] = execute(func->bbs[it],
+            soln[it] = execute(&program,
+                                func->bbs[it],
                                 bb2store[it],
                                 bb2store,
                                 worklist,
@@ -188,27 +190,9 @@ public:
         }
 
         /*
-         * Finally, let's print out the abstract stores of each basic block in
+         * Finally, let's print out the exit abstract stores of each basic block in
          * alphabetical order.
          */
-        /*for (auto it = bb2store.begin(); it != bb2store.end(); ++it) {
-            if ((*it).second.abstract_store.size() > 0) {
-                std::cout << (*it).first << ":" << std::endl;
-                (*it).second.print();
-            }
-            std::cout << std::endl;
-        }*/
-
-        //std::cout << "START OF ACTUAL OUTPUT" << std::endl;
-
-        /*std::cout<<"--------- bb2store ---------" <<std::endl;
-        for (const auto &bb_label : bbs_to_output) {
-            std::cout << bb_label << ":" << std::endl;
-            bb2store[bb_label].print();
-            std::cout << std::endl;
-        }
-
-        std::cout<<"--------- Final exec ---------" <<std::endl;*/
         for (const auto &bb_label : bbs_to_output) {
             std::cout << bb_label << ":" << std::endl;
             soln[bb_label].print();
@@ -226,7 +210,7 @@ public:
      */
     std::deque<std::string> worklist;
     /*
-     * This is the final solution which we get by running through all the basic blocks one last time
+     * This is the final solution which we get by running through all the basic blocks one last time after the worklist algorithm has completed.
     */
     std::map<std::string, AbstractStore> soln;
 
@@ -236,7 +220,6 @@ private:
 
 int main(int argc, char* argv[]) 
 {
-    //std::cout << "Beginning of main" << std::endl;
     if (argc != 4) {
         std::cerr << "Usage: constant-analysis <lir file path> <lir json filepath> <funcname>" << std::endl;
         return EXIT_FAILURE;

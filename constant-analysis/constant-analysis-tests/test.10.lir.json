@@ -1,0 +1,104 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "test": {
+            "id": "test",
+            "ret_ty": null,
+            "params": [
+                {
+                    "name": "p",
+                    "typ": "Int",
+                    "scope": "test"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "id0",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "p",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "id0",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 8
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": null
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "id0",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "rhs": {
+                                    "name": "p",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

@@ -70,7 +70,19 @@ interval_abstract_store execute(BasicBlock *bb,
                          * TODO is a little bit more complicated than this.
                          */
                         std::cout << "Multiply " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-                        sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first * std::get<interval>(op2).first, std::get<interval>(op1).second * std::get<interval>(op2).second);
+
+                        /*
+                         * For multiplication, we have to use the bounds to
+                         * compute every possible value and take the min/max of
+                         * that.
+                         */
+                        std::multiset<int> possible_bounds;
+                        possible_bounds.insert(std::get<interval>(op1).first * std::get<interval>(op2).first);
+                        possible_bounds.insert(std::get<interval>(op1).first * std::get<interval>(op2).second);
+                        possible_bounds.insert(std::get<interval>(op1).second * std::get<interval>(op2).first);
+                        possible_bounds.insert(std::get<interval>(op1).second * std::get<interval>(op2).second);
+
+                        //sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first * std::get<interval>(op2).first, std::get<interval>(op1).second * std::get<interval>(op2).second);
                     } else if (arith_instruction->arith_op == "Divide") {
                         std::cout << "Divide " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 

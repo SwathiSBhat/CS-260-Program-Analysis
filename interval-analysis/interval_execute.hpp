@@ -320,13 +320,26 @@ interval_abstract_store execute(BasicBlock *bb,
                         }
                     }
                 }
+                break;
             } case InstructionType::JumpInstrType: {
                 std::cout << "Encountered $jump " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 JumpInstruction *jump_instruction = (JumpInstruction *) terminal_instruction;
+
+                /*
+                 * Join sigma_prime with the basic block's abstract store
+                 * (updating the basic block's abstract store).
+                 */
+                bool store_changed = join(bb2store[jump_instruction->label], sigma_prime);
+                if (store_changed || bbs_to_output.count(jump_instruction->label) == 0) {
+                    worklist.push_back(jump_instruction->label);
+                }
+                break;
             } case InstructionType::RetInstrType: {
                 std::cout << "Encountered $ret " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                break;
             } default: {
                 std::cout << "Unrecognized terminal instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                break;
             }
         }
     }

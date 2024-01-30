@@ -1,0 +1,29 @@
+struct st {
+  f1:int
+  f2:&int
+}
+
+fn f1(p:&st) -> int {
+entry:
+  $ret 0
+}
+
+fn main() -> int {
+    entry:
+    $ret 0
+}
+
+fn test() -> _ {
+    let id0:&st, id1:int, id2:st, id3:&int
+    entry:
+    id3 = $addrof id1
+    id1 = $copy 1
+    $jump bb1
+
+    bb1:
+    id0 = $addrof id2
+    $call_dir f1(id0) then exit
+
+    exit:
+    $ret 
+}

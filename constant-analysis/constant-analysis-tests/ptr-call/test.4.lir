@@ -1,0 +1,94 @@
+struct st1 {
+  f1:int
+  f2:&int
+}
+
+struct st2 {
+  f1:&st1
+}
+
+f1:&(&st2) -> int
+f2:&(int, &int) -> int
+test:&() -> int
+
+extern e1:(&st1) -> int
+extern e2:(int) -> int
+
+fn f1(p:&st2) -> int {
+entry:
+  $ret 0
+}
+
+fn f2(p:int, q:&int) -> int {
+entry:
+  $ret 0
+}
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let _lo1:int, _t10:int, _t11:int, _t12:&st2, _t13:&int, _t14:int, _t15:&&int, _t16:&int, _t17:&int, _t18:int, _t19:int, _t2:&&int, _t20:&&int, _t21:int, _t22:&int, _t3:&&&&&&int, _t4:&&&&&int, _t5:&&&&int, _t6:&&&int, _t7:&&int, _t8:int, _t9:&int, id0:&&st2, id1:&st1, id10:int, id11:int, id2:int, id3:&&int, id4:&int, id5:&st1, id6:&&int, id7:&&&&int, id8:&&&&&int, id9:&&&&&int
+bb1:
+  $branch _t8 bb3 bb4
+
+bb2:
+  _t9 = $gep id4 _lo1
+  _t10 = $load _t9
+  id10 = $copy _t10
+  _t11 = $arith sub 0 id2
+  id11 = $copy _t11
+  _t12 = $load id0
+  $call_dir f1(_t12) then bb5
+
+bb3:
+  _lo1 = $copy 0
+  $jump bb2
+
+bb4:
+  _lo1 = $copy 1
+  $jump bb2
+
+bb5:
+  _t13 = $gfp id1 f1
+  _t14 = $arith sub 0 7
+  $store _t13 _t14
+  $jump bb6
+
+bb6:
+  $branch 3 bb7 bb8
+
+bb7:
+  _t15 = $gep id3 4
+  _t16 = $load _t15
+  _t17 = $addrof id2
+  _t18 = $cmp neq _t16 _t17
+  id2 = $copy _t18
+  id2 = $copy id2
+  _t19 = $arith sub 0 1
+  id2 = $copy _t19
+  $jump bb6
+
+bb8:
+  $call_ext e1(id5)
+  _t21 = $arith sub 0 9
+  _t20 = $gep id6 _t21
+  _t22 = $load _t20
+  $store _t22 id10
+  $ret id11
+
+entry:
+  _t2 = $addrof id4
+  id3 = $copy _t2
+  _t3 = $addrof id9
+  _t4 = $load _t3
+  id8 = $copy _t4
+  _t5 = $load id8
+  id7 = $copy _t5
+  _t6 = $load id7
+  _t7 = $load _t6
+  id6 = $copy _t7
+  _t8 = $call_dir test() then bb1
+}

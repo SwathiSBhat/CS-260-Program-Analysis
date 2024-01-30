@@ -167,6 +167,7 @@ public:
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
             worklist.pop_front();
+            std::cout << "About to execute " << current_bb << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
             /*
              * Perform our transfer function on the current basic block.
@@ -179,13 +180,14 @@ public:
                     worklist,
                     addrof_ints,
                     bbs_to_output,
-                    false);
+                    false,
+                    loop_headers);
 
             /*
              * Keep track of all the basic blocks we add to the worklist.
              */
             for (const auto &i : worklist) {
-                std::cout << "Adding something to bbs_to_output " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                std::cout << "Adding" << i << " to bbs_to_output " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 bbs_to_output.insert(i);
             }
         }
@@ -204,7 +206,8 @@ public:
                                          worklist,
                                          addrof_ints,
                                          bbs_to_output,
-                                         true);
+                                         true,
+                                         loop_headers);
         }
 
         std::cout << "Computed exit abstract stores " << __FILE_NAME__ << ":" << __LINE__ << std::endl;

@@ -49,7 +49,7 @@ interval_abstract_store execute(BasicBlock *bb,
                  */
                 abstract_interval op2;
                 if (arith_instruction->op2->IsConstInt()) {
-                    op2 = alpha(arith_instruction->op1->val);
+                    op2 = alpha(arith_instruction->op2->val);
                 } else {
                     op2 = get_val_from_store(sigma_prime, arith_instruction->op2->var->name);
                 }

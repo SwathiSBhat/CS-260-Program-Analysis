@@ -12,6 +12,12 @@ class IntervalAnalysis {
 public:
 
     /*
+     * This is the final solution which we get by running through all the basic
+     * blocks one last time after the worklist algorithm has completed.
+     */
+    std::map<std::string, interval_abstract_store> solution;
+
+    /*
      * This data structure holds a list of all basic blocks that have ever been
      * on the worklist. At the end of our analysis, we will only print out the
      * basic blocks that are on this list.
@@ -179,8 +185,39 @@ public:
              * Keep track of all the basic blocks we add to the worklist.
              */
             for (const auto &i : worklist) {
+                std::cout << "Adding something to bbs_to_output " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 bbs_to_output.insert(i);
             }
+        }
+
+        std::cout << "Exited loop " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+        /*
+         * Once we've completed the worklist algorithm, let's execute our
+         * transfer function once more on each basic block to get their exit
+         * abstract stores.
+         */
+        for (const auto &bb_label : bbs_to_output) {
+            solution[bb_label] = execute(func->bbs[bb_label],
+                                         bb2store[bb_label],
+                                         bb2store,
+                                         worklist,
+                                         addrof_ints,
+                                         bbs_to_output,
+                                         true);
+        }
+
+        std::cout << "Computed exit abstract stores " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        std::cout << bbs_to_output.size() << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+        /*
+         * Finally, let's print out the exit abstract stores of each basic block
+         * in alphabetical order.
+         */
+        for (const auto &bb_label : bbs_to_output) {
+            std::cout << bb_label << ":" << std::endl;
+            print(solution[bb_label]);
+            std::cout << std::endl;
         }
     }
 };
@@ -194,7 +231,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     //std::ifstream f(argv[2]);
-    std::ifstream f("/Users/vinayakgajjewar/PhD/CS260/CS-260-Program-Analysis/constant-analysis/constant-analysis-tests/constants-noptr-nocall.lir.json");
+    std::ifstream f("/Users/vinayakgajjewar/PhD/CS260/CS-260-Program-Analysis/constant-analysis/constant-analysis-tests/noptr-no-call/test.1.lir.json");
     Program p = Program(json::parse(f));
     IntervalAnalysis i = IntervalAnalysis(p);
     //i.func_name = argv[3];

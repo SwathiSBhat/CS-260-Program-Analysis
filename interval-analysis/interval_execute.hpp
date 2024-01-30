@@ -64,6 +64,11 @@ interval_abstract_store execute(BasicBlock *bb,
                         std::cout << "Subtract " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first - std::get<interval>(op2).first, std::get<interval>(op1).second - std::get<interval>(op2).second);
                     } else if (arith_instruction->arith_op == "Multiply") {
+
+                        /*
+                         * TODO This is wrong! The semantics for multiplication
+                         * TODO is a little bit more complicated than this.
+                         */
                         std::cout << "Multiply " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first * std::get<interval>(op2).first, std::get<interval>(op1).second * std::get<interval>(op2).second);
                     } else if (arith_instruction->arith_op == "Divide") {

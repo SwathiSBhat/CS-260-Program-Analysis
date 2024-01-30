@@ -256,13 +256,80 @@ interval_abstract_store execute(BasicBlock *bb,
     /*
      * Now that we've executed the non-terminal instructions, let's look at the
      * terminals to see what to do next.
+     *
+     * TODO I have to modify this part to widen at loop headers.
      */
 
     Instruction *terminal_instruction = bb->terminal;
+    if (!execute_post) {
+        switch (terminal_instruction->instrType) {
+            case InstructionType::BranchInstrType: {
+                std::cout << "Encountered $branch " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                BranchInstruction *branch_instruction = (BranchInstruction *) terminal_instruction;
 
-    /*
-     * TODO
-     */
+                /*
+                 * If op is not 0, go to bb1. Otherwise, go to bb2. If op is
+                 * TOP, then propagate to both.
+                 */
+                if (branch_instruction->condition->IsConstInt()) {
+                    if (branch_instruction->condition->val != 0) {
+                        bool store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                        if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
+                            worklist.push_back(branch_instruction->tt);
+                        }
+                    } else {
+                        bool store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                        if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
+                            worklist.push_back(branch_instruction->ff);
+                        }
+                    }
+                } else {
+                    abstract_interval abs_val = get_val_from_store(sigma_prime, branch_instruction->condition->var->name);
+                    if ((std::holds_alternative<AbstractVals>(abs_val)) && (std::visit(IntervalVisitor{}, abs_val) == TOP_STR)) {
+
+                        /*
+                         * Consider the "true" branch.
+                         */
+                        bool store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                        if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
+                            worklist.push_back(branch_instruction->tt);
+                        }
+
+                        /*
+                         * Consider the "false" branch.
+                         */
+                        bool store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                        if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
+                            worklist.push_back(branch_instruction->ff);
+                        }
+                    } else if (std::holds_alternative<interval>(abs_val)) {
+
+                        /*
+                         * TODO I'm not sure about my logic here.
+                         */
+                        if ((std::get<interval>(abs_val).first != 0) || (std::get<interval>(abs_val).second != 0)) {
+                            bool store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
+                            if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
+                                worklist.push_back(branch_instruction->tt);
+                            }
+                        } else {
+                            bool store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
+                            if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
+                                worklist.push_back(branch_instruction->ff);
+                            }
+                        }
+                    }
+                }
+            } case InstructionType::JumpInstrType: {
+                std::cout << "Encountered $jump " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                JumpInstruction *jump_instruction = (JumpInstruction *) terminal_instruction;
+            } case InstructionType::RetInstrType: {
+                std::cout << "Encountered $ret " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            } default: {
+                std::cout << "Unrecognized terminal instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            }
+        }
+    }
 
     return sigma_prime;
 }

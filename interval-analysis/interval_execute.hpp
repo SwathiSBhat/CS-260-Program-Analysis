@@ -427,7 +427,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          * TODO bb is a loop header, but this might be wrong.
                          */
                         bool store_changed_tt;
-                        if (loop_headers.count(bb->label) != 0) {
+                        if (loop_headers.count(branch_instruction->tt) != 0) {
                             store_changed_tt = widen(bb2store[branch_instruction->tt], sigma_prime);
                         } else {
                             store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
@@ -441,7 +441,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          * TODO This logic might be wrong for the same reason.
                          */
                         bool store_changed_ff;
-                        if (loop_headers.count(bb->label) != 0) {
+                        if (loop_headers.count(branch_instruction->ff) != 0) {
                             store_changed_ff = widen(bb2store[branch_instruction->ff], sigma_prime);
                         } else {
                             store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
@@ -460,7 +460,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          * Consider the "true" branch.
                          */
                         bool store_changed_tt;
-                        if (loop_headers.count(bb->label) != 0) {
+                        if (loop_headers.count(branch_instruction->tt) != 0) {
                             store_changed_tt = widen(bb2store[branch_instruction->tt], sigma_prime);
                         } else {
                             store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
@@ -474,7 +474,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          * Consider the "false" branch.
                          */
                         bool store_changed_ff;
-                        if (loop_headers.count(bb->label) != 0) {
+                        if (loop_headers.count(branch_instruction->ff) != 0) {
                             store_changed_ff = widen(bb2store[branch_instruction->ff], sigma_prime);
                         } else {
                             store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
@@ -490,7 +490,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          */
                         if ((std::get<interval>(abs_val).first != 0) || (std::get<interval>(abs_val).second != 0)) {
                             bool store_changed_tt;
-                            if (loop_headers.count(bb->label) != 0) {
+                            if (loop_headers.count(branch_instruction->tt) != 0) {
                                 store_changed_tt = widen(bb2store[branch_instruction->tt], sigma_prime);
                             } else {
                                 store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
@@ -501,7 +501,7 @@ interval_abstract_store execute(BasicBlock *bb,
                             }
                         } else {
                             bool store_changed_ff;
-                            if (loop_headers.count(bb->label) != 0) {
+                            if (loop_headers.count(branch_instruction->ff) != 0) {
                                 store_changed_ff = widen(bb2store[branch_instruction->ff], sigma_prime);
                             } else {
                                 store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
@@ -524,7 +524,7 @@ interval_abstract_store execute(BasicBlock *bb,
                  */
                 //bool store_changed = join(bb2store[jump_instruction->label], sigma_prime);
                 bool store_changed;
-                if (loop_headers.count(bb->label) != 0) {
+                if (loop_headers.count(jump_instruction->label) != 0) {
                     store_changed = widen(bb2store[jump_instruction->label], sigma_prime);
                 } else {
                     store_changed = join(bb2store[jump_instruction->label], sigma_prime);

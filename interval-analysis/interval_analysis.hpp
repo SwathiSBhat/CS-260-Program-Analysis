@@ -194,9 +194,6 @@ bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
 
         /*
          * If either variable is TOP, we know to assign TOP, no questions asked.
-         *
-         * TODO This if-statement is throwing a bad variant access exception but
-         * TODO how else am I supposed to check if something is TOP?
          */
         if (
                 ((std::holds_alternative<AbstractVals>(b_val)) && (std::visit(IntervalVisitor{}, b_val) == TOP_STR)) ||

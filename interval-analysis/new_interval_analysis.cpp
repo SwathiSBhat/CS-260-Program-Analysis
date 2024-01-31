@@ -110,9 +110,11 @@ public:
                     }
                     case InstructionType::RetInstrType: {
                         std::cout << "$ret instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        break;
                     }
                     default: {
                         std::cout << "Unrecognized instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        instr->pretty_print();
                     }
                 } // End of switch-case
             }
@@ -153,6 +155,10 @@ public:
          * performed.
          */
         get_loop_headers(loop_headers, func_name);
+
+        for (const auto &loop_header : loop_headers) {
+            std::cout << loop_header << "is a loop header " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        }
 
         /*
          * First initialize the abstract store for the entry basic block. Then

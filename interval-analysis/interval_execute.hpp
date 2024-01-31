@@ -159,7 +159,13 @@ interval_abstract_store execute(BasicBlock *bb,
                     if (sigma_prime.count(arith_instruction->lhs->name) != 0) {
                         sigma_prime.erase(arith_instruction->lhs->name);
                     }
-                } else if (false) {
+                } else if (((std::holds_alternative<AbstractVals>(op1)) && (std::visit(IntervalVisitor{}, op1) == TOP_STR)) || ((std::holds_alternative<AbstractVals>(op2)) && (std::visit(IntervalVisitor{}, op2) == TOP_STR))) {
+
+                    /*
+                     * Handle the case where one or both of op1 or op2 are TOP.
+                     */
+
+                    std::cout << "Something is TOP " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
                     /*
                      * If either op1 or op2 is [0, 0], then multiplication gives
@@ -168,32 +174,9 @@ interval_abstract_store execute(BasicBlock *bb,
                      * TODO
                      */
                     sigma_prime[arith_instruction->lhs->name] = std::make_pair(0, 0);
-                } else if (false) {
-
-                    /*
-                     * If op1 is [0, 0], then division will always give you
-                     * [0, 0].
-                     *
-                     * TODO
-                     */
-                    sigma_prime[arith_instruction->lhs->name] = std::make_pair(0, 0);
-                } else if (false) {
-
-                    /*
-                     * If op2 is [0, 0], then division will give you bottom.
-                     */
-                    if (sigma_prime.count(arith_instruction->lhs->name) != 0) {
-                        sigma_prime.erase(arith_instruction->lhs->name);
-                    }
-                } else if (false) {
-
-                    /*
-                     * Handle the case where both op1 and op2 are top, so the
-                     * result is top.
-                     */
-                    sigma_prime[arith_instruction->lhs->name] = AbstractVals::TOP;
                 } else {
-                    std::cout << "We shouldn't be here " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                    std::cout << "BLAH BLAH BLAH NO NO NO " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
                 }
                 break;
             } case InstructionType::CmpInstrType: {

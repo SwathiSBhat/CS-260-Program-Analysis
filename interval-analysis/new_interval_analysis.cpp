@@ -201,6 +201,7 @@ public:
          */
         //for (const auto &bb_label : bbs_to_output) {
         for (const auto &[bb_label, bb_store] : bb2store) {
+            std::cout << "Computing the solution for " << bb_label << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
             solution[bb_label] = execute(func->bbs[bb_label],
                                          bb2store[bb_label],
                                          bb2store,
@@ -218,7 +219,7 @@ public:
          * Finally, let's print out the exit abstract stores of each basic block
          * in alphabetical order.
          */
-        for (const auto &bb_label : bbs_to_output) {
+        for (const auto &[bb_label, bb_store] : solution) {
             std::cout << bb_label << ":" << std::endl;
             print(solution[bb_label]);
             std::cout << std::endl;

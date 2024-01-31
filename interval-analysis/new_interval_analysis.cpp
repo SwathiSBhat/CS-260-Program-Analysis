@@ -73,58 +73,51 @@ public:
                           const std::string &func_name) {
         std::unordered_set<std::string> visited;
         std::vector<std::string> post_order;
-        std::vector<std::string> loop_headers_vec;
         std::string entry_bb = "entry";
-        std::string exit_bb = "exit";
         std::string current_bb = entry_bb;
         std::stack<std::string> stack;
+
         stack.push(current_bb);
+
         while (!stack.empty()) {
             current_bb = stack.top();
             stack.pop();
+
             if (visited.count(current_bb) == 0) {
                 visited.insert(current_bb);
                 post_order.push_back(current_bb);
                 Instruction *instr = program.funcs[func_name]->bbs[current_bb]->terminal;
-                switch (instr->instrType) {
-                    case InstructionType::BranchInstrType: {
-                        BranchInstruction *branch_instr = dynamic_cast<BranchInstruction *>(instr);
-                        stack.push(branch_instr->tt);
-                        stack.push(branch_instr->ff);
-                        break;
-                    }
-                    case InstructionType::JumpInstrType: {
-                        JumpInstruction *jump_instr = dynamic_cast<JumpInstruction *>(instr);
-                        stack.push(jump_instr->label);
-                        break;
-                    }
-                    case InstructionType::CallDirInstrType: {
-                        CallDirInstruction *call_dir_instr = dynamic_cast<CallDirInstruction *>(instr);
-                        stack.push(call_dir_instr->next_bb);
-                        break;
-                    }
-                    case InstructionType::CallIdrInstrType: {
-                        CallIdrInstruction *call_idr_instr = dynamic_cast<CallIdrInstruction *>(instr);
-                        stack.push(call_idr_instr->next_bb);
-                        break;
-                    }
-                    case InstructionType::RetInstrType: {
-                        std::cout << "$ret instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-                        break;
-                    }
-                    default: {
-                        std::cout << "Unrecognized instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-                        instr->pretty_print();
-                    }
-                } // End of switch-case
+                // Check instruction type to get next basic block
+                if (instr->instrType == InstructionType::BranchInstrType) {
+                    BranchInstruction *branch_instr = dynamic_cast<BranchInstruction*>(instr);
+                    stack.push(branch_instr->tt);
+                    stack.push(branch_instr->ff);
+                } else if (instr->instrType == InstructionType::JumpInstrType) {
+                    JumpInstruction *jump_instr = dynamic_cast<JumpInstruction*>(instr);
+                    stack.push(jump_instr->label);
+                } else if (instr->instrType == InstructionType::CallDirInstrType) {
+                    CallDirInstruction *call_dir_instr = dynamic_cast<CallDirInstruction*>(instr);
+                    stack.push(call_dir_instr->next_bb);
+                } else if (instr->instrType == InstructionType::CallIdrInstrType) {
+                    CallIdrInstruction *call_idr_instr = dynamic_cast<CallIdrInstruction*>(instr);
+                    stack.push(call_idr_instr->next_bb);
+                } else if (instr->instrType == InstructionType::RetInstrType) {
+                    // No-op
+                }
+                else {
+                    std::cout << "Terminal instruction type not found" << std::endl;
+                }
             }
-        } // End of while-loop
+            else {
+                loop_headers.insert(current_bb);
+            }
+        }
         std::reverse(post_order.begin(), post_order.end());
-        std::cout << "Printing post order " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        /*std::cout << "Printing post order" << std::endl;
         for (auto bb : post_order) {
             std::cout << bb << " ";
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
         return;
     }
 

@@ -1,0 +1,14 @@
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test(p:int) -> _ {
+let x:int, y:int, z:int, a:int
+entry:
+  a = $copy 0
+  x = $arith div p 0
+  y = $arith div z 0
+  z = $arith div p a
+  $ret
+}

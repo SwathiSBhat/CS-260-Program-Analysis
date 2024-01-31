@@ -58,6 +58,17 @@ interval_abstract_store execute(BasicBlock *bb,
                  * Check if op1 and op2 are non-bottom, non-top intervals.
                  */
                 if (std::holds_alternative<interval>(op1) && std::holds_alternative<interval>(op2)) {
+
+                    /*
+                     * For debugging.
+                     */
+                    if ((std::get<interval>(op1).first == INTERVAL_NEG_INFINITY) || (std::get<interval>(op1).first == INTERVAL_INFINITY) || (std::get<interval>(op1).second == INTERVAL_NEG_INFINITY) || (std::get<interval>(op1).second == INTERVAL_INFINITY)) {
+                        std::cout << "TO INFINITY AND BEYOND " __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                    }
+                    if ((std::get<interval>(op2).first == INTERVAL_NEG_INFINITY) || (std::get<interval>(op2).first == INTERVAL_INFINITY) || (std::get<interval>(op2).second == INTERVAL_NEG_INFINITY) || (std::get<interval>(op2).second == INTERVAL_INFINITY)) {
+                        std::cout << "TO INFINITY AND BEYOND " __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                    }
+
                     if (arith_instruction->arith_op == "Add") {
                         std::cout << "Add " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first + std::get<interval>(op2).first, std::get<interval>(op1).second + std::get<interval>(op2).second);
@@ -127,11 +138,8 @@ interval_abstract_store execute(BasicBlock *bb,
                         } else {
 
                             /*
-                             * TODO I think some cases are trickling through.
+                             * Just use the min/max method directly.
                              */
-                            //std::cout << "Unhandled case in division " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-                            //std::cout << std::visit(IntervalVisitor{}, op1) << std::endl;
-                            //std::cout << std::visit(IntervalVisitor{}, op2) << std::endl;
                             std::multiset<int> possible_bounds;
                             possible_bounds.insert((op1_interval.first) / (op2_interval.first));
                             possible_bounds.insert((op1_interval.first) / (op2_interval.second));
@@ -276,13 +284,17 @@ interval_abstract_store execute(BasicBlock *bb,
                              * [6, 8].
                              *
                              * Return [0, 0] if op1_interval is strictly greater
-                             * than op2_interval.
+                             * than op2_interval or if (op1_lower = op2_lower
+                             * and op1_upper <= op2_upper). See the example
+                             * below.
+                             *
+                             * [4,4] lt [4, 10] should return [0, 0].
                              *
                              * Return [0, 1] otherwise.
                              */
                             if (op1_interval.second < op2_interval.first) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
-                            } else if (op1_interval.first > op2_interval.second) {
+                            } else if ((op1_interval.first > op2_interval.second) || ((op1_interval.first == op2_interval.first) && (op1_interval.second <= op2_interval.second))) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
                             } else {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
@@ -313,13 +325,17 @@ interval_abstract_store execute(BasicBlock *bb,
                              * than op2_interval (with no overlap).
                              *
                              * Return [0, 0] if op1_interval is strictly less
-                             * than op2_interval (with no overlap).
+                             * than op2_interval (with no overlap) or if (op1's
+                             * lower <= op2's lower and op1's upper = op2's
+                             * upper).
+                             *
+                             * [4, 10] gt [10, 10] should return [0, 0].
                              *
                              * Return [0, 1] otherwise.
                              */
                             if (op1_interval.first > op2_interval.second) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
-                            } else if (op1_interval.second < op2_interval.first) {
+                            } else if ((op1_interval.second < op2_interval.first) || ((op1_interval.first <= op2_interval.first) && (op1_interval.second == op2_interval.second))) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
                             } else {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
@@ -557,5 +573,9 @@ interval_abstract_store execute(BasicBlock *bb,
         }
     }
 
+    if (execute_post) {
+        std::cout << "Basic block name:" << bb->label << std::endl;
+        print(sigma_prime);
+    }
     return sigma_prime;
 }

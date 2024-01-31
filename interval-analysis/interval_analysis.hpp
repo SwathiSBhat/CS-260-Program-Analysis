@@ -17,7 +17,7 @@
 /*
  * String representation of TOP for my convenience.
  */
-#define TOP_STR                 "[-INF, INF]"
+#define TOP_STR                 "(NegInf, PosInf)"
 
 /*
  * For interval analysis, we are defining TOP as [-INF, INF].
@@ -45,10 +45,10 @@ struct IntervalVisitor {
         std::string lower = std::to_string(val.first);
         std::string upper = std::to_string(val.second);
         if (val.first == INTERVAL_NEG_INFINITY) {
-            lower = "-INF";
+            lower = "NegInf";
         }
         if (val.second == INTERVAL_INFINITY) {
-            upper = "INF";
+            upper = "PosInf";
         }
         std::string return_string = "[" + lower + ", " + upper + "]";
         return return_string;
@@ -106,7 +106,7 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
 
         abstract_interval new_a;
 
-        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
         if (std::holds_alternative<AbstractVals>(b_val)) {
             std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;

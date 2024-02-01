@@ -9,10 +9,10 @@ ADD_EXECUTABLE(assn0
 	headers/json.hpp
 )
 
-ADD_EXECUTABLE(test_abstract_store
-	tests/test_abstract_store.cpp
-	headers/abstract_store.hpp
-)
+#ADD_EXECUTABLE(test_abstract_store
+#	tests/test_abstract_store.cpp
+#	headers/abstract_store.hpp
+#)
 
 ADD_EXECUTABLE(assn1_constant_analysis
 	constant-analysis/constant_analysis.cpp
@@ -27,6 +27,12 @@ ADD_EXECUTABLE(assn1_interval_analysis
 	interval-analysis/interval_analysis.hpp
 	interval-analysis/alpha.hpp
 	interval-analysis/interval_execute.hpp
+	headers/datatypes.h
+)
+
+ADD_EXECUTABLE(assn2_control_flow_analysis
+	control-flow-analysis/control_flow_analysis.cpp
+	control-flow-analysis/cfa_utils.hpp
 	headers/datatypes.h
 )
 

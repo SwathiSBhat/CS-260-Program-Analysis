@@ -43,6 +43,10 @@ public:
      * TODO: This should also include addrof of global variables but we are not doing it for assignment 1
     */
     void get_addr_of_int_types(std::unordered_set<std::string> &addr_of_int_types, const std::string &func_name) {  
+        //program.funcs[func_name]->bbs["entry"]->pretty_print(json::parse("{\"structs\": \"false\",\"globals\": \"false\",\"functions\": {\"bbs\": {\"instructions\" : \"true\"}},\"externs\": \"false\"}"));
+        for(auto it = program.funcs[func_name]->bbs.begin(); it != program.funcs[func_name]->bbs.end(); ++it) {
+            std::cout<<it->first<<std::endl;
+        }
         for (auto basic_block : program.funcs[func_name]->bbs) {
             for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
                 if ((*instruction)->instrType == InstructionType::AddrofInstrType) {

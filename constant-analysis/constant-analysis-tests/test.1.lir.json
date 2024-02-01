@@ -784,6 +784,87 @@
                 }
             }
         },
+        "func_test_cmp": {
+            "id": "func_test_cmp",
+            "ret_ty": null,
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_cmp"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "func_test_cmp"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "b",
+                                        "typ": "Int",
+                                        "scope": "func_test_cmp"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func_test_cmp"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "x",
+                                        "typ": "Int",
+                                        "scope": "func_test_cmp"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": null
+                    }
+                }
+            }
+        },
         "main": {
             "id": "main",
             "ret_ty": "Int",

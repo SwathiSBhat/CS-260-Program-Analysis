@@ -1,0 +1,21 @@
+fn main() -> int {
+    entry:
+    $ret 0
+}
+
+fn test1() -> _ {
+    entry:
+    $branch 10 bb1 bb2 
+
+    bb1:
+    $jump bb3
+
+    bb2:
+    $branch 10 bb3 bb4
+
+    bb3:
+    $ret 
+
+    bb4:
+    $jump bb2
+}

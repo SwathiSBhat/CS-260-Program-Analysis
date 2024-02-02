@@ -44,14 +44,22 @@ struct IntervalVisitor {
     std::string operator()(interval val) {
         std::string lower = std::to_string(val.first);
         std::string upper = std::to_string(val.second);
+
+        /*
+         * If either the lower or upper bound are infinity, we need to replace
+         * the square bracket on that side with a parenthesis.
+         */
+        std::string left_bracket = "[";
+        std::string right_bracket = "]";
         if (val.first == INTERVAL_NEG_INFINITY) {
             lower = "NegInf";
+            left_bracket = "(";
         }
         if (val.second == INTERVAL_INFINITY) {
             upper = "PosInf";
+            right_bracket = ")";
         }
-        std::string return_string = "[" + lower + ", " + upper + "]";
-        return return_string;
+        return (left_bracket + lower + ", " + upper + right_bracket);
     }
     std::string operator()(AbstractVals val) {
         if (val == AbstractVals::BOTTOM) {

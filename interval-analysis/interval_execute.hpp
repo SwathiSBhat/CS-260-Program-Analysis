@@ -71,25 +71,167 @@ interval_abstract_store execute(BasicBlock *bb,
 
                     if (arith_instruction->arith_op == "Add") {
                         //std::cout << "Add " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-                        sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first + std::get<interval>(op2).first, std::get<interval>(op1).second + std::get<interval>(op2).second);
+
+                        /*
+                         * If one of the bounds are infinity/negative infinity,
+                         * we don't want to add.
+                         */
+                        int lower_bound_result;
+                        int upper_bound_result;
+                        int op1_lower = std::get<interval>(op1).first;
+                        int op1_upper = std::get<interval>(op1).second;
+                        int op2_lower = std::get<interval>(op2).first;
+                        int op2_upper = std::get<interval>(op2).second;
+
+                        /*
+                         * Calculate the result for the lower bound.
+                         */
+                        if ((op1_lower == INTERVAL_NEG_INFINITY) || (op2_lower == INTERVAL_NEG_INFINITY)) {
+                            lower_bound_result = INTERVAL_NEG_INFINITY;
+                        } else {
+                            lower_bound_result = op1_lower + op2_lower;
+                        }
+
+                        /*
+                         * Calculate the result for the upper bound.
+                         */
+                        if ((op1_upper == INTERVAL_INFINITY) || (op2_upper == INTERVAL_INFINITY)) {
+                            upper_bound_result = INTERVAL_INFINITY;
+                        } else {
+                            upper_bound_result = op1_upper + op2_upper;
+                        }
+
+                        /*
+                         * Update sigma_prime.
+                         */
+                        sigma_prime[arith_instruction->lhs->name] = std::make_pair(lower_bound_result, upper_bound_result);
                     } else if (arith_instruction->arith_op == "Subtract") {
+
+                        int lower_bound_result;
+                        int upper_bound_result;
+                        int op1_lower = std::get<interval>(op1).first;
+                        int op1_upper = std::get<interval>(op1).second;
+                        int op2_lower = std::get<interval>(op2).first;
+                        int op2_upper = std::get<interval>(op2).second;
+
+                        /*
+                         * Calculate the result for the lower bound. If
+                         * op1_lower is negative infinity and op2_lower is NOT
+                         * negative infinity, the result is negative infinity.
+                         * If op1_lower is negative infinity AND op2_lower is
+                         * negative infinity, the result is BOTTOM???. If
+                         * op1_lower is NOT negative infinity and op2_lower IS
+                         * negative infinity, the result is BOTTOM?
+                         */
+                        if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
+                            lower_bound_result = INTERVAL_NEG_INFINITY;
+                        } else if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower == INTERVAL_NEG_INFINITY)) {
+                            std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+                            std::cout << "Subtracting -INF from -INF" << std::endl;
+                            lower_bound_result = INTERVAL_NEG_INFINITY;
+                        } else if ((op1_lower != INTERVAL_NEG_INFINITY) && (op2_lower == INTERVAL_NEG_INFINITY)) {
+                            std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+                            std::cout << "Subtracting -INF from an integer" << std::endl;
+                        } else {
+                            lower_bound_result = op1_lower - op2_lower;
+                        }
+
+                        /*
+                         * Calculate the result for the upper bound. If
+                         * op1_upper is infinity while op2_upper is NOT
+                         * infinity, the result is infinity. If both op1_upper
+                         * and op2_upper are infinity, I guess the result is
+                         * BOTTOM? If op1_upper is NOT infinity and op2_upper IS
+                         * infinity, I guess the result is also BOTTOM?
+                         */
+                        if ((op1_upper == INTERVAL_INFINITY) && (op2_upper != INTERVAL_INFINITY)) {
+                            upper_bound_result = INTERVAL_INFINITY;
+                        } else if ((op1_upper == INTERVAL_INFINITY) && (op2_upper == INTERVAL_INFINITY)) {
+                            std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+                            std::cout << "Subtracting INF from INF" << std::endl;
+                            upper_bound_result = INTERVAL_INFINITY;
+                        } else if ((op1_upper != INTERVAL_INFINITY) && (op2_upper == INTERVAL_INFINITY)) {
+                            std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+                            std::cout << "Subtracting INF from an integer" << std::endl;
+
+                            /*
+                             * TODO This is definitely wrong.
+                             */
+                            upper_bound_result = INTERVAL_INFINITY;
+                        } else {
+                            upper_bound_result = op1_upper - op2_upper;
+                        }
+
+                        /*
+                         * Update sigma_prime.
+                         */
                         //std::cout << "Subtracting " <<  std::visit(IntervalVisitor{}, op1) << " and " << std::visit(IntervalVisitor{}, op2) << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-                        sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first - std::get<interval>(op2).first, std::get<interval>(op1).second - std::get<interval>(op2).second);
+                        sigma_prime[arith_instruction->lhs->name] = std::make_pair(lower_bound_result, upper_bound_result);
                     } else if (arith_instruction->arith_op == "Multiply") {
-                        //std::cout << "Multiply " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
 
                         /*
                          * For multiplication, we have to use the bounds to
-                         * compute every possible value and take the min/max of
+                         * compute every possible value and use the min/max of
                          * that.
                          */
                         std::multiset<int> possible_bounds;
-                        possible_bounds.insert(std::get<interval>(op1).first * std::get<interval>(op2).first);
-                        possible_bounds.insert(std::get<interval>(op1).first * std::get<interval>(op2).second);
-                        possible_bounds.insert(std::get<interval>(op1).second * std::get<interval>(op2).first);
-                        possible_bounds.insert(std::get<interval>(op1).second * std::get<interval>(op2).second);
+                        int op1_lower = std::get<interval>(op1).first;
+                        int op1_upper = std::get<interval>(op1).second;
+                        int op2_lower = std::get<interval>(op2).first;
+                        int op2_upper = std::get<interval>(op2).second;
+
+                        /*
+                         * Handle the case where op1_lower or op2_lower are
+                         * -INF. In that case, insert -INF into the multiset.
+                         * Otherwise, insert op1_lower * op2_lower.
+                         */
+                        if ((op1_lower == INTERVAL_NEG_INFINITY) ||
+                            (op2_lower == INTERVAL_NEG_INFINITY)) {
+                            possible_bounds.insert(INTERVAL_NEG_INFINITY);
+                        } else {
+                            possible_bounds.insert(op1_lower * op2_lower);
+                        }
+
+                        /*
+                         * Handle the case where op1_upper or op2_upper are INF.
+                         * In that case, insert INF into the multiset.
+                         * Otherwise, insert op1_upper * op2_upper.
+                         */
+                        if ((op1_upper == INTERVAL_INFINITY) ||
+                            (op2_upper == INTERVAL_INFINITY)) {
+                            possible_bounds.insert(INTERVAL_INFINITY);
+                        } else {
+                            possible_bounds.insert(op1_upper * op2_upper);
+                        }
+
+                        /*
+                         * Handle the case where multiplying op1_lower with
+                         * op2_upper produces a non-infinite bound.
+                         */
+                        if ((op1_lower != INTERVAL_NEG_INFINITY) &&
+                            (op2_upper != INTERVAL_INFINITY)) {
+                            possible_bounds.insert(op1_lower * op2_upper);
+                        }
+
+                        /*
+                         * Handle the case where multiplying op1_upper with
+                         * op2_lower produces a bound.
+                         */
+                        if ((op1_upper != INTERVAL_INFINITY) &&
+                            (op2_lower != INTERVAL_NEG_INFINITY)) {
+                            possible_bounds.insert(op1_upper * op2_lower);
+                        }
+
+                        /*
+                         * Update sigma_prime with the true min and max.
+                         */
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                     } else if (arith_instruction->arith_op == "Divide") {
+
+                        /*
+                         * TODO account for infinities?
+                         */
                         //std::cout << "Divide " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
                         /*

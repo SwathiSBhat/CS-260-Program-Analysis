@@ -243,14 +243,14 @@ public:
  */
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        std::cout << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return EXIT_FAILURE;
     }
-    //std::ifstream f(argv[2]);
-    std::ifstream f("/Users/vinayakgajjewar/PhD/CS260/CS-260-Program-Analysis/interval-analysis/interval-analysis-tests/intervals-noptr-nocall.lir.json");
+    std::ifstream f(argv[2]);
+    //std::ifstream f("/Users/vinayakgajjewar/PhD/CS260/CS-260-Program-Analysis/interval-analysis/interval-analysis-tests/intervals-noptr-nocall.lir.json");
     Program p = Program(json::parse(f));
     IntervalAnalysis i = IntervalAnalysis(p);
-    //i.func_name = argv[3];
-    i.func_name = "test";
+    i.func_name = argv[3];
+    //i.func_name = "test";
     i.AnalyzeFunc();
 }

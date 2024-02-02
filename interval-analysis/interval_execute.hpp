@@ -378,7 +378,7 @@ interval_abstract_store execute(BasicBlock *bb,
                              */
                             if ((op1_interval.first == op1_interval.second) && (op1_interval.first == op2_interval.first) && (op1_interval.first == op2_interval.second)) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
-                            } else if (op1_interval.second < op2_interval.first) {
+                            } else if ((op1_interval.second < op2_interval.first) || (op1_interval.first > op2_interval.second)) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
                             } else {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);

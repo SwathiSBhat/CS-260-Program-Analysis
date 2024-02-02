@@ -10,7 +10,7 @@ int main() {
      * initialize this easily.
      */
 
-    std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+    //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
     interval_abstract_store s1 = {{"v1", std::make_pair(1, 2)},
                                  {"v2", TOP},
@@ -20,7 +20,7 @@ int main() {
                                  {"v2", BOTTOM},
                                  {"v4", std::make_pair(-90, 4)}};
 
-    std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+    //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
     /*
      * Join s2 to s1, modifying s1 in-place.

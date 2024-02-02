@@ -152,6 +152,11 @@ class Type {
             else std::cout << "Error: Type not found" << std::endl;
         };
 
+        static bool isEqualType(Type* type1, Type *type2)
+        {
+            return (type1->indirection == type2->indirection && type1->type == type2->type);
+        }
+
         void pretty_print()
         {
             std::cout << "******************* Type *******************" << std::endl;
@@ -1118,7 +1123,6 @@ class Program {
                     Struct *st = new Struct(st_val);
                     structs[st_key] = st;
                     structs[st_key]->name = st_key;
-                    //structs[st_key]->pretty_print();
                 }
             }
             if (program_json["globals"] != nullptr) {

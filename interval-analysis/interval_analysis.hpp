@@ -109,7 +109,7 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
         //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
         if (std::holds_alternative<AbstractVals>(b_val)) {
-            std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
         }
 
         /*
@@ -120,7 +120,7 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
                 ((std::holds_alternative<AbstractVals>(a_val)) && (std::visit(IntervalVisitor{}, a_val) == TOP_STR))
         ) {
 
-            std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
             new_a = AbstractVals::TOP;
 
@@ -164,6 +164,12 @@ bool join(interval_abstract_store &a, const interval_abstract_store &b) {
  * TODO
  */
 bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
+    //std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    //std::cout << "WIDENING:" << std::endl;
+    //print(a);
+    //std::cout << "AND" << std::endl;
+    //print(b);
+
     bool a_changed = false;
 
     /*
@@ -183,14 +189,14 @@ bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
 
         abstract_interval new_a;
 
-        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-        std::cout << std::visit(IntervalVisitor{}, b_val) << std::endl;
+        //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        //std::cout << std::visit(IntervalVisitor{}, b_val) << std::endl;
         if (std::holds_alternative<AbstractVals>(b_val)) {
-            std::cout << "AbstractVals" << std::endl;
+            //std::cout << "AbstractVals" << std::endl;
         } else {
-            std::cout << "interval" << std::endl;
+            //std::cout << "interval" << std::endl;
         }
-        std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
         /*
          * If either variable is TOP, we know to assign TOP, no questions asked.
@@ -200,7 +206,7 @@ bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
                 ((std::holds_alternative<AbstractVals>(a_val)) && (std::visit(IntervalVisitor{}, a_val) == TOP_STR))
                 ) {
 
-            std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            //std::cout << "DEBUG " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
             new_a = AbstractVals::TOP;
 
@@ -246,5 +252,8 @@ bool widen(interval_abstract_store &a, const interval_abstract_store &b) {
             }
         }
     }
+    //std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    //std::cout << "RESULT:" << std::endl;
+    //print(a);
     return a_changed;
 }

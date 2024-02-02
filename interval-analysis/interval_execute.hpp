@@ -31,7 +31,7 @@ interval_abstract_store execute(BasicBlock *bb,
     for (const Instruction *instruction : bb->instructions) {
         switch (instruction->instrType) {
             case InstructionType::ArithInstrType: {
-                std::cout << "Encountered $arith " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $arith " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 ArithInstruction *arith_instruction = (ArithInstruction *) instruction;
 
                 /*
@@ -63,20 +63,20 @@ interval_abstract_store execute(BasicBlock *bb,
                      * For debugging.
                      */
                     if ((std::get<interval>(op1).first == INTERVAL_NEG_INFINITY) || (std::get<interval>(op1).first == INTERVAL_INFINITY) || (std::get<interval>(op1).second == INTERVAL_NEG_INFINITY) || (std::get<interval>(op1).second == INTERVAL_INFINITY)) {
-                        std::cout << "TO INFINITY AND BEYOND " __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        //std::cout << "TO INFINITY AND BEYOND " __FILE_NAME__ << ":" << __LINE__ << std::endl;
                     }
                     if ((std::get<interval>(op2).first == INTERVAL_NEG_INFINITY) || (std::get<interval>(op2).first == INTERVAL_INFINITY) || (std::get<interval>(op2).second == INTERVAL_NEG_INFINITY) || (std::get<interval>(op2).second == INTERVAL_INFINITY)) {
-                        std::cout << "TO INFINITY AND BEYOND " __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        //std::cout << "TO INFINITY AND BEYOND " __FILE_NAME__ << ":" << __LINE__ << std::endl;
                     }
 
                     if (arith_instruction->arith_op == "Add") {
-                        std::cout << "Add " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        //std::cout << "Add " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first + std::get<interval>(op2).first, std::get<interval>(op1).second + std::get<interval>(op2).second);
                     } else if (arith_instruction->arith_op == "Subtract") {
-                        std::cout << "Subtracting " <<  std::visit(IntervalVisitor{}, op1) << " and " << std::visit(IntervalVisitor{}, op2) << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        //std::cout << "Subtracting " <<  std::visit(IntervalVisitor{}, op1) << " and " << std::visit(IntervalVisitor{}, op2) << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(std::get<interval>(op1).first - std::get<interval>(op2).first, std::get<interval>(op1).second - std::get<interval>(op2).second);
                     } else if (arith_instruction->arith_op == "Multiply") {
-                        std::cout << "Multiply " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        //std::cout << "Multiply " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
                         /*
                          * For multiplication, we have to use the bounds to
@@ -90,7 +90,7 @@ interval_abstract_store execute(BasicBlock *bb,
                         possible_bounds.insert(std::get<interval>(op1).second * std::get<interval>(op2).second);
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                     } else if (arith_instruction->arith_op == "Divide") {
-                        std::cout << "Divide " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        //std::cout << "Divide " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
                         /*
                          * Get the actual intervals for the operands.
@@ -148,7 +148,7 @@ interval_abstract_store execute(BasicBlock *bb,
                             sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                         }
                     } else {
-                        std::cout << "Unrecognized arithmetic operation " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                        //std::cout << "Unrecognized arithmetic operation " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                     }
                 } else if ((std::holds_alternative<AbstractVals>(op1) && std::visit(IntervalVisitor{}, op1) == "Bottom") ||(std::holds_alternative<AbstractVals>(op2) && std::visit(IntervalVisitor{}, op2) == "Bottom")) {
 
@@ -165,7 +165,7 @@ interval_abstract_store execute(BasicBlock *bb,
                      * Handle the case where one or both of op1 or op2 are TOP.
                      */
 
-                    std::cout << "Something is TOP " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                    //std::cout << "Something is TOP " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
                     /*
                      * If either op1 or op2 is [0, 0], then multiplication gives
@@ -175,12 +175,12 @@ interval_abstract_store execute(BasicBlock *bb,
                      */
                     sigma_prime[arith_instruction->lhs->name] = std::make_pair(0, 0);
                 } else {
-                    std::cout << "BLAH BLAH BLAH NO NO NO " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                    //std::cout << "BLAH BLAH BLAH NO NO NO " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
                 }
                 break;
             } case InstructionType::CmpInstrType: {
-                std::cout << "Encountered $cmp " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $cmp " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 CmpInstruction *cmp_instruction = (CmpInstruction *) instruction;
 
                 /*
@@ -344,7 +344,7 @@ interval_abstract_store execute(BasicBlock *bb,
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
                             }
                         } else {
-                            std::cout << "Unrecognized $cmp operation " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                            //std::cout << "Unrecognized $cmp operation " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         }
                     } else if (((std::holds_alternative<AbstractVals>(op1)) && (std::visit(IntervalVisitor{}, op1) == "Bottom")) || ((std::holds_alternative<AbstractVals>(op2)) && (std::visit(IntervalVisitor{}, op2) == "Bottom"))) {
 
@@ -362,7 +362,7 @@ interval_abstract_store execute(BasicBlock *bb,
                 }
                 break;
             } case InstructionType::CopyInstrType: {
-                std::cout << "Encountered $copy " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $copy " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 CopyInstruction *copy_instruction = (CopyInstruction *) instruction;
 
                 /*
@@ -382,49 +382,61 @@ interval_abstract_store execute(BasicBlock *bb,
                 } else {
                     op = get_val_from_store(sigma_prime, copy_instruction->op->var->name);
                 }
-
+                if (bb->label == "bb1") {
+                    //std::cout << "Inside bb1, value of op inside copy\n";
+                    //std::cout << std::visit(IntervalVisitor{}, op) << std::endl;
+                    //if (!copy_instruction->op->IsConstInt())
+                    //std::cout << copy_instruction->op->var->name << std::endl;
+                }
                 /*
                  * Handle the case where op is BOTTOM.
                  */
                 if ((std::holds_alternative<AbstractVals>(op)) && (std::visit(IntervalVisitor{}, op) == "Bottom")) {
-                    if (sigma_prime.count(copy_instruction->op->var->name) != 0) {
-                        sigma_prime.erase(copy_instruction->op->var->name);
+                    if (bb->label == "bb1") {
+                        //std::cout << "Count of " << copy_instruction->op->var->name << std::endl;
+                        //std::cout << sigma_prime.count(copy_instruction->op->var->name) << std::endl;
+                    }
+                    if (sigma_prime.count(copy_instruction->lhs->name) != 0) {
+                        sigma_prime.erase(copy_instruction->lhs->name);
                     }
                 } else {
                     sigma_prime[copy_instruction->lhs->name] = op;
                 }
                 break;
             } case InstructionType::LoadInstrType: {
-                std::cout << "Encountered $load " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $load " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;
             } case InstructionType::StoreInstrType: {
-                std::cout << "Encountered $store " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $store " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;
             } case InstructionType::CallExtInstrType: {
-                std::cout << "Encountered $call_ext " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $call_ext " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;
             } default: {
-                std::cout << "Instruction not recognized " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Instruction not recognized " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
             }
         } // End of switch-case statement.
     } // End of for-loop.
 
-    std::cout << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+    //std::cout << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
     /*
      * Now that we've executed the non-terminal instructions, let's look at the
      * terminals to see what to do next.
-     *
-     * TODO I have to modify this part to widen at loop headers.
      */
 
     Instruction *terminal_instruction = bb->terminal;
     if (!execute_post) {
-        std::cout << "Considering terminals now " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        //std::cout << "Considering terminals now " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
         switch (terminal_instruction->instrType) {
             case InstructionType::BranchInstrType: {
-                std::cout << "Encountered $branch " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+                /*
+                 * TODO We might need to get the branch name from the store dynamically!!!
+                 */
+                //std::cout << "Encountered $branch " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 BranchInstruction *branch_instruction = (BranchInstruction *) terminal_instruction;
+                //std::cout << "This is the branch value =" << branch_instruction->condition->val << std::endl;
 
                 /*
                  * If op is not 0, go to bb1. Otherwise, go to bb2. If op is
@@ -444,7 +456,7 @@ interval_abstract_store execute(BasicBlock *bb,
                             store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
                         }
                         if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
-                            std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                            //std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->tt);
                         }
                     } else {
@@ -458,14 +470,15 @@ interval_abstract_store execute(BasicBlock *bb,
                             store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
                         }
                         if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
-                            std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                            //std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->ff);
                         }
                     }
                 } else {
                     abstract_interval abs_val = get_val_from_store(sigma_prime, branch_instruction->condition->var->name);
-                    std::cout << std::visit(IntervalVisitor{}, abs_val) << std::endl;
-                    if ((std::holds_alternative<AbstractVals>(abs_val)) && (std::visit(IntervalVisitor{}, abs_val) == TOP_STR)) {
+                    //std::cout << "This is our branch abstract interval!!!! =" << std::visit(IntervalVisitor{}, abs_val) << std::endl;
+                    //std::cout << std::visit(IntervalVisitor{}, abs_val) << std::endl;
+                    if (((std::holds_alternative<AbstractVals>(abs_val)) && (std::visit(IntervalVisitor{}, abs_val) == TOP_STR)) || ((std::holds_alternative<interval>(abs_val)) && (((std::get<interval>(abs_val).first < 0) && (std::get<interval>(abs_val).second >= 0)) || ((std::get<interval>(abs_val).first <= 0) && (std::get<interval>(abs_val).second > 0))))) {
 
                         /*
                          * Consider the "true" branch.
@@ -477,7 +490,7 @@ interval_abstract_store execute(BasicBlock *bb,
                             store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
                         }
                         if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
-                            std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                            //std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->tt);
                         }
 
@@ -491,7 +504,7 @@ interval_abstract_store execute(BasicBlock *bb,
                             store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
                         }
                         if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
-                            std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                            //std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                             worklist.push_back(branch_instruction->ff);
                         }
                     } else if (std::holds_alternative<interval>(abs_val)) {
@@ -507,7 +520,7 @@ interval_abstract_store execute(BasicBlock *bb,
                                 store_changed_tt = join(bb2store[branch_instruction->tt], sigma_prime);
                             }
                             if (store_changed_tt || bbs_to_output.count(branch_instruction->tt) == 0) {
-                                std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                                //std::cout << "Pushing " << branch_instruction->tt << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                                 worklist.push_back(branch_instruction->tt);
                             }
                         } else {
@@ -518,7 +531,7 @@ interval_abstract_store execute(BasicBlock *bb,
                                 store_changed_ff = join(bb2store[branch_instruction->ff], sigma_prime);
                             }
                             if (store_changed_ff || bbs_to_output.count(branch_instruction->ff) == 0) {
-                                std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                                //std::cout << "Pushing " << branch_instruction->ff << " onto the worklist " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                                 worklist.push_back(branch_instruction->ff);
                             }
                         }
@@ -526,39 +539,48 @@ interval_abstract_store execute(BasicBlock *bb,
                 }
                 break;
             } case InstructionType::JumpInstrType: {
-                std::cout << "Encountered $jump " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $jump " << __FILE__ << ":" << __LINE__ << std::endl;
                 JumpInstruction *jump_instruction = (JumpInstruction *) terminal_instruction;
+                //std::cout << "Current: " << bb->label << " target: " << jump_instruction->label << " " << __FILE__ << ":" << __LINE__ << std::endl;
 
-                /*
-                 * Join sigma_prime with the basic block's abstract store
-                 * (updating the basic block's abstract store).
-                 */
+                          /*
+                           * Join sigma_prime with the basic block's abstract store
+                           * (updating the basic block's abstract store).
+                           */
                 bool store_changed;
                 if (loop_headers.count(jump_instruction->label) != 0) {
+                    //std::cout << "Going to widen " << __FILE__ << ":" << __LINE__ << std::endl;
+                    //std::cout << "bb2store[jump_instruction->label] BEFORE!" << std::endl;
+                    //print(bb2store[jump_instruction->label]);
                     store_changed = widen(bb2store[jump_instruction->label],
                                           sigma_prime);
+                    //std::cout << "sigma_prime" << std::endl;
+                    //print(sigma_prime);
+                    //std::cout << "bb2store[jump_instruction->label] after" << std::endl;
+                    //print(bb2store[jump_instruction->label]);
                 } else {
+                    //std::cout << "Going to join " << __FILE__ << ":" << __LINE__ << std::endl;
                     store_changed = join(bb2store[jump_instruction->label],
                                          sigma_prime);
                 }
                 if (store_changed || (bbs_to_output.count(jump_instruction->label) == 0)) {
-                    std::cout << "Pushing " << jump_instruction->label << " onto the worklist (from $jump) " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                    //std::cout << "Pushing " << jump_instruction->label << " onto the worklist (from $jump) " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                     worklist.push_back(jump_instruction->label);
                 }
                 break;
             } case InstructionType::RetInstrType: {
-                std::cout << "Encountered $ret " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Encountered $ret " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;
             } default: {
-                std::cout << "Unrecognized terminal instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Unrecognized terminal instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;
             }
         }
     }
 
     if (execute_post) {
-        std::cout << "Basic block name:" << bb->label << std::endl;
-        print(sigma_prime);
+        //std::cout << "Basic block name:" << bb->label << std::endl;
+        //print(sigma_prime);
     }
     return sigma_prime;
 }

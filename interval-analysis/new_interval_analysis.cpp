@@ -105,7 +105,7 @@ public:
                     // No-op
                 }
                 else {
-                    std::cout << "Terminal instruction type not found" << std::endl;
+                    //std::cout << "Terminal instruction type not found" << std::endl;
                 }
             }
             else {
@@ -150,7 +150,7 @@ public:
         get_loop_headers(loop_headers, func_name);
 
         for (const auto &loop_header : loop_headers) {
-            std::cout << loop_header << "is a loop header " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            //std::cout << loop_header << "is a loop header " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
         }
 
         /*
@@ -166,7 +166,10 @@ public:
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
             worklist.pop_front();
-            std::cout << "About to execute " << current_bb << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            //std::cout << "About to execute " << current_bb << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+
+            //std::cout << "Before transfer function" << std::endl;
+            //print(bb2store[current_bb]);
 
             /*
              * Perform our transfer function on the current basic block.
@@ -180,16 +183,25 @@ public:
                     false,
                     loop_headers);
 
+            //std::cout << "After transfer function" << std::endl;
+            //print(bb2store[current_bb]);
+
             /*
              * Keep track of all the basic blocks we add to the worklist.
              */
             for (const auto &i : worklist) {
-                std::cout << "Adding " << i << " to bbs_to_output " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                //std::cout << "Adding " << i << " to bbs_to_output " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 bbs_to_output.insert(i);
+            }
+
+            //std::cout << "This is the worklist now:" << std::endl;
+            for (const auto &i: worklist) {
+                //std::cout << i << " ";
+                //bbs_to_output.insert(i);
             }
         }
 
-        std::cout << "Exited loop " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        //std::cout << "Exited loop " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
         /*
          * Once we've completed the worklist algorithm, let's execute our
@@ -200,7 +212,7 @@ public:
          */
         //for (const auto &bb_label : bbs_to_output) {
         for (const auto &[bb_label, bb_store] : bb2store) {
-            std::cout << "Computing the solution for " << bb_label << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+            //std::cout << "Computing the solution for " << bb_label << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
             solution[bb_label] = execute(func->bbs[bb_label],
                                          bb2store[bb_label],
                                          bb2store,
@@ -211,8 +223,8 @@ public:
                                          loop_headers);
         }
 
-        std::cout << "Computed exit abstract stores " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-        std::cout << bbs_to_output.size() << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        //std::cout << "Computed exit abstract stores " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+        //std::cout << bbs_to_output.size() << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
 
         /*
          * Finally, let's print out the exit abstract stores of each basic block
@@ -235,7 +247,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     //std::ifstream f(argv[2]);
-    std::ifstream f("/Users/vinayakgajjewar/PhD/CS260/CS-260-Program-Analysis/constant-analysis/constant-analysis-tests/noptr-no-call/test.1.lir.json");
+    std::ifstream f("/Users/vinayakgajjewar/PhD/CS260/CS-260-Program-Analysis/interval-analysis/interval-analysis-tests/intervals-noptr-nocall.lir.json");
     Program p = Program(json::parse(f));
     IntervalAnalysis i = IntervalAnalysis(p);
     //i.func_name = argv[3];

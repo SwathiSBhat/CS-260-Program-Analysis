@@ -174,7 +174,8 @@ public:
             /*
              * Perform our transfer function on the current basic block.
              */
-            execute(func->bbs[current_bb],
+            execute(&program,
+                    func->bbs[current_bb],
                     bb2store[current_bb],
                     bb2store,
                     worklist,
@@ -213,7 +214,8 @@ public:
         //for (const auto &bb_label : bbs_to_output) {
         for (const auto &[bb_label, bb_store] : bb2store) {
             //std::cout << "Computing the solution for " << bb_label << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-            solution[bb_label] = execute(func->bbs[bb_label],
+            solution[bb_label] = execute(&program,
+                                         func->bbs[bb_label],
                                          bb2store[bb_label],
                                          bb2store,
                                          worklist,

@@ -2,6 +2,7 @@
 
 #include <deque>
 #include <set>
+#include <queue>
 
 #include "alpha.hpp"
 #include "interval_analysis.hpp"
@@ -10,7 +11,8 @@
 /*
  * Execute a BasicBlock against an interval_abstract_store.
  */
-interval_abstract_store execute(BasicBlock *bb,
+interval_abstract_store execute(Program *program,
+                                BasicBlock *bb,
                                 interval_abstract_store sigma,
                                 std::map<std::string, interval_abstract_store> &bb2store,
                                 std::deque<std::string> &worklist,
@@ -649,7 +651,56 @@ interval_abstract_store execute(BasicBlock *bb,
                 //std::cout << "Encountered $store " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;
             } case InstructionType::CallExtInstrType: {
-                //std::cout << "Encountered $call_ext " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
+                CallExtInstruction *call_ext_instruction = (CallExtInstruction *) instruction;
+                if (call_ext_instruction && call_ext_instruction->lhs && call_ext_instruction->lhs->isIntType()) {
+                    sigma_prime[call_ext_instruction->lhs->name] = AbstractVals::TOP;
+                }
+                for (const auto &arg : call_ext_instruction->args) {
+                    if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::IntType) {
+                        for (const auto &addrof_int : addrof_ints) {
+                            sigma_prime[addrof_int] = AbstractVals::TOP;
+                        }
+                        break;
+                    } else if (arg->var && arg->var->type->indirection > 0 && arg->var->type->type == DataType::StructType) {
+                        bool has_int_field = false;
+                        std::string struct_name = "";
+                        Type::StructType *struct_type = (Type::StructType *) (arg->var->type->ptr_type);
+                        if (struct_type) {
+                            struct_name = struct_type->name;
+                            std::queue<std::string> q;
+                            std::unordered_set<std::string> visited;
+                            q.push(struct_name);
+                            while (!q.empty()) {
+                                std::string curr = q.front();
+                                q.pop();
+                                visited.insert(curr);
+                                Struct *st = program->structs[curr];
+                                for (const auto &field : st->fields) {
+                                    if ((field->type->indirection > 0) &&
+                                        (field->type->type == DataType::IntType)) {
+                                        has_int_field = true;
+                                        break;
+                                    } else if ((field->type->indirection > 0) &&
+                                        (field->type->type == DataType::StructType)) {
+                                        Type::StructType *nested_struct = (Type::StructType *) (field->type->ptr_type);
+                                        if (visited.count(nested_struct->name) == 0) {
+                                            q.push(nested_struct->name);
+                                        }
+                                    }
+                                } // End of for-loop.
+                                if (has_int_field) {
+                                    break;
+                                }
+                            }
+                        } // End of if-statement.
+                        if (has_int_field) {
+                            for (const auto &addrof_int : addrof_ints) {
+                                sigma_prime[addrof_int] = AbstractVals::TOP;
+                            }
+                            break;
+                        }
+                    }
+                }
                 break;
             } default: {
                 //std::cout << "Instruction not recognized " << __FILE_NAME__ << ":" << __LINE__ << std::endl;

@@ -861,6 +861,77 @@ interval_abstract_store execute(Program *program,
             } case InstructionType::RetInstrType: {
                 //std::cout << "Encountered $ret " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;
+            } case InstructionType::CallDirInstrType: {
+                CallDirInstruction *call_dir = (CallDirInstruction *) terminal_instruction;
+                if ((call_dir->lhs) && (call_dir->lhs->isIntType())) {
+                    sigma_prime[call_dir->lhs->name] = AbstractVals::TOP;
+                }
+                for (const auto &arg : call_dir->args) {
+                    if ((arg->var) &&
+                        (arg->var->type->indirection > 0) &&
+                        (arg->var->type->type == DataType::IntType)) {
+                        for (const auto &addrof_int : addrof_ints) {
+                            sigma_prime[addrof_int] = AbstractVals::TOP;
+                        }
+                        break;
+                    } else if ((arg->var) &&
+                        (arg->var->type->indirection > 0) &&
+                        (arg->var->type->type == DataType::StructType)) {
+                        bool has_int_field = false;
+                        std::string struct_name = "";
+                        Type::StructType *struct_type = (Type::StructType *) (arg->var->type->ptr_type);
+                        if (struct_type) {
+                            struct_name = struct_type->name;
+                            std::queue<std::string> q;
+                            std::unordered_set<std::string> visited;
+                            q.push(struct_name);
+                            while (!q.empty()) {
+                                std::string curr = q.front();
+                                q.pop();
+                                visited.insert(curr);
+                                Struct *st = program->structs[curr];
+                                for (const auto &field : st->fields) {
+                                    if ((field->type->indirection > 0) &&
+                                        (field->type->type == DataType::IntType)) {
+                                        has_int_field = true;
+                                        break;
+                                    } else if ((field->type->indirection > 0) &&
+                                        (field->type->type == DataType::StructType)) {
+                                        Type::StructType *nested_struct = (Type::StructType *) (field->type->ptr_type);
+                                        if (visited.count(nested_struct->name) == 0) {
+                                            q.push(nested_struct->name);
+                                        }
+                                    }
+                                } // End of for-loop.
+                                if (has_int_field) {
+                                    break;
+                                }
+                            }
+                        } // End of if-statement.
+                        if (has_int_field) {
+                            for (const auto &addrof_int : addrof_ints) {
+                                sigma_prime[addrof_int] = AbstractVals::TOP;
+                            }
+                            break;
+                        }
+                    }
+                } // End of for-loop.
+                if (!execute_post) {
+
+                    /*
+                     * Widen when the target is a loop header.
+                     */
+                    if (loop_headers.count(call_dir->next_bb) == 0) {
+                        if ((join(bb2store[call_dir->next_bb], sigma_prime) || (bbs_to_output.count(call_dir->next_bb) == 0))) {
+                            worklist.push_back(call_dir->next_bb);
+                        }
+                    } else {
+                        if ((widen(bb2store[call_dir->next_bb], sigma_prime) || (bbs_to_output.count(call_dir->next_bb) == 0))) {
+                            worklist.push_back(call_dir->next_bb);
+                        }
+                    }
+
+                }
             } default: {
                 //std::cout << "Unrecognized terminal instruction " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                 break;

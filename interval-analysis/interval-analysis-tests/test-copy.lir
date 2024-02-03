@@ -1,0 +1,14 @@
+test:&() -> int
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let id1:int
+entry:
+  id1 = $copy 5
+  id1 = $copy id1
+  $ret id1
+}

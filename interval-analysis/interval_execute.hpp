@@ -109,10 +109,62 @@ interval_abstract_store execute(BasicBlock *bb,
 
                         int lower_bound_result;
                         int upper_bound_result;
+                        std::multiset<int> possible_bounds;
                         int op1_lower = std::get<interval>(op1).first;
                         int op1_upper = std::get<interval>(op1).second;
                         int op2_lower = std::get<interval>(op2).first;
                         int op2_upper = std::get<interval>(op2).second;
+
+                        /*if (bb->label == "bb11") {
+                            std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+                            std::cout << "Going to do op1 - op2" << std::endl;
+                            std::cout << "op1 is " << op1_lower << ", " << op1_upper << std::endl;
+                            std::cout << "op2 is " << op2_lower << ", " << op2_upper << std::endl;
+                        }*/
+
+                        /*
+                         * There are four special cases we need to account for:
+                         *
+                         * 1) op1_lower is -INF. In this case, add -INF to our
+                         * set.
+                         *
+                         * 2) op1_upper is INF. In this case, add INF to our
+                         * set.
+                         *
+                         * 3) op2_lower is -INF. In this case, add INF to our
+                         * set.
+                         *
+                         * 4) op2_upper is INF. In this case, add -INF to our
+                         * set.
+                         *
+                         * TODO Idk if this logic makes sense, but I'll try it.
+                         */
+
+                        if ((op1_lower == INTERVAL_NEG_INFINITY) ||
+                            (op2_upper == INTERVAL_INFINITY)) {
+                            possible_bounds.insert(INTERVAL_NEG_INFINITY);
+                        } else {
+                            possible_bounds.insert(op1_lower - op2_upper);
+                        }
+
+                        if ((op1_upper == INTERVAL_INFINITY) ||
+                            (op2_lower == INTERVAL_NEG_INFINITY)) {
+                            possible_bounds.insert(INTERVAL_INFINITY);
+                        } else {
+                            possible_bounds.insert(op1_upper - op2_lower);
+                        }
+
+                        /*
+                         * Now we'll handle the straightforward cases where the
+                         * two lower/upper bounds produce a new lower/upper
+                         * bound.
+                         */
+                        if ((op1_lower != INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
+                            possible_bounds.insert(op1_lower - op2_lower);
+                        }
+                        if ((op1_upper != INTERVAL_INFINITY) && (op2_upper != INTERVAL_INFINITY)) {
+                            possible_bounds.insert(op1_upper - op2_upper);
+                        }
 
                         /*
                          * Calculate the result for the lower bound. If
@@ -123,7 +175,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          * op1_lower is NOT negative infinity and op2_lower IS
                          * negative infinity, the result is BOTTOM?
                          */
-                        if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
+                        /*if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
                             lower_bound_result = INTERVAL_NEG_INFINITY;
                         } else if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower == INTERVAL_NEG_INFINITY)) {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
@@ -134,7 +186,7 @@ interval_abstract_store execute(BasicBlock *bb,
                             std::cout << "Subtracting -INF from an integer" << std::endl;
                         } else {
                             lower_bound_result = op1_lower - op2_lower;
-                        }
+                        }*/
 
                         /*
                          * Calculate the result for the upper bound. If
@@ -144,7 +196,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          * BOTTOM? If op1_upper is NOT infinity and op2_upper IS
                          * infinity, I guess the result is also BOTTOM?
                          */
-                        if ((op1_upper == INTERVAL_INFINITY) && (op2_upper != INTERVAL_INFINITY)) {
+                        /*if ((op1_upper == INTERVAL_INFINITY) && (op2_upper != INTERVAL_INFINITY)) {
                             upper_bound_result = INTERVAL_INFINITY;
                         } else if ((op1_upper == INTERVAL_INFINITY) && (op2_upper == INTERVAL_INFINITY)) {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
@@ -153,20 +205,17 @@ interval_abstract_store execute(BasicBlock *bb,
                         } else if ((op1_upper != INTERVAL_INFINITY) && (op2_upper == INTERVAL_INFINITY)) {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                             std::cout << "Subtracting INF from an integer" << std::endl;
-
-                            /*
-                             * TODO This is definitely wrong.
-                             */
                             upper_bound_result = INTERVAL_INFINITY;
                         } else {
                             upper_bound_result = op1_upper - op2_upper;
-                        }
+                        }*/
 
                         /*
-                         * Update sigma_prime.
+                         * Update sigma_prime with the smallest and largest
+                         * possible bound.
                          */
                         //std::cout << "Subtracting " <<  std::visit(IntervalVisitor{}, op1) << " and " << std::visit(IntervalVisitor{}, op2) << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
-                        sigma_prime[arith_instruction->lhs->name] = std::make_pair(lower_bound_result, upper_bound_result);
+                        sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
                     } else if (arith_instruction->arith_op == "Multiply") {
 
 
@@ -417,11 +466,44 @@ interval_abstract_store execute(BasicBlock *bb,
                              *
                              * Return [0, 1] otherwise.
                              */
+
+                            /*
+                             * TODO DELETE THIS LATER!
+                             */
+                            if ((bb->label == "bb11") && (cmp_instruction->lhs->name == "_t19")) {
+                                std::cout << "op1 is " << op1_interval.first << "," << op1_interval.second << std::endl;
+                                std::cout << "op2 is " << op2_interval.first << "," << op2_interval.second << std::endl;
+                            }
                             if (op1_interval.second < op2_interval.first) {
+
+                                if ((bb->label == "bb11") && (cmp_instruction->lhs->name == "_t19")) {
+                                    std::cout << "Decided to return [1, 1]" << std::endl;
+                                }
+
+                                /*
+                                 * op1 is definitely less than op2.
+                                 */
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
-                            } else if ((op1_interval.first > op2_interval.second) || ((op1_interval.first == op2_interval.first) && (op1_interval.second <= op2_interval.second))) {
+                            } else if ((op1_interval.first > op2_interval.second) || ((op1_interval.first == op1_interval.second) && (op1_interval.first == op2_interval.first) && (op1_interval.first == op2_interval.second))) {
+
+                                if ((bb->label == "bb11") && (cmp_instruction->lhs->name == "_t19")) {
+                                    std::cout << "Decided to return [0, 0]" << std::endl;
+                                }
+
+                                /*
+                                 * op1 is definitely not less than op2. This is
+                                 * only true if (op1 GTE op2) is true.
+                                 */
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
                             } else {
+
+                                if ((bb->label == "bb11") && (cmp_instruction->lhs->name == "_t19")) {
+                                    std::cout << "Decided to return [0, 1]" << std::endl;
+                                }
+
+                                /*
+                                 * We can't tell.
+                                 */
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);
                             }
                         } else if (cmp_instruction->cmp_op == "LessEq") {
@@ -460,7 +542,7 @@ interval_abstract_store execute(BasicBlock *bb,
                              */
                             if (op1_interval.first > op2_interval.second) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(1, 1);
-                            } else if ((op1_interval.second < op2_interval.first) || ((op1_interval.first <= op2_interval.first) && (op1_interval.second == op2_interval.second))) {
+                            } else if ((op1_interval.second < op2_interval.first) || ((op1_interval.first == op1_interval.second) && (op1_interval.first == op2_interval.first) && (op1_interval.first == op2_interval.second))) {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 0);
                             } else {
                                 sigma_prime[cmp_instruction->lhs->name] = std::make_pair(0, 1);

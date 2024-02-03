@@ -56,14 +56,40 @@ public:
     IntervalAnalysis(Program p) : program(p) {};
 
     /*
-     * TODO
+     * Get the set of int-typed global variables.
      */
-    void get_int_type_globals() {}
+    void get_int_type_globals(std::unordered_set<std::string> &int_type_globals) {
+        for (const auto &global_var : program.globals) {
+            Variable *global_var_ptr = global_var->globalVar;
+            if (global_var_ptr->isIntType()) {
+                int_type_globals.insert(global_var_ptr->name);
+            }
+        }
+    }
 
     /*
-     * TODO
+     * Get the set of all the int-typed local variables and function parameters
+     * whose addresses were taken using the $addrof command.
      */
-    void get_addrof_ints() {}
+    void get_addrof_ints(std::unordered_set<std::string> &addrof_ints, const std::string &func_name) {
+        for (const auto &basic_block : program.funcs[func_name]->bbs) {
+            for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
+                if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
+                    if (dynamic_cast<AddrofInstruction *>(*instruction)->rhs->isIntType()) {
+                        if (program.funcs[func_name]->locals.count(dynamic_cast<AddrofInstruction *>(*instruction)->rhs->name) != 0) {
+                            addrof_ints.insert(dynamic_cast<AddrofInstruction *>(*instruction)->rhs->name);
+                        } else {
+                            for (auto param : program.funcs[func_name]->params) {
+                                if (param && param->name == dynamic_cast<AddrofInstruction *>(*instruction)->rhs->name) {
+                                    addrof_ints.insert(dynamic_cast<AddrofInstruction *>(*instruction)->rhs->name);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /*
      * Get the list of loop headers through post-order traversal of all basic

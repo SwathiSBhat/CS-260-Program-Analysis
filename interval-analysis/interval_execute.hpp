@@ -115,12 +115,12 @@ interval_abstract_store execute(BasicBlock *bb,
                         int op2_lower = std::get<interval>(op2).first;
                         int op2_upper = std::get<interval>(op2).second;
 
-                        /*if (bb->label == "bb11") {
+                        if (bb->label == "bb11") {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                             std::cout << "Going to do op1 - op2" << std::endl;
                             std::cout << "op1 is " << op1_lower << ", " << op1_upper << std::endl;
                             std::cout << "op2 is " << op2_lower << ", " << op2_upper << std::endl;
-                        }*/
+                        }
 
                         /*
                          * There are four special cases we need to account for:
@@ -140,7 +140,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          * TODO Idk if this logic makes sense, but I'll try it.
                          */
 
-                        if ((op1_lower == INTERVAL_NEG_INFINITY) ||
+                        /*if ((op1_lower == INTERVAL_NEG_INFINITY) ||
                             (op2_upper == INTERVAL_INFINITY)) {
                             possible_bounds.insert(INTERVAL_NEG_INFINITY);
                         } else {
@@ -152,19 +152,19 @@ interval_abstract_store execute(BasicBlock *bb,
                             possible_bounds.insert(INTERVAL_INFINITY);
                         } else {
                             possible_bounds.insert(op1_upper - op2_lower);
-                        }
+                        }*/
 
                         /*
                          * Now we'll handle the straightforward cases where the
                          * two lower/upper bounds produce a new lower/upper
                          * bound.
                          */
-                        if ((op1_lower != INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
+                        /*if ((op1_lower != INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
                             possible_bounds.insert(op1_lower - op2_lower);
                         }
                         if ((op1_upper != INTERVAL_INFINITY) && (op2_upper != INTERVAL_INFINITY)) {
                             possible_bounds.insert(op1_upper - op2_upper);
-                        }
+                        }*/
 
                         /*
                          * Calculate the result for the lower bound. If
@@ -175,18 +175,22 @@ interval_abstract_store execute(BasicBlock *bb,
                          * op1_lower is NOT negative infinity and op2_lower IS
                          * negative infinity, the result is BOTTOM?
                          */
-                        /*if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
-                            lower_bound_result = INTERVAL_NEG_INFINITY;
+                        if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower != INTERVAL_NEG_INFINITY)) {
+                            //lower_bound_result = INTERVAL_NEG_INFINITY;
+                            possible_bounds.insert(INTERVAL_NEG_INFINITY);
                         } else if ((op1_lower == INTERVAL_NEG_INFINITY) && (op2_lower == INTERVAL_NEG_INFINITY)) {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                             std::cout << "Subtracting -INF from -INF" << std::endl;
-                            lower_bound_result = INTERVAL_NEG_INFINITY;
+                            //lower_bound_result = INTERVAL_NEG_INFINITY;
+                            possible_bounds.insert(INTERVAL_NEG_INFINITY);
                         } else if ((op1_lower != INTERVAL_NEG_INFINITY) && (op2_lower == INTERVAL_NEG_INFINITY)) {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                             std::cout << "Subtracting -INF from an integer" << std::endl;
+                            possible_bounds.insert(INTERVAL_INFINITY);
                         } else {
-                            lower_bound_result = op1_lower - op2_lower;
-                        }*/
+                            //lower_bound_result = op1_lower - op2_lower;
+                            possible_bounds.insert(op1_lower - op2_lower);
+                        }
 
                         /*
                          * Calculate the result for the upper bound. If
@@ -196,19 +200,29 @@ interval_abstract_store execute(BasicBlock *bb,
                          * BOTTOM? If op1_upper is NOT infinity and op2_upper IS
                          * infinity, I guess the result is also BOTTOM?
                          */
-                        /*if ((op1_upper == INTERVAL_INFINITY) && (op2_upper != INTERVAL_INFINITY)) {
-                            upper_bound_result = INTERVAL_INFINITY;
+                        if ((op1_upper == INTERVAL_INFINITY) && (op2_upper != INTERVAL_INFINITY)) {
+                            //upper_bound_result = INTERVAL_INFINITY;
+                            possible_bounds.insert(INTERVAL_INFINITY);
                         } else if ((op1_upper == INTERVAL_INFINITY) && (op2_upper == INTERVAL_INFINITY)) {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                             std::cout << "Subtracting INF from INF" << std::endl;
-                            upper_bound_result = INTERVAL_INFINITY;
+                            //upper_bound_result = INTERVAL_INFINITY;
+                            possible_bounds.insert(INTERVAL_INFINITY);
                         } else if ((op1_upper != INTERVAL_INFINITY) && (op2_upper == INTERVAL_INFINITY)) {
                             std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                             std::cout << "Subtracting INF from an integer" << std::endl;
-                            upper_bound_result = INTERVAL_INFINITY;
+                            //upper_bound_result = INTERVAL_INFINITY;
+                            possible_bounds.insert(INTERVAL_INFINITY);
                         } else {
-                            upper_bound_result = op1_upper - op2_upper;
-                        }*/
+                            //upper_bound_result = op1_upper - op2_upper;
+                            possible_bounds.insert(op1_upper - op2_upper);
+                        }
+
+                        if (bb->label == "bb11") {
+                            std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+                            std::cout << "Subtraction lower bound is " << *(possible_bounds.begin()) << std::endl;
+                            std::cout << "Subtraction upper bound is " << *(--possible_bounds.end()) << std::endl;
+                        }
 
                         /*
                          * Update sigma_prime with the smallest and largest
@@ -216,6 +230,7 @@ interval_abstract_store execute(BasicBlock *bb,
                          */
                         //std::cout << "Subtracting " <<  std::visit(IntervalVisitor{}, op1) << " and " << std::visit(IntervalVisitor{}, op2) << " " << __FILE_NAME__ << ":" << __LINE__ << std::endl;
                         sigma_prime[arith_instruction->lhs->name] = std::make_pair(*(possible_bounds.begin()), *(--possible_bounds.end()));
+                        //sigma_prime[arith_instruction->lhs->name] = std::make_pair(lower_bound_result, upper_bound_result);
                     } else if (arith_instruction->arith_op == "Multiply") {
 
 

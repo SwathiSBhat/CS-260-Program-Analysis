@@ -4,4 +4,5 @@
 
 class ReachableType: public Type {
     public:
+    //GetReachableType();
 };

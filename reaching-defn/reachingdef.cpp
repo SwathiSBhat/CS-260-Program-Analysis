@@ -25,6 +25,30 @@ public:
     ReachingDef(Program program) : program(program) {};
 
     /*
+    Method to get all pointer typed globals, parameters, locals of the function
+    */
+    std::unordered_set<Variable*> get_ptrs() {
+        std::unordered_set<Variable*> PTRS;
+        for (auto global_var : program.globals) {
+            Variable *global_var_ptr = global_var->globalVar;
+            if (global_var_ptr->type->indirection > 0) {
+                PTRS.insert(global_var_ptr);
+            }  
+        }
+        for (auto param : program.funcs[funcname]->params) {
+            if (param->type->indirection > 0) {
+                PTRS.insert(param);
+            }
+        }
+        for (auto local : program.funcs[funcname]->locals) {
+            if (local.second->type->indirection > 0) {
+                PTRS.insert(local.second);
+            }
+        }
+        return PTRS;
+    }
+
+    /*
     Method to get the set of int-typed global variables
     */
     void get_int_type_globals(std::unordered_set<std::string> &int_type_globals) {
@@ -38,11 +62,13 @@ public:
     }
 
     /*
-     * Get all reachable types from all pointers in the function
+     * Get all reachable types from the set given in arg
     */
-   void get_reachable_types(std::vector<ReachableType*> &reachable_types)
+   std::vector<ReachableType*> get_reachable_types(std::unordered_set<Variable*> PTRS)
    {
       // TODO - Add logic here
+        std::vector<ReachableType*> reachable_types;
+        return reachable_types;
    } 
 
     /*
@@ -50,6 +76,8 @@ public:
     */
     void get_addr_taken(std::unordered_set<Variable*> &addr_taken) {  
         //program.funcs[func_name]->bbs["entry"]->pretty_print(json::parse("{\"structs\": \"false\",\"globals\": \"false\",\"functions\": {\"bbs\": {\"instructions\" : \"true\"}},\"externs\": \"false\"}"));
+        
+        // TODO: Handle scenario where there are variables with same name in different scopes
         for (auto basic_block : program.funcs[funcname]->bbs) {
             for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
                 if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
@@ -58,12 +86,16 @@ public:
                             addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
                         }
                         // TODO: Convert globals to ordered set in datatypes.h
-                        else if (std::find(program.globals.begin(), program.globals.end() ,dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != program.globals.end())
-                        {
-                            addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
-                        }
                         else
                         {
+                            for (auto global: program.globals)
+                            {
+                                if (global->globalVar->name == dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name)
+                                {
+                                    addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
+                                }
+                            }
+
                             for (auto param : program.funcs[funcname]->params) {
                                 if (param && param->name == dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) {
                                     addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
@@ -75,17 +107,6 @@ public:
         }
 
         return; 
-    }
-
-    /*
-        Initialize the abstract store for 'entry' basic block
-    */
-    void InitEntryStore() {
-        
-        std::string bb_name = "entry";
-        AbstractStore store = AbstractStore();
-        bb2store[bb_name] = store;
-        return;
     }
 
     /*
@@ -111,7 +132,8 @@ public:
         // 1. Compute set of variables that are address taken
         get_addr_taken(addr_taken);
         // 2. Compute reachable types from all pointers in the function
-        get_reachable_types(reachable_types);
+        std::unordered_set<Variable*> PTRS = get_ptrs(); // Get all pointer typed globals, parameters, locals of the function
+        reachable_types = get_reachable_types(PTRS);
         // 3. Put all fake variables in the address taken set
         // TODO - Yet to write logic
 
@@ -120,7 +142,6 @@ public:
             1. Initialize the abstract store for 'entry' basic block
             2. Add 'entry' basic block to worklist
         */
-        InitEntryStore();
         worklist.push_back("entry");
         bbs_to_output.insert("entry");
 
@@ -138,10 +159,18 @@ public:
             worklist.pop_front();
 
             // Perform the transfer function on the current basic block
-            //std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
-            //bb2store[current_bb].print();
+            /*std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
+            for (auto def : bb2store[current_bb]) {
+                std::cout << def.first << " -> {";
+                for(auto def : def.second)
+                {
+                    std::cout << def << ",";
+                }
+                std::cout << "}" << std::endl;
+            }*/
             
-            execute(func->bbs[current_bb],
+            execute(&program,
+                    func->bbs[current_bb],
                     bb2store,
                     worklist,
                     addr_taken,
@@ -149,8 +178,15 @@ public:
                     soln
                     );
 
-            //std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
-            //bb2store[current_bb].print();
+            /*std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
+            for (auto def : bb2store[current_bb]) {
+                std::cout << def.first << " -> {";
+                for(auto def : def.second)
+                {
+                    std::cout << def << ",";
+                }
+                std::cout << "}" << std::endl;
+            }*/
 
             //std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {
@@ -160,13 +196,20 @@ public:
             //std::cout << std::endl;
         }
 
+        /*std::cout << " bbs to output: " << std::endl;
+        for (const auto &i: bbs_to_output) {
+            std::cout << i << " ";
+        }*/
+
         /*
          * Once we've completed the worklist algorithm, let's execute our
          * transfer function once more on each basic block to get their exit
          * abstract stores.
          */
+
         for (const auto &it : bbs_to_output) {
-            execute(func->bbs[it],
+            execute(&program,
+                    func->bbs[it],
                     bb2store,
                     worklist,
                     addr_taken,
@@ -177,13 +220,23 @@ public:
         }
 
         /*
-         * Finally, let's print out the exit abstract stores of each basic block in
+         * Finally, let's print out the exit abstract stores of each program point in
          * alphabetical order.
          */
-        for (const auto &bb_label : bbs_to_output) {
-            std::cout << bb_label << ":" << std::endl;
-            soln[bb_label].print();
-            std::cout << std::endl;
+        for (auto it = soln.begin(); it != soln.end(); it++) {
+            if (it->second.size() == 0) {
+                continue;
+            }
+            std::cout << it->first << " -> {";
+            int indx = 0;
+            int size = it->second.size();
+            for (auto def = it->second.begin(); def != it->second.end(); def++, indx++) {
+                if (indx == size - 1) {
+                    std::cout << *def << "}" << std::endl;
+                } else {
+                    std::cout << *def << ", ";
+                }
+            }
         }
     }
 

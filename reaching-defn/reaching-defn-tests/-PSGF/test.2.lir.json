@@ -1,0 +1,305 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "test": {
+            "id": "test",
+            "ret_ty": "Int",
+            "params": [
+                {
+                    "name": "p",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "q",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t2",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t3",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t4",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "c",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "q",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "c",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "rhs": {
+                                    "name": "b",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "while.hdr"
+                    }
+                },
+                "exit": {
+                    "id": "exit",
+                    "insts": [
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t4",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "c",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "_t4",
+                                "typ": "Int",
+                                "scope": "test"
+                            }
+                        }
+                    }
+                },
+                "while.body": {
+                    "id": "while.body",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "Var": {
+                                        "name": "b",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "c",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t3",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "while.hdr"
+                    }
+                },
+                "while.hdr": {
+                    "id": "while.hdr",
+                    "insts": [
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Less",
+                                "op1": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "p",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "while.body",
+                            "ff": "exit"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

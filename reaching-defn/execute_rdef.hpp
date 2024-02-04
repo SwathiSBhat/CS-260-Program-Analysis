@@ -8,7 +8,7 @@
 /*
  * Join is a union of the two abstract stores where each abstract store is a map of variable name to a set of pp where they are defined.
 */
-bool joinAbsStore(std::map<std::string, std::set<std::string>>curr_abs_store, std::map<std::string, std::set<std::string>>parent_bb_abs_store) {
+bool joinAbsStore(std::map<std::string, std::set<std::string>>&curr_abs_store, std::map<std::string, std::set<std::string>>parent_bb_abs_store) {
     
     bool changed = false;
     std::map<std::string, std::set<std::string>> result_set;
@@ -45,6 +45,7 @@ bool joinSets(std::set<std::string> &s1, std::set<std::string> &s2) {
 }
 
 void execute(
+    Program *program,
     BasicBlock *bb,
     std::map<std::string, std::map<std::string, std::set<std::string>>> &bb2store,
     std::deque<std::string> &worklist,
@@ -61,8 +62,7 @@ void execute(
      * DEF = set of variables
      * USE = set of variables
     */
-    std::set<Variable*> DEF;
-    std::set<Variable*> USE;
+    
     int index = 0; // To help build program point name
 
     /*
@@ -79,6 +79,8 @@ void execute(
              * Cast it.
              */
              ArithInstruction *arith_inst = (ArithInstruction *) inst;
+             std::set<Variable*> DEF;
+             std::set<Variable*> USE;
 
             /*
              * x = $arith add y z
@@ -108,7 +110,8 @@ void execute(
              * Cast it.
              */
              CmpInstruction *cmp_inst = (CmpInstruction *) inst;
-
+             std::set<Variable*> DEF;
+             std::set<Variable*> USE;
             /*
              * x = $cmp gt y z
              * DEF = {x}
@@ -137,7 +140,8 @@ void execute(
              * Cast it.
              */
              CopyInstruction *copy_inst = (CopyInstruction *) inst;
-
+             std::set<Variable*> DEF;
+             std::set<Variable*> USE;
             /*
              * x = $copy y
              * DEF = {x}
@@ -164,7 +168,8 @@ void execute(
              * Cast it.
              */
              AllocInstruction *alloc_inst = (AllocInstruction *) inst;
-
+             std::set<Variable*> DEF;
+             std::set<Variable*> USE;
             /*
              * x = $alloc y [id]
              * DEF = {x}
@@ -191,7 +196,8 @@ void execute(
              * Cast it.
              */
              GepInstruction *gep_inst = (GepInstruction *) inst;
-
+             std::set<Variable*> DEF;
+             std::set<Variable*> USE;
             /*
              * x = $gep id op
              * DEF = {x}
@@ -219,7 +225,8 @@ void execute(
              */
             // TODO - Check if gfp and gep require the id of variable types also included
              GfpInstruction *gfp_inst = (GfpInstruction *) inst;
-
+             std::set<Variable*> DEF;
+             std::set<Variable*> USE;
             /*
              * x = $gfp id id
              * DEF = {x}
@@ -244,7 +251,8 @@ void execute(
              * Cast it.
              */
              AddrofInstruction *addrof_inst = (AddrofInstruction *) inst;
-
+             std::set<Variable*> DEF;
+             std::set<Variable*> USE;
             /*
              * x = $addrof y
              * DEF = {x}
@@ -264,7 +272,9 @@ void execute(
              * Cast it.
              */
             LoadInstruction *load_inst = (LoadInstruction *) inst;
-            
+            std::set<Variable*> DEF;
+            std::set<Variable*> USE;
+
             // TODO : Need to do extra handling for structs here
             /*
              * DEF = {x}
@@ -295,6 +305,8 @@ void execute(
              * Cast it
             */
             StoreInstruction *store_inst = (StoreInstruction *) inst;
+            std::set<Variable*> DEF;
+            std::set<Variable*> USE;
 
             // TODO : Need to do extra handling for structs here
             /*
@@ -329,11 +341,165 @@ void execute(
         }
         else if ((*inst).instrType == InstructionType::CallExtInstrType)
         {
-            // TODO - Yet to implement
-        }
+            /*
+             * Cast it
+            */
+            CallExtInstruction *callext_inst = (CallExtInstruction *) inst;
+            std::set<Variable*> USE;
+            // TODO: This needs to be verified again and updated
+            /*
+             * SDEF = {x} - Strong defs - definitely updating the variable
+             * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
+             * USE = { fp } U { arg | arg is a variable } U WDEF // add fp only in case of call_idr
+             * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
+             * for all v in WDEF: sigma_prime[v] = sigma_prime[v] U { pp }
+             * sigma_prime[x] = { pp }
+            */
+            std::set<Variable*> SDEF;
+            std::set<Variable*> WDEF;
 
+            if (callext_inst->lhs != NULL)
+                SDEF.insert(callext_inst->lhs);
+            
+            // Add all globals to WDEF
+            /*std::copy(program->globals.begin(), program->globals.end(), std::inserter(WDEF, WDEF.end()));
+            for (auto v : addr_taken) {
+                if (Type::isReachableType(v, program->globals))
+                    WDEF.insert(v);
+            }
+            for (auto v : addr_taken) {
+                if (Type::isReachableType(v, callext_inst->args))
+                    WDEF.insert(v);
+            }
+
+            std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
+            for(auto arg : callext_inst->args) {
+                if (!arg->IsConstInt())
+                    USE.insert(arg->var);
+            }*/
+        }
+        /*if (execute_final) {
+            std::cout << pp << " -> {";
+            for (auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                std::cout << *it << " ";
+            }
+            std::cout << "}" << std::endl;
+        }*/
         index += 1;
     }
+    /*if (!execute_final) {
+        std::cout << "sigma_prime for bb : " << bb->label << std::endl;
+        for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
+            std::cout << it->first << " : ";
+            for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+                std::cout << *it2 << " ";
+            }
+            std::cout << std::endl;
+        }
+    }*/
 
+    Instruction *terminal_instruction = bb->terminal;
+
+    std::string pp = bb->label + "." + "term";
+
+    if ((*terminal_instruction).instrType == InstructionType::JumpInstrType)
+    {
+        JumpInstruction *jump_inst = (JumpInstruction *) terminal_instruction;
+        std::set<Variable*> USE;
+        std::set<Variable*> DEF;
+
+        /*
+         * DEF = {}
+         * USE = {}
+         * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v] => since USE is empty, no update to soln
+        */
+
+        // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
+        // TODO - Check if usage of bbs_to_output can be removed
+        if (!execute_final) {
+            if (joinAbsStore(bb2store[jump_inst->label], sigma_prime) || bbs_to_output.count(jump_inst->label) == 0) {
+                worklist.push_back(jump_inst->label);
+                bbs_to_output.insert(jump_inst->label);
+            }
+        }
+    }
+    else if ((*terminal_instruction).instrType == InstructionType::BranchInstrType)
+    {
+        BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
+
+        /*
+         * DEF = {}
+         * USE = { op | op is a variable }
+         * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
+        */
+        std::set<Variable*> USE;
+        std::set<Variable*> DEF;
+
+        if (!branch_inst->condition->IsConstInt())
+            USE.insert(branch_inst->condition->var);
+        
+        // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
+        // TODO - Check if usage of bbs_to_output can be removed
+        if (!execute_final) {
+            // std::cout << "Joining for branch true : " << branch_inst->tt << std::endl;
+            if (joinAbsStore(bb2store[branch_inst->tt], sigma_prime) || bbs_to_output.count(branch_inst->tt) == 0) {
+                worklist.push_back(branch_inst->tt);
+                bbs_to_output.insert(branch_inst->tt);
+            }
+            // std::cout << "Joining for branch false: " << branch_inst->ff << std::endl;
+            if (joinAbsStore(bb2store[branch_inst->ff], sigma_prime) || bbs_to_output.count(branch_inst->ff) == 0) {
+                worklist.push_back(branch_inst->ff);
+                bbs_to_output.insert(branch_inst->ff);
+            }
+        }
+
+        if (execute_final) {
+            for (Variable *v : USE) {
+                // soln[pp] = soln[pp] U sigma_prime[v]
+                joinSets(soln[pp], sigma_prime[v->name]);
+            }
+        }
+    }
+    else if ((*terminal_instruction).instrType == InstructionType::RetInstrType)
+    {
+        RetInstruction *ret_inst = (RetInstruction *) terminal_instruction;
+
+        /*
+         * DEF = {}
+         * USE = { op | op is a variable }
+         * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
+        */
+        std::set<Variable*> USE;
+        std::set<Variable*> DEF;
+
+        if (ret_inst->op && !(ret_inst->op->IsConstInt()))
+            USE.insert(ret_inst->op->var);
+        
+        if (execute_final) {
+            for (Variable *v : USE) {
+                // soln[pp] = soln[pp] U sigma_prime[v]
+                joinSets(soln[pp], sigma_prime[v->name]);
+            }
+        }
+    }
+    else if ((*terminal_instruction).instrType == InstructionType::CallDirInstrType)
+    {
+        // TODO - Will be filled later
+    }
+    else if ((*terminal_instruction).instrType == InstructionType::CallIdrInstrType)
+    {
+        // TODO - Will be filled later
+    }
+    else
+    {
+        std::cout << "Unknown terminal instruction type" << std::endl;
+    }
+    /*if (execute_final) {
+            std::cout << pp << " -> {";
+            for (auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                std::cout << *it << " ";
+            }
+            std::cout << "}" << std::endl;
+    }*/
     return;
 }

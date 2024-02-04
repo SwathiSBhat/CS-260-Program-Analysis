@@ -2,6 +2,11 @@
 #include <vector>
 #include <unordered_set>
 #include <set>
+#include<deque>
+#include <iostream>
+#include <map>
+#include <string>
+#include <unordered_map>
 
 #include "../headers/datatypes.h"
 #include "execute_rdef.hpp"

@@ -4,6 +4,9 @@
 #include<set>
 #include<iostream>
 #include "../headers/datatypes.h"
+#include <deque>
+#include <unordered_set>
+#include <unordered_map>
 
 /*
  * Join is a union of the two abstract stores where each abstract store is a map of variable name to a set of pp where they are defined.
@@ -346,7 +349,7 @@ void execute(
             */
             CallExtInstruction *callext_inst = (CallExtInstruction *) inst;
             std::set<Variable*> USE;
-            // TODO: This needs to be verified again and updated
+            // TODO: This needs to be updated with pointer information
             /*
              * SDEF = {x} - Strong defs - definitely updating the variable
              * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
@@ -377,6 +380,15 @@ void execute(
                 if (!arg->IsConstInt())
                     USE.insert(arg->var);
             }*/
+
+            if (execute_final) {
+                for (Variable *v : USE) {
+                    // soln[pp] = soln[pp] U sigma_prime[v]
+                    joinSets(soln[pp], sigma_prime[v->name]);
+                }
+            }
+
+
         }
         /*if (execute_final) {
             std::cout << pp << " -> {";

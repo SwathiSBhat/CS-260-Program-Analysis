@@ -228,14 +228,40 @@ public:
          * Finally, let's print out the exit abstract stores of each program point in
          * alphabetical order.
          */
+        /* Workaround to print bb1.11 after bb1.9 */
+        std::vector<std::string>sorted_pps;
         for (auto it = soln.begin(); it != soln.end(); it++) {
-            if (it->second.size() == 0) {
+            sorted_pps.push_back(it->first);
+        }
+        std::sort(sorted_pps.begin(), sorted_pps.end(), [](const std::string &a, const std::string &b) {
+            {
+                std::string a1 = a.substr(0, a.rfind("."));
+                std::string a2 = a.substr(a.rfind(".") + 1);
+                std::string b1 = b.substr(0, b.rfind("."));
+                std::string b2 = b.substr(b.rfind(".") + 1);
+                // std::cout << "a1: " << a1 << " a2: " << a2 << " b1: " << b1 << " b2: " << b2 << std::endl;
+                if (a1 == b1 && (a2 == "term" || b2 == "term"))
+                    return false;
+                if (a1 == b1) {
+                    return std::stoi(a2) < std::stoi(b2);
+                }
+                return a1 < b1;
+            }
+        });
+        /*std::cout <<" Sorted vector " << std::endl;
+        for (auto it = sorted_pps.begin(); it != sorted_pps.end(); it++) {
+            std::cout << *it << " ";
+        }
+        std::cout << std::endl;*/
+
+        for (auto it = sorted_pps.begin(); it != sorted_pps.end(); it++) {
+            if (soln[*it].size() == 0) {
                 continue;
             }
-            std::cout << it->first << " -> {";
+            std::cout << *it << " -> {";
             int indx = 0;
-            int size = it->second.size();
-            for (auto def = it->second.begin(); def != it->second.end(); def++, indx++) {
+            int size = soln[*it].size();
+            for (auto def = soln[*it].begin(); def != soln[*it].end(); def++, indx++) {
                 if (indx == size - 1) {
                     std::cout << *def << "}" << std::endl;
                 } else {

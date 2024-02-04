@@ -361,7 +361,7 @@ void execute(
             std::set<Variable*> SDEF;
             std::set<Variable*> WDEF;
 
-            if (callext_inst->lhs != NULL)
+            if (callext_inst->lhs)
                 SDEF.insert(callext_inst->lhs);
             
             // Add all globals to WDEF

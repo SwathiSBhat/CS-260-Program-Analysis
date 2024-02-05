@@ -70,19 +70,17 @@ void get_def_use_sets(Instruction *instruction,
         case InstructionType::GepInstrType: {
             GepInstruction *gep = (GepInstruction *) instruction;
             def.insert(gep->lhs->name);
-
-            /*
-             * TODO Update USE set.
-             */
+            use.insert(gep->src->name);
+            if (!gep->idx->IsConstInt()) {
+                use.insert(gep->idx->var->name);
+            }
             break;
         }
         case InstructionType::GfpInstrType: {
             GfpInstruction *gfp = (GfpInstruction *) instruction;
             def.insert(gfp->lhs->name);
-
-            /*
-             * TODO Update USE set.
-             */
+            use.insert(gfp->src->name);
+            use.insert(gfp->field->name);
             break;
         }
         default: {

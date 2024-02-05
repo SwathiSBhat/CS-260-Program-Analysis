@@ -87,6 +87,35 @@ namespace reaching_definitions {
     }
 
     /*
+     * Abstract semantics for the $branch instruction. For every variable in the
+     * USE set, update this program point's solution by doing a set union with
+     * itself and that variable's sigma.
+     */
+    void branch_semantics(BranchInstruction *branch,
+                          std::map<program_point, std::set<program_point>> &solution,
+                          abstract_store &sigma,
+                          program_point pp) {
+
+        /*
+         * First, get the DEF and USE sets.
+         */
+        std::set<std::string> def;
+        std::set<std::string> use;
+        get_def_use_sets(branch, def, use);
+
+        /*
+         * Update this program point's solution.
+         */
+        for (const auto &v : use) {
+            std::set_union(solution[pp].begin(),
+                           solution[pp].end(),
+                           sigma[v].begin(),
+                           sigma[v].end(),
+                           std::inserter(solution[pp], solution[pp].begin()));
+        }
+    }
+
+    /*
      * Abstract semantics for the $cmp instruction.
      */
     void cmp_semantics(CmpInstruction *cmp,

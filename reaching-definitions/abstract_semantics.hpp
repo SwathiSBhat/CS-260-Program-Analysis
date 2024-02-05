@@ -246,4 +246,4 @@ namespace reaching_definitions {
          */
         sigma[gfp->lhs->name] = {pp};
     }
-}
+} // End of namespace.

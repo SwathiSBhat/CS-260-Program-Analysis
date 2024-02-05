@@ -20,6 +20,17 @@
 typedef std::pair<std::string, int> program_point;
 
 /*
+ * Our abstract store for each basic block is a mapping from a variable name to
+ * a set of program points.
+ */
+typedef std::map<std::string, std::set<program_point>> abstract_store;
+
+/*
+ * Our bb2store is a mapping from each basic block label to its abstract store.
+ */
+std::map<std::string, abstract_store> bb2store;
+
+/*
  * Our analysis will eventually give us a mapping from program points to sets of
  * program points that specify the set of reaching definitions for that line.
  */

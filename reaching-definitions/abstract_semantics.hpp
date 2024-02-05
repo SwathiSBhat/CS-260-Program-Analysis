@@ -10,6 +10,17 @@
 namespace reaching_definitions {
 
     /*
+     * Abstract semantics for the $addrof instruction. This one is pretty
+     * simple. All we do here is update sigma[lhs] to be the current program
+     * point.
+     */
+    void addrof_semantics(AddrofInstruction *addrof,
+                          abstract_store &sigma,
+                          program_point pp) {
+        sigma[addrof->lhs->name] = {pp};
+    }
+
+    /*
      * Abstract semantics for the $alloc instruction.
      */
     void alloc_semantics(AllocInstruction *alloc,

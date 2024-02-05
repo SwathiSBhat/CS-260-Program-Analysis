@@ -27,6 +27,8 @@ std::map<program_point, std::set<program_point>> solution;
 
 /*
  * Utility function to get the DEF and USE sets for any instruction.
+ *
+ * TODO I still have to add $call_dir, $call_idr, $call_ext, $store, and $load.
  */
 void get_def_use_sets(Instruction *instruction,
                       std::set<std::string> &def,
@@ -81,6 +83,44 @@ void get_def_use_sets(Instruction *instruction,
             def.insert(gfp->lhs->name);
             use.insert(gfp->src->name);
             use.insert(gfp->field->name);
+            break;
+        }
+        case InstructionType::AddrofInstrType: {
+            AddrofInstruction *addr = (AddrofInstruction *) instruction;
+            def.insert(addr->lhs->name);
+
+            /*
+             * Don't insert anything into the USE set.
+             */
+            break;
+        }
+        case InstructionType::RetInstrType: {
+            RetInstruction *ret = (RetInstruction *) instruction;
+
+            /*
+             * Don't insert anything into the DEF set.
+             */
+            if (!ret->op->IsConstInt()) {
+                use.insert(ret->op->var->name);
+            }
+            break;
+        }
+        case InstructionType::BranchInstrType: {
+            BranchInstruction *branch = (BranchInstruction *) instruction;
+
+            /*
+             * Don't insert anything into the DEF set.
+             */
+            if (!branch->condition->IsConstInt()) {
+                use.insert(branch->condition->var->name);
+            }
+            break;
+        }
+        case InstructionType::JumpInstrType: {
+
+            /*
+             * Don't insert anything into either set.
+             */
             break;
         }
         default: {

@@ -255,21 +255,7 @@ public:
         for (auto it = soln.begin(); it != soln.end(); it++) {
             sorted_pps.push_back(it->first);
         }
-        std::sort(sorted_pps.begin(), sorted_pps.end(), custom_sort()); /*{
-            {
-                std::string a1 = a.substr(0, a.rfind("."));
-                std::string a2 = a.substr(a.rfind(".") + 1);
-                std::string b1 = b.substr(0, b.rfind("."));
-                std::string b2 = b.substr(b.rfind(".") + 1);
-                // std::cout << "a1: " << a1 << " a2: " << a2 << " b1: " << b1 << " b2: " << b2 << std::endl;
-                if (a1 == b1 && (a2 == "term" || b2 == "term"))
-                    return false;
-                if (a1 == b1) {
-                    return std::stoi(a2) < std::stoi(b2);
-                }
-                return a1 < b1;
-            }
-        });*/
+        std::sort(sorted_pps.begin(), sorted_pps.end(), custom_sort()); 
         /*std::cout <<" Sorted vector " << std::endl;
         for (auto it = sorted_pps.begin(); it != sorted_pps.end(); it++) {
             std::cout << *it << " ";

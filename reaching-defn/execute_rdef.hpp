@@ -21,7 +21,9 @@ bool joinAbsStore(std::map<std::string, std::set<std::string>>&curr_abs_store, s
     for(auto it = curr_abs_store.begin(); it != curr_abs_store.end(); it++) {
         std::set<std::string> result_set;
         std::set_union(it->second.begin(), it->second.end(), parent_bb_abs_store[it->first].begin(), parent_bb_abs_store[it->first].end(), std::inserter(result_set, result_set.begin()));
-        changed = (result_set.size() != it->second.size());
+        // We do not want to unset changed to false if alerady set to true
+        if (!changed)
+            changed = (result_set.size() != it->second.size());
         it->second = result_set;
     }
 
@@ -32,7 +34,6 @@ bool joinAbsStore(std::map<std::string, std::set<std::string>>&curr_abs_store, s
             changed = true;
         }
     }
-    
     return changed;
 }
 
@@ -388,27 +389,12 @@ void execute(
                 }
             }
 
+            if (callext_inst->lhs)
+                sigma_prime[callext_inst->lhs->name] = {pp};
 
         }
-        /*if (execute_final) {
-            std::cout << pp << " -> {";
-            for (auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                std::cout << *it << " ";
-            }
-            std::cout << "}" << std::endl;
-        }*/
         index += 1;
     }
-    /*if (!execute_final) {
-        std::cout << "sigma_prime for bb : " << bb->label << std::endl;
-        for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
-            std::cout << it->first << " : ";
-            for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-                std::cout << *it2 << " ";
-            }
-            std::cout << std::endl;
-        }
-    }*/
 
     Instruction *terminal_instruction = bb->terminal;
 
@@ -449,26 +435,30 @@ void execute(
 
         if (!branch_inst->condition->IsConstInt())
             USE.insert(branch_inst->condition->var);
-        
-        // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
-        // TODO - Check if usage of bbs_to_output can be removed
-        if (!execute_final) {
-            // std::cout << "Joining for branch true : " << branch_inst->tt << std::endl;
-            if (joinAbsStore(bb2store[branch_inst->tt], sigma_prime) || bbs_to_output.count(branch_inst->tt) == 0) {
-                worklist.push_back(branch_inst->tt);
-                bbs_to_output.insert(branch_inst->tt);
-            }
-            // std::cout << "Joining for branch false: " << branch_inst->ff << std::endl;
-            if (joinAbsStore(bb2store[branch_inst->ff], sigma_prime) || bbs_to_output.count(branch_inst->ff) == 0) {
-                worklist.push_back(branch_inst->ff);
-                bbs_to_output.insert(branch_inst->ff);
-            }
-        }
 
         if (execute_final) {
             for (Variable *v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
                 joinSets(soln[pp], sigma_prime[v->name]);
+            }
+        }
+
+        // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
+        // TODO - Check if usage of bbs_to_output can be removed
+        if (!execute_final) {
+            
+            bool store_changed_tt = joinAbsStore(bb2store[branch_inst->tt], sigma_prime);
+            bool store_changed_ff = joinAbsStore(bb2store[branch_inst->ff], sigma_prime);
+            // std::cout << "Joining for branch true : " << branch_inst->tt << std::endl;
+            if (store_changed_tt || bbs_to_output.count(branch_inst->tt) == 0) {
+                worklist.push_back(branch_inst->tt);
+                bbs_to_output.insert(branch_inst->tt);
+            }
+
+            // std::cout << "Joining for branch false: " << branch_inst->ff << std::endl;
+            if (store_changed_ff || bbs_to_output.count(branch_inst->ff) == 0) {
+                worklist.push_back(branch_inst->ff);
+                bbs_to_output.insert(branch_inst->ff);
             }
         }
     }
@@ -496,11 +486,113 @@ void execute(
     }
     else if ((*terminal_instruction).instrType == InstructionType::CallDirInstrType)
     {
-        // TODO - Will be filled later
+        CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal_instruction;
+
+        std::set<Variable*> USE;
+        // TODO: This needs to be updated with pointer information
+        /*
+            * SDEF = {x} - Strong defs - definitely updating the variable
+            * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
+            * USE = { fp } U { arg | arg is a variable } U WDEF // add fp only in case of call_idr
+            * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
+            * for all v in WDEF: sigma_prime[v] = sigma_prime[v] U { pp }
+            * sigma_prime[x] = { pp }
+        */
+        std::set<Variable*> SDEF;
+        std::set<Variable*> WDEF;
+
+        if (calldir_inst->lhs)
+            SDEF.insert(calldir_inst->lhs);
+        
+        // Add all globals to WDEF
+        /*std::copy(program->globals.begin(), program->globals.end(), std::inserter(WDEF, WDEF.end()));
+        for (auto v : addr_taken) {
+            if (Type::isReachableType(v, program->globals))
+                WDEF.insert(v);
+        }
+        for (auto v : addr_taken) {
+            if (Type::isReachableType(v, callext_inst->args))
+                WDEF.insert(v);
+        }
+
+        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));*/
+        for(auto arg : calldir_inst->args) {
+            if (!arg->IsConstInt())
+                USE.insert(arg->var);
+        }
+
+        if (execute_final) {
+            for (Variable *v : USE) {
+                // soln[pp] = soln[pp] U sigma_prime[v]
+                joinSets(soln[pp], sigma_prime[v->name]);
+            }
+        }
+
+        if (calldir_inst->lhs)
+            sigma_prime[calldir_inst->lhs->name] = {pp};
+
+        if (!execute_final) {
+            if (joinAbsStore(bb2store[calldir_inst->next_bb], sigma_prime) || bbs_to_output.count(calldir_inst->next_bb) == 0) {
+                worklist.push_back(calldir_inst->next_bb);
+                bbs_to_output.insert(calldir_inst->next_bb);
+            }
+        }
+
     }
     else if ((*terminal_instruction).instrType == InstructionType::CallIdrInstrType)
     {
-        // TODO - Will be filled later
+        CallIdrInstruction *callidir_inst = (CallIdrInstruction *) terminal_instruction;
+
+        std::set<Variable*> USE;
+        // TODO: This needs to be updated with pointer information
+        /*
+            * SDEF = {x} - Strong defs - definitely updating the variable
+            * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
+            * USE = { fp } U { arg | arg is a variable } U WDEF // add fp only in case of call_idr
+            * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
+            * for all v in WDEF: sigma_prime[v] = sigma_prime[v] U { pp }
+            * sigma_prime[x] = { pp }
+        */
+        std::set<Variable*> SDEF;
+        std::set<Variable*> WDEF;
+
+        if (callidir_inst->lhs)
+            SDEF.insert(callidir_inst->lhs);
+        
+        // Add all globals to WDEF
+        /*std::copy(program->globals.begin(), program->globals.end(), std::inserter(WDEF, WDEF.end()));
+        for (auto v : addr_taken) {
+            if (Type::isReachableType(v, program->globals))
+                WDEF.insert(v);
+        }
+        for (auto v : addr_taken) {
+            if (Type::isReachableType(v, callext_inst->args))
+                WDEF.insert(v);
+        }
+
+        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));*/
+        for(auto arg : callidir_inst->args) {
+            if (!arg->IsConstInt())
+                USE.insert(arg->var);
+        }
+
+        if (execute_final) {
+            for (Variable *v : USE) {
+                // soln[pp] = soln[pp] U sigma_prime[v]
+                joinSets(soln[pp], sigma_prime[v->name]);
+            }
+        }
+
+        if (callidir_inst->lhs)
+            sigma_prime[callidir_inst->lhs->name] = {pp};
+
+        if (!execute_final) {
+            if (joinAbsStore(bb2store[callidir_inst->next_bb], sigma_prime) || bbs_to_output.count(callidir_inst->next_bb) == 0) {
+                worklist.push_back(callidir_inst->next_bb);
+                bbs_to_output.insert(callidir_inst->next_bb);
+            }
+        }
+
     }
     else
     {

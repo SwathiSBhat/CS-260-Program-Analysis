@@ -106,6 +106,8 @@ class Type {
                 }
                 std::string name;
         };
+
+        Type() {};
         
         Type(json type_json) : indirection(0) {
             // TODO : Need to check if any other types are defined this way

@@ -54,27 +54,15 @@ public:
     }
 
     /*
-    Method to get the set of int-typed global variables
+     * Wrapper function to get reachable types for all ptr typed variables in the function
     */
-    void get_int_type_globals(std::unordered_set<std::string> &int_type_globals) {
-        for (auto global_var : program.globals) {
-            Variable *global_var_ptr = global_var->globalVar;
-            if (global_var_ptr->isIntType()) {
-                int_type_globals.insert(global_var_ptr->name);
-            }  
+    void get_reachable_types(std::unordered_set<Variable*> &PTRS, std::unordered_set<ReachableType*> &reachable_types, Program *program) {
+        for (auto ptr : PTRS) {
+            ReachableType *var_type = new ReachableType(ptr->type);
+            ReachableType::GetReachableType(program, var_type, reachable_types);
         }
         return;
     }
-
-    /*
-     * Get all reachable types from the set given in arg
-    */
-   std::vector<ReachableType*> get_reachable_types(std::unordered_set<Variable*> PTRS)
-   {
-      // TODO - Add logic here
-        std::vector<ReachableType*> reachable_types;
-        return reachable_types;
-   } 
 
     /*
      * Get all address taken local variable + function parameters + global variables
@@ -153,16 +141,46 @@ public:
         // data structures required for prep stage
         std::unordered_set<Variable*> addr_taken; // contains all variables that are address taken i.e addrof is used on them
         // TODO: This can be converted to an unordered set of type ReachableType with it's own hash function. Need to figure out how to do it
-        std::vector<ReachableType*> reachable_types; // reachable data types from all pointers in the function
+        std::unordered_set<ReachableType*> reachable_types; // reachable data types from all pointers in the function
         
         // Prep steps:
+        
         // 1. Compute set of variables that are address taken
         get_addr_taken(addr_taken);
+        
         // 2. Compute reachable types from all pointers in the function
         std::unordered_set<Variable*> PTRS = get_ptrs(); // Get all pointer typed globals, parameters, locals of the function
-        reachable_types = get_reachable_types(PTRS);
+        get_reachable_types(PTRS, reachable_types, &program);
+        
         // 3. Put all fake variables in the address taken set
-        // TODO - Yet to write logic
+        int i=0;
+        std::unordered_set<ReachableType*> types_considered_for_fakes;
+        for (auto rtype : reachable_types) {
+            if (!ReachableType::isPresentInSet(types_considered_for_fakes, rtype)) {
+                types_considered_for_fakes.insert(rtype);
+                
+                void *fake_var_ptr_type = rtype->ptr_type;
+                int indirection = rtype->indirection;
+                if (rtype->type == DataType::IntType && (rtype->indirection == 1 || rtype->indirection == 0))
+                {
+                    fake_var_ptr_type = nullptr;
+                    if (rtype->indirection == 0)
+                        indirection = 0;
+                }
+                
+                ReachableType *fake_type = new ReachableType(rtype->type, fake_var_ptr_type, indirection);
+                
+                addr_taken.insert(new Variable("fake_var_" + std::to_string(i), (Type*) fake_type));
+                std::cout << "Added fake var : " << "fake_var_" + std::to_string(i) << std::endl;
+                fake_type->pretty_print();
+                i += 1;
+            }
+        }
+
+        std::cout << "Address taken variables: " << std::endl;
+        for (auto var : addr_taken) {
+            var->pretty_print();
+        }
 
         /*
             Setup steps
@@ -223,11 +241,6 @@ public:
             //std::cout << std::endl;
         }
 
-        /*std::cout << " bbs to output: " << std::endl;
-        for (const auto &i: bbs_to_output) {
-            std::cout << i << " ";
-        }*/
-
         /*
          * Once we've completed the worklist algorithm, let's execute our
          * transfer function once more on each basic block to get their exit
@@ -256,11 +269,6 @@ public:
             sorted_pps.push_back(it->first);
         }
         std::sort(sorted_pps.begin(), sorted_pps.end(), custom_sort()); 
-        /*std::cout <<" Sorted vector " << std::endl;
-        for (auto it = sorted_pps.begin(); it != sorted_pps.end(); it++) {
-            std::cout << *it << " ";
-        }
-        std::cout << std::endl;*/
 
         for (auto it = sorted_pps.begin(); it != sorted_pps.end(); it++) {
             if (soln[*it].size() == 0) {

@@ -277,7 +277,14 @@ public:
             std::cout << *it << " -> {";
             int indx = 0;
             int size = soln[*it].size();
-            for (auto def = soln[*it].begin(); def != soln[*it].end(); def++, indx++) {
+
+            std::vector<std::string> defs;
+            for (auto def = soln[*it].begin(); def != soln[*it].end(); def++) {
+                defs.push_back(*def);
+            }
+            std::sort(defs.begin(), defs.end(), custom_sort());
+
+            for (auto def = defs.begin(); def != defs.end(); def++, indx++) {
                 if (indx == size - 1) {
                     std::cout << *def << "}" << std::endl;
                 } else {

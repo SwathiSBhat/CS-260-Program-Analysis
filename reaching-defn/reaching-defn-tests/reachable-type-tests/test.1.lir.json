@@ -27,6 +27,69 @@
                     }
                 }
             }
+        ],
+        "struct3": [
+            {
+                "name": "f1",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": "Int",
+                            "param_ty": []
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": {
+                                "Pointer": {
+                                    "Struct": "struct2"
+                                }
+                            },
+                            "param_ty": [
+                                "Int",
+                                {
+                                    "Pointer": "Int"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f3",
+                "typ": {
+                    "Pointer": {
+                        "Pointer": {
+                            "Function": {
+                                "ret_ty": null,
+                                "param_ty": [
+                                    "Int"
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f4",
+                "typ": {
+                    "Pointer": {
+                        "Pointer": {
+                            "Function": {
+                                "ret_ty": null,
+                                "param_ty": [
+                                    "Int"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
         ]
     },
     "globals": [
@@ -334,6 +397,33 @@
                 {
                     "name": "id3",
                     "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id4",
+                    "typ": {
+                        "Struct": "struct3"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id5",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct3"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id6",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "struct3"
+                            }
+                        }
+                    },
                     "scope": "test"
                 }
             ],

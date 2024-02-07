@@ -12,6 +12,13 @@ func1:&() -> int
 func2:&(int, &int) -> &struct2
 func3:&(int) -> _
 
+struct struct3 {
+  f1:&() -> int
+  f2:&(int, &int) -> &struct2
+  f3:&&(int) -> _
+  f4:&() -> int
+}
+
 extern e1:() -> int
 extern e2:(int) -> int
 
@@ -38,7 +45,7 @@ entry:
 }
 
 fn test() -> _ {
-let _t1:int, _t2:&int, _t3:&&int, _t4:&&&int, _t5:&&&&int, _t6:struct2, _t7:&struct2, _t8:&&struct2, _t9:struct1, id0:&struct1, id1:&&struct1, id2:&&&struct1, id3:int
+let _t1:int, _t2:&int, _t3:&&int, _t4:&&&int, _t5:&&&&int, _t6:struct2, _t7:&struct2, _t8:&&struct2, _t9:struct1, id0:&struct1, id1:&&struct1, id2:&&&struct1, id3:int, id4:struct3, id5:&struct3, id6:&&struct3
 entry:
   $ret
 }

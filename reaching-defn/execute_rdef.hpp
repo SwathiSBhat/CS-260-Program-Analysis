@@ -366,27 +366,36 @@ void execute(
                 SDEF.insert(callext_inst->lhs);
             
             // Add all globals to WDEF
-            /*std::copy(program->globals.begin(), program->globals.end(), std::inserter(WDEF, WDEF.end()));
-            for (auto v : addr_taken) {
+            for (auto it = program->globals.begin(); it != program->globals.end(); it++) {
+                WDEF.insert((*it)->globalVar);
+            }
+
+            /*for (auto v : addr_taken) {
                 if (Type::isReachableType(v, program->globals))
                     WDEF.insert(v);
             }
             for (auto v : addr_taken) {
                 if (Type::isReachableType(v, callext_inst->args))
                     WDEF.insert(v);
-            }
+            }*/
 
             std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
+            
             for(auto arg : callext_inst->args) {
                 if (!arg->IsConstInt())
                     USE.insert(arg->var);
-            }*/
+            }
 
             if (execute_final) {
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+            }
+
+            for (Variable *v : WDEF) {
+                // sigma_prime[v] = sigma_prime[v] U { pp }
+                sigma_prime[v->name].insert(pp);
             }
 
             if (callext_inst->lhs)
@@ -505,17 +514,21 @@ void execute(
             SDEF.insert(calldir_inst->lhs);
         
         // Add all globals to WDEF
-        /*std::copy(program->globals.begin(), program->globals.end(), std::inserter(WDEF, WDEF.end()));
-        for (auto v : addr_taken) {
+        for (auto it = program->globals.begin(); it != program->globals.end(); it++) {
+            WDEF.insert((*it)->globalVar);
+        }
+        /*for (auto v : addr_taken) {
             if (Type::isReachableType(v, program->globals))
                 WDEF.insert(v);
         }
         for (auto v : addr_taken) {
             if (Type::isReachableType(v, callext_inst->args))
                 WDEF.insert(v);
-        }
+        }*/
 
-        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));*/
+        // Add WDEF to USE
+        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
+        
         for(auto arg : calldir_inst->args) {
             if (!arg->IsConstInt())
                 USE.insert(arg->var);
@@ -526,6 +539,11 @@ void execute(
                 // soln[pp] = soln[pp] U sigma_prime[v]
                 joinSets(soln[pp], sigma_prime[v->name]);
             }
+        }
+
+        for (Variable *v : WDEF) {
+            // sigma_prime[v] = sigma_prime[v] U { pp }
+            sigma_prime[v->name].insert(pp);
         }
 
         if (calldir_inst->lhs)
@@ -560,17 +578,20 @@ void execute(
             SDEF.insert(callidir_inst->lhs);
         
         // Add all globals to WDEF
-        /*std::copy(program->globals.begin(), program->globals.end(), std::inserter(WDEF, WDEF.end()));
-        for (auto v : addr_taken) {
+        for (auto it = program->globals.begin(); it != program->globals.end(); it++) {
+            WDEF.insert((*it)->globalVar);
+        }
+        /*for (auto v : addr_taken) {
             if (Type::isReachableType(v, program->globals))
                 WDEF.insert(v);
         }
         for (auto v : addr_taken) {
             if (Type::isReachableType(v, callext_inst->args))
                 WDEF.insert(v);
-        }
+        }*/
 
-        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));*/
+        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
+
         for(auto arg : callidir_inst->args) {
             if (!arg->IsConstInt())
                 USE.insert(arg->var);
@@ -581,6 +602,11 @@ void execute(
                 // soln[pp] = soln[pp] U sigma_prime[v]
                 joinSets(soln[pp], sigma_prime[v->name]);
             }
+        }
+
+        for (Variable *v : WDEF) {
+            // sigma_prime[v] = sigma_prime[v] U { pp }
+            sigma_prime[v->name].insert(pp);
         }
 
         if (callidir_inst->lhs)

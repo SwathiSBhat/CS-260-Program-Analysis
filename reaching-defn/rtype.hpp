@@ -34,9 +34,10 @@ class ReachableType: public Type {
     static void GetReachableType(Program *program, ReachableType *var_type, std::unordered_set<ReachableType*> &rset)
     {
         /*
-         * Ensuring that the type is a pointer that is not of function type
+         * Ensuring that the type is a pointer i.e type = &type' and type' is not a function type
         */
-        if (var_type->indirection > 0 && var_type->type != DataType::FuncType)
+
+        if (var_type->indirection > 0 && !(var_type->indirection == 1 && var_type->type == DataType::FuncType))
         {
             /*
              * If the type is a pointer, then we need to get the reachable type of the pointer
@@ -50,6 +51,7 @@ class ReachableType: public Type {
                     ptr_type = nullptr;
                 }
                 ReachableType *rtype = new ReachableType(var_type->type, ptr_type, var_type->indirection - 1);
+                std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
                 if (!isPresentInSet(rset, rtype))
                     rset.insert(rtype);
             }

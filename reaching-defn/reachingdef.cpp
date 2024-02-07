@@ -150,13 +150,28 @@ public:
         
         // 2. Compute reachable types from all pointers in the function
         std::unordered_set<Variable*> PTRS = get_ptrs(); // Get all pointer typed globals, parameters, locals of the function
+        /*std::cout << "PTRS: " << std::endl;
+        for (auto ptr : PTRS) {
+            std::cout << "PTR: " << ptr->name << std::endl;
+        }*/
+
+        // 3. Get reachable types for all ptr typed variables in the function
         get_reachable_types(PTRS, reachable_types, &program);
+        /*std::cout << "Reachable types: " << std::endl;
+        for (auto rtype : reachable_types) {
+            rtype->pretty_print();
+        }*/
         
-        // 3. Put all fake variables in the address taken set
+        // 4. Put all fake variables in the address taken set
         int i=0;
         std::unordered_set<ReachableType*> types_considered_for_fakes;
         for (auto rtype : reachable_types) {
-            if (!ReachableType::isPresentInSet(types_considered_for_fakes, rtype)) {
+            ReachableType *faketype = new ReachableType(rtype->type, rtype->ptr_type, rtype->indirection);
+            addr_taken.insert(new Variable("fake_var_" + std::to_string(i), (Type*) faketype));
+            i += 1;
+            //std::cout << "Added fake var : " << "fake_var_" + std::to_string(i) << std::endl;
+            //faketype->pretty_print();
+            /*if (!ReachableType::isPresentInSet(types_considered_for_fakes, rtype)) {
                 types_considered_for_fakes.insert(rtype);
                 
                 void *fake_var_ptr_type = rtype->ptr_type;
@@ -172,9 +187,9 @@ public:
                 
                 addr_taken.insert(new Variable("fake_var_" + std::to_string(i), (Type*) fake_type));
                 //std::cout << "Added fake var : " << "fake_var_" + std::to_string(i) << std::endl;
-                fake_type->pretty_print();
+                //fake_type->pretty_print();
                 i += 1;
-            }
+            }*/
         }
 
         /*std::cout << "Address taken variables: " << std::endl;

@@ -51,9 +51,10 @@ class ReachableType: public Type {
                     ptr_type = nullptr;
                 }
                 ReachableType *rtype = new ReachableType(var_type->type, ptr_type, var_type->indirection - 1);
-                std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
-                if (!isPresentInSet(rset, rtype))
+                if (!isPresentInSet(rset, rtype)) {
+                    //std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
                     rset.insert(rtype);
+                }
             }
             /*
             * Get reachable type for next level pointer type
@@ -72,6 +73,7 @@ class ReachableType: public Type {
                 ReachableType *rtype = new ReachableType(new ReachableType((*field)->type->type, (*field)->type->ptr_type, (*field)->type->indirection));
                 if (!isPresentInSet(rset,rtype) && !((*field)->type->type == DataType::StructType))
                 {
+                    std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
                     rset.insert(rtype);
                 }
                 GetReachableType(program, new ReachableType((*field)->type->type,  (*field)->type->ptr_type, (*field)->type->indirection), rset);

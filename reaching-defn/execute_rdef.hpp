@@ -75,6 +75,7 @@ void execute(
     for (const Instruction *inst : bb->instructions) {
 
         std::string pp = bb->label + "." + std::to_string(index);
+        //std::cout << "pp: " << pp << std::endl;
 
         // arith, cmp, alloc, copy, gep, gfp work the same way
         if ((*inst).instrType == InstructionType::ArithInstrType) {
@@ -212,6 +213,8 @@ void execute(
             DEF.insert(gep_inst->lhs);
             if (!gep_inst->idx->IsConstInt())
                 USE.insert(gep_inst->idx->var);
+            // TODO - Confirm this with Ben
+            USE.insert(gep_inst->src);
 
             if (execute_final) {
                 for (Variable *v : USE) {
@@ -239,6 +242,9 @@ void execute(
              * sigma_prime[x] = { pp }
             */
             DEF.insert(gfp_inst->lhs);
+            // TODO - Confirm this with Ben
+            USE.insert(gfp_inst->src);
+            USE.insert(gfp_inst->field);
             
             if (execute_final) {
                 for (Variable *v : USE) {
@@ -288,6 +294,8 @@ void execute(
             */
             DEF.insert(load_inst->lhs);
             USE.insert(load_inst->src);
+
+            //std::cout << "Load instruction: " << load_inst->lhs->name << " = $load " << load_inst->src->name << std::endl;
             for (auto v : addr_taken) {
                 if (Type::isEqualType(v->type, load_inst->lhs->type)) {
                     USE.insert(v);
@@ -322,8 +330,12 @@ void execute(
             */
             for (auto v : addr_taken) {
                 // To handle the case when op is a constant int vs variable
-                if (store_inst->op->IsConstInt() && v->isIntType())
-                    DEF.insert(v);
+                if (store_inst->op->IsConstInt())
+                {
+                    if (v->isIntType())
+                        DEF.insert(v);
+                }
+                // TODO - This equality will not suffice for all types 
                 else if (Type::isEqualType(v->type, store_inst->op->var->type))
                     DEF.insert(v);
             }
@@ -408,7 +420,8 @@ void execute(
     Instruction *terminal_instruction = bb->terminal;
 
     std::string pp = bb->label + "." + "term";
-
+    //std::cout << "pp: " << pp << std::endl;
+    
     if ((*terminal_instruction).instrType == InstructionType::JumpInstrType)
     {
         JumpInstruction *jump_inst = (JumpInstruction *) terminal_instruction;
@@ -424,10 +437,43 @@ void execute(
         // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
         // TODO - Check if usage of bbs_to_output can be removed
         if (!execute_final) {
-            if (joinAbsStore(bb2store[jump_inst->label], sigma_prime) || bbs_to_output.count(jump_inst->label) == 0) {
+            /*if (bb->label == "bb7")
+            {
+                std::cout << "Joining for jump: " << jump_inst->label << std::endl;
+                std::cout << "Before joining: " << std::endl;
+                for (auto it = bb2store[jump_inst->label].begin(); it != bb2store[jump_inst->label].end(); it++) {
+                    std::cout << it->first << " -> {";
+                    for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+                        std::cout << *it2 << " ";
+                    }
+                    std::cout << "}" << std::endl;
+                }
+                std::cout << "Sigma prime: " << std::endl;
+                for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
+                    std::cout << it->first << " -> {";
+                    for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+                        std::cout << *it2 << " ";
+                    }
+                    std::cout << "}" << std::endl;
+                }
+            }*/
+            bool store_changed = joinAbsStore(bb2store[jump_inst->label], sigma_prime);
+            if (store_changed || bbs_to_output.count(jump_inst->label) == 0) {
                 worklist.push_back(jump_inst->label);
                 bbs_to_output.insert(jump_inst->label);
             }
+            /*if (bb->label == "bb7")
+            {
+                std::cout << "Store changed : "<< store_changed << std::endl;
+                std::cout << "After join " << std::endl;
+                for (auto it = bb2store[jump_inst->label].begin(); it != bb2store[jump_inst->label].end(); it++) {
+                    std::cout << it->first << " -> {";
+                    for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+                        std::cout << *it2 << " ";
+                    }
+                    std::cout << "}" << std::endl;
+                }
+            }*/
         }
     }
     else if ((*terminal_instruction).instrType == InstructionType::BranchInstrType)
@@ -630,6 +676,17 @@ void execute(
                 std::cout << *it << " ";
             }
             std::cout << "}" << std::endl;
+    }
+    if (!execute_final) {
+        std::cout << "Sigma prime for bb: " << bb->label << std::endl;
+        for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
+            std::cout << it->first << " -> {";
+            for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+                std::cout << *it2 << " ";
+            }
+            std::cout << "}" << std::endl;
+        } 
     }*/
+    
     return;
 }

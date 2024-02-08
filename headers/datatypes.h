@@ -156,7 +156,50 @@ class Type {
 
         static bool isEqualType(Type* type1, Type *type2)
         {
-            return (type1->indirection == type2->indirection && type1->type == type2->type);
+            if (type1->type != type2->type)
+                return false;
+            else if (type1->type == DataType::IntType && 
+            type1->indirection == type2->indirection && 
+            type1->ptr_type == type2->ptr_type)
+                return true; 
+            else if (type1->type == DataType::FuncType && type1->indirection == type2->indirection)
+            {
+                FunctionType *f1 = (FunctionType*)type1->ptr_type;
+                FunctionType *f2 = (FunctionType*)type2->ptr_type;
+                if (f1->ret->type == f2->ret->type && f1->ret->indirection == f2->ret->indirection)
+                {
+                    if (f1->ret->type == DataType::StructType)
+                    {
+                        if (((StructType*)f1->ret->ptr_type)->name != ((StructType*)f2->ret->ptr_type)->name)
+                        {
+                            return false;
+                        }
+                    }
+
+                    if (f1->params.size() == f2->params.size())
+                    {
+                        for (int i = 0; i < f1->params.size(); i++)
+                        {
+                            if ((f1->params)[i]->type != (f2->params)[i]->type || 
+                            (f1->params)[i]->indirection != (f2->params)[i]->indirection || 
+                            (f1->params)[i]->ptr_type != (f2->params)[i]->ptr_type)
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+            else if (type1->type == DataType::StructType && type1->indirection == type2->indirection)
+            {
+                if (((StructType*)type1->ptr_type)->name != ((StructType*)type2->ptr_type)->name)
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
         }
 
         void pretty_print()

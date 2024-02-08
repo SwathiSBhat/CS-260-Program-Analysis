@@ -169,27 +169,6 @@ public:
             ReachableType *faketype = new ReachableType(rtype->type, rtype->ptr_type, rtype->indirection);
             addr_taken.insert(new Variable("fake_var_" + std::to_string(i), (Type*) faketype));
             i += 1;
-            //std::cout << "Added fake var : " << "fake_var_" + std::to_string(i) << std::endl;
-            //faketype->pretty_print();
-            /*if (!ReachableType::isPresentInSet(types_considered_for_fakes, rtype)) {
-                types_considered_for_fakes.insert(rtype);
-                
-                void *fake_var_ptr_type = rtype->ptr_type;
-                int indirection = rtype->indirection;
-                if (rtype->type == DataType::IntType && (rtype->indirection == 1 || rtype->indirection == 0))
-                {
-                    fake_var_ptr_type = nullptr;
-                    if (rtype->indirection == 0)
-                        indirection = 0;
-                }
-                
-                ReachableType *fake_type = new ReachableType(rtype->type, fake_var_ptr_type, indirection);
-                
-                addr_taken.insert(new Variable("fake_var_" + std::to_string(i), (Type*) fake_type));
-                //std::cout << "Added fake var : " << "fake_var_" + std::to_string(i) << std::endl;
-                //fake_type->pretty_print();
-                i += 1;
-            }*/
         }
 
         /*std::cout << "Address taken variables: " << std::endl;

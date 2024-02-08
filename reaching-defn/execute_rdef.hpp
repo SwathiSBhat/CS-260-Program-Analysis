@@ -335,7 +335,7 @@ void execute(
                     if (v->isIntType())
                         DEF.insert(v);
                 }
-                // TODO - This equality will not suffice for all types 
+
                 else if (Type::isEqualType(v->type, store_inst->op->var->type))
                     DEF.insert(v);
             }

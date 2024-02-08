@@ -101,7 +101,7 @@ class ReachableType: public Type {
                 ReachableType *rtype = new ReachableType(new ReachableType((*field)->type->type, (*field)->type->ptr_type, (*field)->type->indirection));
                 if (!isPresentInSet(rset,rtype) && !((*field)->type->type == DataType::StructType))
                 {
-                    std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
+                    //std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
                     rset.insert(rtype);
                 }
                 GetReachableType(program, new ReachableType((*field)->type->type,  (*field)->type->ptr_type, (*field)->type->indirection), rset);

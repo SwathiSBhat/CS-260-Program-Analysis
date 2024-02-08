@@ -415,6 +415,14 @@ void execute(
 
         }
         index += 1;
+        if (execute_final) {
+            std::cout << " Soln final " <<std::endl;
+            std::cout << pp << " -> {";
+            for (auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                std::cout << *it << " ";
+            }
+            std::cout << "}" << std::endl;
+    }
     }
 
     Instruction *terminal_instruction = bb->terminal;
@@ -437,43 +445,11 @@ void execute(
         // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
         // TODO - Check if usage of bbs_to_output can be removed
         if (!execute_final) {
-            /*if (bb->label == "bb7")
-            {
-                std::cout << "Joining for jump: " << jump_inst->label << std::endl;
-                std::cout << "Before joining: " << std::endl;
-                for (auto it = bb2store[jump_inst->label].begin(); it != bb2store[jump_inst->label].end(); it++) {
-                    std::cout << it->first << " -> {";
-                    for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-                        std::cout << *it2 << " ";
-                    }
-                    std::cout << "}" << std::endl;
-                }
-                std::cout << "Sigma prime: " << std::endl;
-                for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
-                    std::cout << it->first << " -> {";
-                    for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-                        std::cout << *it2 << " ";
-                    }
-                    std::cout << "}" << std::endl;
-                }
-            }*/
             bool store_changed = joinAbsStore(bb2store[jump_inst->label], sigma_prime);
             if (store_changed || bbs_to_output.count(jump_inst->label) == 0) {
                 worklist.push_back(jump_inst->label);
                 bbs_to_output.insert(jump_inst->label);
             }
-            /*if (bb->label == "bb7")
-            {
-                std::cout << "Store changed : "<< store_changed << std::endl;
-                std::cout << "After join " << std::endl;
-                for (auto it = bb2store[jump_inst->label].begin(); it != bb2store[jump_inst->label].end(); it++) {
-                    std::cout << it->first << " -> {";
-                    for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-                        std::cout << *it2 << " ";
-                    }
-                    std::cout << "}" << std::endl;
-                }
-            }*/
         }
     }
     else if ((*terminal_instruction).instrType == InstructionType::BranchInstrType)
@@ -670,7 +646,8 @@ void execute(
     {
         std::cout << "Unknown terminal instruction type" << std::endl;
     }
-    /*if (execute_final) {
+    if (execute_final) {
+            std::cout << " Soln final " <<std::endl;
             std::cout << pp << " -> {";
             for (auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
                 std::cout << *it << " ";
@@ -686,7 +663,7 @@ void execute(
             }
             std::cout << "}" << std::endl;
         } 
-    }*/
+    }
     
     return;
 }

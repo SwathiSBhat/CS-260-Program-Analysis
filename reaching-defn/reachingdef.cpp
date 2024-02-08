@@ -65,6 +65,18 @@ public:
     }
 
     /*
+     * Ensure address taken values are unique
+    */
+    bool isPresentInAddrTaken(std::unordered_set<Variable*> &addr_taken, Variable *var) {
+        for (auto it = addr_taken.begin(); it != addr_taken.end(); it++) {
+            if ((*it)->name == var->name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
      * Get all address taken local variable + function parameters + global variables
     */
     void get_addr_taken(std::unordered_set<Variable*> &addr_taken) {  
@@ -76,7 +88,8 @@ public:
                 if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
                         if (program.funcs[funcname]->locals.count(dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) != 0)
                         {
-                            addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
+                            if (!isPresentInAddrTaken(addr_taken, dynamic_cast<AddrofInstruction*>(*instruction)->rhs))
+                                addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
                         }
                         // TODO: Convert globals to ordered set in datatypes.h
                         else
@@ -85,13 +98,15 @@ public:
                             {
                                 if (global->globalVar->name == dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name)
                                 {
-                                    addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
+                                    if (!isPresentInAddrTaken(addr_taken, dynamic_cast<AddrofInstruction*>(*instruction)->rhs))
+                                        addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
                                 }
                             }
 
                             for (auto param : program.funcs[funcname]->params) {
                                 if (param && param->name == dynamic_cast<AddrofInstruction*>(*instruction)->rhs->name) {
-                                    addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
+                                    if (!isPresentInAddrTaken(addr_taken, dynamic_cast<AddrofInstruction*>(*instruction)->rhs))
+                                        addr_taken.insert(dynamic_cast<AddrofInstruction*>(*instruction)->rhs);
                                 }
                             }
                         }
@@ -157,10 +172,10 @@ public:
 
         // 3. Get reachable types for all ptr typed variables in the function
         get_reachable_types(PTRS, reachable_types, &program);
-        /*std::cout << "Reachable types: " << std::endl;
+        std::cout << "Reachable types: " << reachable_types.size() << std::endl;
         for (auto rtype : reachable_types) {
             rtype->pretty_print();
-        }*/
+        }
         
         // 4. Put all fake variables in the address taken set
         int i=0;
@@ -171,10 +186,10 @@ public:
             i += 1;
         }
 
-        /*std::cout << "Address taken variables: " << std::endl;
+        std::cout << "Address taken variables: " << addr_taken.size() << std::endl;
         for (auto var : addr_taken) {
             var->pretty_print();
-        }*/
+        }
 
         /*
             Setup steps
@@ -227,12 +242,12 @@ public:
                 std::cout << "}" << std::endl;
             }*/
 
-            //std::cout << "This is the worklist now:" << std::endl;
+            std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {
-                //std::cout << i << " ";
+                std::cout << i << " ";
                 bbs_to_output.insert(i);
             }
-            //std::cout << std::endl;
+            std::cout << std::endl;
         }
 
         /*

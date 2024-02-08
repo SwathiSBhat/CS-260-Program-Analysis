@@ -79,13 +79,110 @@
                 "name": "f4",
                 "typ": {
                     "Pointer": {
-                        "Pointer": {
-                            "Function": {
-                                "ret_ty": null,
-                                "param_ty": [
-                                    "Int"
-                                ]
-                            }
+                        "Function": {
+                            "ret_ty": "Int",
+                            "param_ty": []
+                        }
+                    }
+                }
+            }
+        ],
+        "struct4": [
+            {
+                "name": "f1",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": "Int",
+                            "param_ty": []
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": "Int",
+                            "param_ty": []
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f3",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": "Int",
+                            "param_ty": [
+                                "Int",
+                                {
+                                    "Pointer": "Int"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f4",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": "Int",
+                            "param_ty": [
+                                {
+                                    "Pointer": "Int"
+                                },
+                                "Int"
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f5",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": {
+                                "Pointer": {
+                                    "Struct": "struct2"
+                                }
+                            },
+                            "param_ty": []
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f6",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": {
+                                "Pointer": {
+                                    "Struct": "struct2"
+                                }
+                            },
+                            "param_ty": []
+                        }
+                    }
+                }
+            },
+            {
+                "name": "f7",
+                "typ": {
+                    "Pointer": {
+                        "Function": {
+                            "ret_ty": {
+                                "Pointer": {
+                                    "Struct": "struct1"
+                                }
+                            },
+                            "param_ty": []
                         }
                     }
                 }
@@ -421,6 +518,33 @@
                         "Pointer": {
                             "Pointer": {
                                 "Struct": "struct3"
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id7",
+                    "typ": {
+                        "Struct": "struct4"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id8",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct4"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id9",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "struct4"
                             }
                         }
                     },

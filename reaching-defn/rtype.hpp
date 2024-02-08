@@ -22,15 +22,43 @@ class ReachableType: public Type {
     {
         for (auto it = rset.begin(); it != rset.end(); it++)
         {
-            if ((*it)->type == rtype->type && (*it)->ptr_type == rtype->ptr_type && (*it)->indirection == rtype->indirection)
+            if ((*it)->type == DataType::IntType && (*it)->type == rtype->type && (*it)->ptr_type == rtype->ptr_type && (*it)->indirection == rtype->indirection)
             {
                 return true;
+            }
+            else if ((*it)->type == DataType::FuncType && (*it)->type == rtype->type && (*it)->indirection == rtype->indirection)
+            {
+                FunctionType *f1 = (FunctionType*)(*it)->ptr_type;
+                FunctionType *f2 = (FunctionType*)rtype->ptr_type;
+                if (f1->ret->type == f2->ret->type && f1->ret->indirection == f2->ret->indirection)
+                {
+                    if (f1->ret->type == DataType::StructType)
+                    {
+                        if (((StructType*)f1->ret->ptr_type)->name != ((StructType*)f2->ret->ptr_type)->name)
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (f1->params.size() == f2->params.size())
+                    {
+                        for (int i = 0; i < f1->params.size(); i++)
+                        {
+                            if ((f1->params)[i]->type != (f2->params)[i]->type || 
+                            (f1->params)[i]->indirection != (f2->params)[i]->indirection || 
+                            (f1->params)[i]->ptr_type != (f2->params)[i]->ptr_type)
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
             }
         }
         return false;
     }
 
-    // TODO - This does not handle when struct fields are func pointers
     static void GetReachableType(Program *program, ReachableType *var_type, std::unordered_set<ReachableType*> &rset)
     {
         /*

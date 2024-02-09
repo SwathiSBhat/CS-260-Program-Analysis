@@ -101,10 +101,31 @@ void execute(
                 USE.insert(arith_inst->op2->var);
 
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Arith inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             sigma_prime[arith_inst->lhs->name] = {pp};
@@ -131,10 +152,31 @@ void execute(
                 USE.insert(cmp_inst->op2->var);
 
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Cmp inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             sigma_prime[cmp_inst->lhs->name] = {pp};
@@ -159,10 +201,31 @@ void execute(
                 USE.insert(copy_inst->op->var);
 
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Copy inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             sigma_prime[copy_inst->lhs->name] = {pp};
@@ -187,10 +250,31 @@ void execute(
                 USE.insert(alloc_inst->num->var);
 
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Alloc inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             sigma_prime[alloc_inst->lhs->name] = {pp};
@@ -217,10 +301,31 @@ void execute(
             USE.insert(gep_inst->src);
 
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Gep inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             sigma_prime[gep_inst->lhs->name] = {pp};
@@ -247,10 +352,32 @@ void execute(
             USE.insert(gfp_inst->field);
             
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Gfp inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             sigma_prime[gfp_inst->lhs->name] = {pp};
@@ -303,10 +430,31 @@ void execute(
             }
 
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Load inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             sigma_prime[load_inst->lhs->name] = {pp};
@@ -345,10 +493,31 @@ void execute(
                 USE.insert(store_inst->op->var);
 
             if (execute_final) {
+                /*std::cout << "pp: " << pp << " Store inst " << std::endl;
+                std::cout << "Before joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << "USE: " <<std::endl;
+                for (Variable *v : USE) {
+                    std::cout << "Joining for variable: " << v->name << std::endl;
+                    std::cout << "Sigma prime " << std::endl;
+                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                        std::cout << *it << " ";
+                    }
+                    std::cout << std::endl;
+                }*/
+
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
+
+                /*std::cout << "After joining soln[pp]: " << std::endl;
+                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;*/
             }
 
             for (Variable *v : DEF) {
@@ -415,14 +584,6 @@ void execute(
 
         }
         index += 1;
-        if (execute_final) {
-            std::cout << " Soln final " <<std::endl;
-            std::cout << pp << " -> {";
-            for (auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                std::cout << *it << " ";
-            }
-            std::cout << "}" << std::endl;
-    }
     }
 
     Instruction *terminal_instruction = bb->terminal;
@@ -468,10 +629,31 @@ void execute(
             USE.insert(branch_inst->condition->var);
 
         if (execute_final) {
+            /*std::cout << "pp: " << pp << " Branch inst " << std::endl;
+            std::cout << "Before joining soln[pp]: " << std::endl;
+            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                std::cout << *it << " ";
+            }
+            std::cout << "USE: " <<std::endl;
+            for (Variable *v : USE) {
+                std::cout << "Joining for variable: " << v->name << std::endl;
+                std::cout << "Sigma prime " << std::endl;
+                for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;
+            }*/
+
             for (Variable *v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
                 joinSets(soln[pp], sigma_prime[v->name]);
             }
+
+            /*std::cout << "After joining soln[pp]: " << std::endl;
+            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                std::cout << *it << " ";
+            }
+            std::cout << std::endl;*/
         }
 
         // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
@@ -509,10 +691,31 @@ void execute(
             USE.insert(ret_inst->op->var);
         
         if (execute_final) {
+            /*std::cout << "pp: " << pp << " Ret inst " << std::endl;
+            std::cout << "Before joining soln[pp]: " << std::endl;
+            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                std::cout << *it << " ";
+            }
+            std::cout << "USE: " <<std::endl;
+            for (Variable *v : USE) {
+                std::cout << "Joining for variable: " << v->name << std::endl;
+                std::cout << "Sigma prime " << std::endl;
+                for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
+                    std::cout << *it << " ";
+                }
+                std::cout << std::endl;
+            }*/
+
             for (Variable *v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
                 joinSets(soln[pp], sigma_prime[v->name]);
             }
+
+            /*std::cout << "After joining soln[pp]: " << std::endl;
+            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
+                std::cout << *it << " ";
+            }
+            std::cout << std::endl;*/
         }
     }
     else if ((*terminal_instruction).instrType == InstructionType::CallDirInstrType)
@@ -646,15 +849,8 @@ void execute(
     {
         std::cout << "Unknown terminal instruction type" << std::endl;
     }
-    if (execute_final) {
-            std::cout << " Soln final " <<std::endl;
-            std::cout << pp << " -> {";
-            for (auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                std::cout << *it << " ";
-            }
-            std::cout << "}" << std::endl;
-    }
-    if (!execute_final) {
+    
+    /*if (!execute_final) {
         std::cout << "Sigma prime for bb: " << bb->label << std::endl;
         for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
             std::cout << it->first << " -> {";
@@ -663,7 +859,7 @@ void execute(
             }
             std::cout << "}" << std::endl;
         } 
-    }
+    }*/
     
     return;
 }

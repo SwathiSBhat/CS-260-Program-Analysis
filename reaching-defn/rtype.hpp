@@ -30,6 +30,7 @@ class ReachableType: public Type {
             {
                 FunctionType *f1 = (FunctionType*)(*it)->ptr_type;
                 FunctionType *f2 = (FunctionType*)rtype->ptr_type;
+                
                 if ((f1->ret && !f2->ret) || (!f1->ret && f2->ret))
                 {
                     continue;
@@ -46,16 +47,18 @@ class ReachableType: public Type {
 
                     if (f1->params.size() == f2->params.size())
                     {
+                        bool areParamsEqual = true;
                         for (int i = 0; i < f1->params.size(); i++)
                         {
-                            if ((f1->params)[i]->type != (f2->params)[i]->type || 
-                            (f1->params)[i]->indirection != (f2->params)[i]->indirection || 
-                            (f1->params)[i]->ptr_type != (f2->params)[i]->ptr_type)
+                            if (!isEqualType((f1->params)[i], (f2->params)[i]))
                             {
-                                return false;
+                                areParamsEqual = false;
+                                break;
                             }
                         }
-                        return true;
+                        if (areParamsEqual) {
+                            return true;
+                        }
                     }
                 }
             }

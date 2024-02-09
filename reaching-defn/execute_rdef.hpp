@@ -902,7 +902,7 @@ void execute(
         std::cout << "Unknown terminal instruction type" << std::endl;
     }
     
-    /*if (!execute_final) {
+    if (!execute_final) {
         std::cout << "Sigma prime for bb: " << bb->label << std::endl;
         for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
             std::cout << it->first << " -> {";
@@ -911,7 +911,7 @@ void execute(
             }
             std::cout << "}" << std::endl;
         } 
-    }*/
+    }
     
     return;
 }

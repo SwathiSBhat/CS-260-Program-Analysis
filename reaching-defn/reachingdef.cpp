@@ -172,10 +172,10 @@ public:
 
         // 3. Get reachable types for all ptr typed variables in the function
         get_reachable_types(PTRS, reachable_types, &program);
-        /*std::cout << "Reachable types: " << reachable_types.size() << std::endl;
+        std::cout << "Reachable types: " << reachable_types.size() << std::endl;
         for (auto rtype : reachable_types) {
             rtype->pretty_print();
-        }*/
+        }
         
         // 4. Put all fake variables in the address taken set
         int i=0;
@@ -186,10 +186,10 @@ public:
             i += 1;
         }
 
-        /*std::cout << "Address taken variables: " << addr_taken.size() << std::endl;
+        std::cout << "Address taken variables: " << addr_taken.size() << std::endl;
         for (auto var : addr_taken) {
             var->pretty_print();
-        }*/
+        }
 
         /*
             Setup steps

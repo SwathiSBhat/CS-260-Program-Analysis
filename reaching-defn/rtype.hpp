@@ -30,7 +30,11 @@ class ReachableType: public Type {
             {
                 FunctionType *f1 = (FunctionType*)(*it)->ptr_type;
                 FunctionType *f2 = (FunctionType*)rtype->ptr_type;
-                if (f1->ret->type == f2->ret->type && f1->ret->indirection == f2->ret->indirection)
+                if ((f1->ret && !f2->ret) || (!f1->ret && f2->ret))
+                {
+                    continue;
+                }
+                if ((!f1->ret && !f2->ret) || (f1->ret->type == f2->ret->type && f1->ret->indirection == f2->ret->indirection))
                 {
                     if (f1->ret->type == DataType::StructType)
                     {
@@ -81,6 +85,7 @@ class ReachableType: public Type {
              * and add it to the set
             */
             void* ptr_type = var_type->ptr_type;
+
             if (!(var_type->indirection == 1 && var_type->type == DataType::StructType))
             {
                 if (var_type->indirection == 1)
@@ -89,7 +94,6 @@ class ReachableType: public Type {
                 }
                 ReachableType *rtype = new ReachableType(var_type->type, ptr_type, var_type->indirection - 1);
                 if (!isPresentInSet(rset, rtype)) {
-                    //std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
                     rset.insert(rtype);
                 }
             }
@@ -110,7 +114,6 @@ class ReachableType: public Type {
                 ReachableType *rtype = new ReachableType(new ReachableType((*field)->type->type, (*field)->type->ptr_type, (*field)->type->indirection));
                 if (!isPresentInSet(rset,rtype) && !((*field)->type->type == DataType::StructType))
                 {
-                    //std::cout << "Adding to set: " << rtype->type << " " << rtype->indirection << std::endl;
                     rset.insert(rtype);
                 }
                 GetReachableType(program, new ReachableType((*field)->type->type,  (*field)->type->ptr_type, (*field)->type->indirection), rset);

@@ -7,6 +7,7 @@
 #include <deque>
 #include <unordered_set>
 #include <unordered_map>
+#include "rtype.hpp"
 
 /*
  * Join is a union of the two abstract stores where each abstract store is a map of variable name to a set of pp where they are defined.
@@ -347,9 +348,8 @@ void execute(
              * sigma_prime[x] = { pp }
             */
             DEF.insert(gfp_inst->lhs);
-            // TODO - Confirm this with Ben
             USE.insert(gfp_inst->src);
-            USE.insert(gfp_inst->field);
+            //USE.insert(gfp_inst->field);
             
             if (execute_final) {
                 /*std::cout << "pp: " << pp << " Gfp inst " << std::endl;
@@ -531,7 +531,6 @@ void execute(
             */
             CallExtInstruction *callext_inst = (CallExtInstruction *) inst;
             std::set<Variable*> USE;
-            // TODO: This needs to be updated with pointer information
             /*
              * SDEF = {x} - Strong defs - definitely updating the variable
              * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
@@ -551,14 +550,31 @@ void execute(
                 WDEF.insert((*it)->globalVar);
             }
 
-            /*for (auto v : addr_taken) {
-                if (Type::isReachableType(v, program->globals))
+            // Get reachable types for all globals
+            std::unordered_set<ReachableType*> global_reachable_types;
+            for (auto gl : program->globals) {
+                ReachableType *var_type = new ReachableType(gl->globalVar->type);
+                ReachableType::GetReachableType(program, var_type, global_reachable_types);
+            }
+
+            // Get reachable types for all args
+            std::unordered_set<ReachableType*> args_reachable_types;
+            for (auto arg : callext_inst->args) {
+                if (arg->IsConstInt())
+                    continue;
+                ReachableType *var_type = new ReachableType(arg->var->type);
+                ReachableType::GetReachableType(program, var_type, args_reachable_types);
+            }
+
+            for (auto v : addr_taken) {
+                if (ReachableType::isPresentInSet(global_reachable_types, new ReachableType(v->type)))
                     WDEF.insert(v);
             }
+
             for (auto v : addr_taken) {
-                if (Type::isReachableType(v, callext_inst->args))
+                if (ReachableType::isPresentInSet(args_reachable_types, new ReachableType(v->type)))
                     WDEF.insert(v);
-            }*/
+            }
 
             std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
             
@@ -742,14 +758,32 @@ void execute(
         for (auto it = program->globals.begin(); it != program->globals.end(); it++) {
             WDEF.insert((*it)->globalVar);
         }
-        /*for (auto v : addr_taken) {
-            if (Type::isReachableType(v, program->globals))
-                WDEF.insert(v);
-        }
-        for (auto v : addr_taken) {
-            if (Type::isReachableType(v, callext_inst->args))
-                WDEF.insert(v);
-        }*/
+
+        // Get reachable types for all globals
+            std::unordered_set<ReachableType*> global_reachable_types;
+            for (auto gl : program->globals) {
+                ReachableType *var_type = new ReachableType(gl->globalVar->type);
+                ReachableType::GetReachableType(program, var_type, global_reachable_types);
+            }
+
+            // Get reachable types for all args
+            std::unordered_set<ReachableType*> args_reachable_types;
+            for (auto arg : calldir_inst->args) {
+                if (arg->IsConstInt())
+                    continue;
+                ReachableType *var_type = new ReachableType(arg->var->type);
+                ReachableType::GetReachableType(program, var_type, args_reachable_types);
+            }
+
+            for (auto v : addr_taken) {
+                if (ReachableType::isPresentInSet(global_reachable_types, new ReachableType(v->type)))
+                    WDEF.insert(v);
+            }
+
+            for (auto v : addr_taken) {
+                if (ReachableType::isPresentInSet(args_reachable_types, new ReachableType(v->type)))
+                    WDEF.insert(v);
+            }
 
         // Add WDEF to USE
         std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
@@ -806,14 +840,31 @@ void execute(
         for (auto it = program->globals.begin(); it != program->globals.end(); it++) {
             WDEF.insert((*it)->globalVar);
         }
-        /*for (auto v : addr_taken) {
-            if (Type::isReachableType(v, program->globals))
+        // Get reachable types for all globals
+        std::unordered_set<ReachableType*> global_reachable_types;
+        for (auto gl : program->globals) {
+            ReachableType *var_type = new ReachableType(gl->globalVar->type);
+            ReachableType::GetReachableType(program, var_type, global_reachable_types);
+        }
+
+        // Get reachable types for all args
+        std::unordered_set<ReachableType*> args_reachable_types;
+        for (auto arg : callidir_inst->args) {
+            if (arg->IsConstInt())
+                continue;
+            ReachableType *var_type = new ReachableType(arg->var->type);
+            ReachableType::GetReachableType(program, var_type, args_reachable_types);
+        }
+
+        for (auto v : addr_taken) {
+            if (ReachableType::isPresentInSet(global_reachable_types, new ReachableType(v->type)))
                 WDEF.insert(v);
         }
+
         for (auto v : addr_taken) {
-            if (Type::isReachableType(v, callext_inst->args))
+            if (ReachableType::isPresentInSet(args_reachable_types, new ReachableType(v->type)))
                 WDEF.insert(v);
-        }*/
+        }
 
         std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
 
@@ -821,6 +872,7 @@ void execute(
             if (!arg->IsConstInt())
                 USE.insert(arg->var);
         }
+        USE.insert(callidir_inst->fp);
 
         if (execute_final) {
             for (Variable *v : USE) {

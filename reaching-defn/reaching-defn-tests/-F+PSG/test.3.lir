@@ -1,0 +1,45 @@
+struct st {
+  f1:int
+  f2:&int
+}
+
+g3:&st
+test:&() -> int
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let _lo1:int, _lo2:int, _lo3:int, _t10:int, _t11:&int, _t12:int, _t13:int, _t14:int, _t15:int, _t16:int, _t17:int, _t18:&&int, _t19:&int, _t20:int, _t21:&int, _t22:int, _t23:int, _t24:int, _t25:int, _t26:int, _t4:&int, _t5:int, _t6:int, _t7:int, _t8:int, _t9:int, id0:&int, id1:&int, id10:int, id11:&&int, id2:int, id3:int, id4:&int, id5:&int, id6:&&int, id7:&&int, id8:&&int, id9:int
+entry:
+    $branch 3 bb1 bb2
+bb1:
+    _lo1 = $copy 0
+    $jump bb3
+
+bb2:
+    _lo1 = $copy 1
+    $jump bb3
+
+bb3:
+    $branch _lo1 bb4 bb5
+
+bb4:
+    $store id4 _t8
+    $branch 1 bb6 bb7
+
+bb5:
+    $jump bb8
+
+bb6:
+    $jump bb7
+
+bb7:
+    $jump bb8
+
+bb8:
+    _t22 = $load id5
+    $ret 0
+}

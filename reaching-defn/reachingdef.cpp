@@ -114,6 +114,16 @@ public:
             }
         }
 
+        /*
+         * Add globals to addr-taken since they can be changed from anywhere in the function
+         * Note that this function SHOULD come after the above loop since we need to maintain the scope of the variables
+         * Locals with the same names will be added first and then the globals will be skipped if they have the same name
+        */ 
+        for (auto global_var : program.globals) {
+            if (!isPresentInAddrTaken(addr_taken, global_var->globalVar))
+                addr_taken.insert(global_var->globalVar);
+        }
+
         return; 
     }
 
@@ -172,10 +182,10 @@ public:
 
         // 3. Get reachable types for all ptr typed variables in the function
         get_reachable_types(PTRS, reachable_types, &program);
-        std::cout << "Reachable types: " << reachable_types.size() << std::endl;
+        /*std::cout << "Reachable types: " << reachable_types.size() << std::endl;
         for (auto rtype : reachable_types) {
             rtype->pretty_print();
-        }
+        }*/
         
         // 4. Put all fake variables in the address taken set
         int i=0;
@@ -186,10 +196,10 @@ public:
             i += 1;
         }
 
-        std::cout << "Address taken variables: " << addr_taken.size() << std::endl;
+        /*std::cout << "Address taken variables: " << addr_taken.size() << std::endl;
         for (auto var : addr_taken) {
             var->pretty_print();
-        }
+        }*/
 
         /*
             Setup steps

@@ -72,7 +72,7 @@ class ReachableType: public Type {
              * and add it to the set
             */
             void* ptr_type = var_type->ptr_type;
-            if (!(var_type->type == DataType::StructType))
+            if (!(var_type->indirection == 1 && var_type->type == DataType::StructType))
             {
                 if (var_type->indirection == 1)
                 {

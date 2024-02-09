@@ -412,7 +412,6 @@ void execute(
             std::set<Variable*> DEF;
             std::set<Variable*> USE;
 
-            // TODO : Need to do extra handling for structs here
             /*
              * DEF = {x}
              * USE = {y} U { v in addr_taken | type(v) = type(x) }
@@ -902,7 +901,7 @@ void execute(
         std::cout << "Unknown terminal instruction type" << std::endl;
     }
     
-    if (!execute_final) {
+    /*if (!execute_final) {
         std::cout << "Sigma prime for bb: " << bb->label << std::endl;
         for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
             std::cout << it->first << " -> {";
@@ -911,7 +910,7 @@ void execute(
             }
             std::cout << "}" << std::endl;
         } 
-    }
+    }*/
     
     return;
 }

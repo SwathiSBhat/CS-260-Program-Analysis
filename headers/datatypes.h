@@ -166,6 +166,7 @@ class Type {
             {
                 FunctionType *f1 = (FunctionType*)type1->ptr_type;
                 FunctionType *f2 = (FunctionType*)type2->ptr_type;
+
                 if (f1->ret->type == f2->ret->type && f1->ret->indirection == f2->ret->indirection)
                 {
                     if (f1->ret->type == DataType::StructType)
@@ -178,16 +179,18 @@ class Type {
 
                     if (f1->params.size() == f2->params.size())
                     {
+                        bool areParamsEqual = true;
                         for (int i = 0; i < f1->params.size(); i++)
                         {
-                            if ((f1->params)[i]->type != (f2->params)[i]->type || 
-                            (f1->params)[i]->indirection != (f2->params)[i]->indirection || 
-                            (f1->params)[i]->ptr_type != (f2->params)[i]->ptr_type)
+                            if (!isEqualType((f1->params)[i], (f2->params)[i]))
                             {
-                                return false;
+                                areParamsEqual = false;
+                                break;
                             }
                         }
-                        return true;
+                        if (areParamsEqual) {
+                            return true;
+                        }
                     }
                 }
             }

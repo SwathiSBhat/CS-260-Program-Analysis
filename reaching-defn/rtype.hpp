@@ -55,6 +55,15 @@ class ReachableType: public Type {
                     }
                 }
             }
+            else if ((*it)->type == DataType::StructType && (*it)->type == rtype->type && (*it)->indirection == rtype->indirection)
+            {
+                StructType *s1 = (StructType*)(*it)->ptr_type;
+                StructType *s2 = (StructType*)rtype->ptr_type;
+                if (s1->name == s2->name)
+                {
+                    return true;
+                }
+            }
         }
         return false;
     }

@@ -76,7 +76,6 @@ void execute(
     for (const Instruction *inst : bb->instructions) {
 
         std::string pp = bb->label + "." + std::to_string(index);
-        //std::cout << "pp: " << pp << std::endl;
 
         // arith, cmp, alloc, copy, gep, gfp work the same way
         if ((*inst).instrType == InstructionType::ArithInstrType) {
@@ -102,31 +101,10 @@ void execute(
                 USE.insert(arith_inst->op2->var);
 
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Arith inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
-
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             sigma_prime[arith_inst->lhs->name] = {pp};
@@ -153,31 +131,10 @@ void execute(
                 USE.insert(cmp_inst->op2->var);
 
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Cmp inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
-
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             sigma_prime[cmp_inst->lhs->name] = {pp};
@@ -202,31 +159,10 @@ void execute(
                 USE.insert(copy_inst->op->var);
 
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Copy inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
-
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             sigma_prime[copy_inst->lhs->name] = {pp};
@@ -251,31 +187,11 @@ void execute(
                 USE.insert(alloc_inst->num->var);
 
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Alloc inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
 
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             sigma_prime[alloc_inst->lhs->name] = {pp};
@@ -302,41 +218,16 @@ void execute(
             USE.insert(gep_inst->src);
 
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Gep inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
-
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             sigma_prime[gep_inst->lhs->name] = {pp};
         }
         else if ((*inst).instrType == InstructionType::GfpInstrType)
         {
-            /*
-             * Cast it.
-             */
-            // TODO - Check if gfp and gep require the id of variable types also included
              GfpInstruction *gfp_inst = (GfpInstruction *) inst;
              std::set<Variable*> DEF;
              std::set<Variable*> USE;
@@ -352,32 +243,10 @@ void execute(
             //USE.insert(gfp_inst->field);
             
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Gfp inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
-
-
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             sigma_prime[gfp_inst->lhs->name] = {pp};
@@ -421,7 +290,6 @@ void execute(
             DEF.insert(load_inst->lhs);
             USE.insert(load_inst->src);
 
-            //std::cout << "Load instruction: " << load_inst->lhs->name << " = $load " << load_inst->src->name << std::endl;
             for (auto v : addr_taken) {
                 if (Type::isEqualType(v->type, load_inst->lhs->type)) {
                     USE.insert(v);
@@ -429,45 +297,20 @@ void execute(
             }
 
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Load inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
-
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             sigma_prime[load_inst->lhs->name] = {pp};
         }
         else if ((*inst).instrType == InstructionType::StoreInstrType)
         {
-            /*
-             * Cast it
-            */
             StoreInstruction *store_inst = (StoreInstruction *) inst;
             std::set<Variable*> DEF;
             std::set<Variable*> USE;
 
-            // TODO : Need to do extra handling for structs here
             /*
              * $store x op
              * DEF = { v in addr_taken | type(v) = type(op) }
@@ -492,31 +335,10 @@ void execute(
                 USE.insert(store_inst->op->var);
 
             if (execute_final) {
-                /*std::cout << "pp: " << pp << " Store inst " << std::endl;
-                std::cout << "Before joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << "USE: " <<std::endl;
-                for (Variable *v : USE) {
-                    std::cout << "Joining for variable: " << v->name << std::endl;
-                    std::cout << "Sigma prime " << std::endl;
-                    for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                        std::cout << *it << " ";
-                    }
-                    std::cout << std::endl;
-                }*/
-
                 for (Variable *v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
                     joinSets(soln[pp], sigma_prime[v->name]);
                 }
-
-                /*std::cout << "After joining soln[pp]: " << std::endl;
-                for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;*/
             }
 
             for (Variable *v : DEF) {
@@ -525,9 +347,6 @@ void execute(
         }
         else if ((*inst).instrType == InstructionType::CallExtInstrType)
         {
-            /*
-             * Cast it
-            */
             CallExtInstruction *callext_inst = (CallExtInstruction *) inst;
             std::set<Variable*> USE;
             /*
@@ -604,7 +423,6 @@ void execute(
     Instruction *terminal_instruction = bb->terminal;
 
     std::string pp = bb->label + "." + "term";
-    //std::cout << "pp: " << pp << std::endl;
     
     if ((*terminal_instruction).instrType == InstructionType::JumpInstrType)
     {
@@ -619,7 +437,6 @@ void execute(
         */
 
         // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
-        // TODO - Check if usage of bbs_to_output can be removed
         if (!execute_final) {
             bool store_changed = joinAbsStore(bb2store[jump_inst->label], sigma_prime);
             if (store_changed || bbs_to_output.count(jump_inst->label) == 0) {
@@ -644,46 +461,23 @@ void execute(
             USE.insert(branch_inst->condition->var);
 
         if (execute_final) {
-            /*std::cout << "pp: " << pp << " Branch inst " << std::endl;
-            std::cout << "Before joining soln[pp]: " << std::endl;
-            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                std::cout << *it << " ";
-            }
-            std::cout << "USE: " <<std::endl;
-            for (Variable *v : USE) {
-                std::cout << "Joining for variable: " << v->name << std::endl;
-                std::cout << "Sigma prime " << std::endl;
-                for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;
-            }*/
-
             for (Variable *v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
                 joinSets(soln[pp], sigma_prime[v->name]);
             }
-
-            /*std::cout << "After joining soln[pp]: " << std::endl;
-            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                std::cout << *it << " ";
-            }
-            std::cout << std::endl;*/
         }
 
         // For target basic block, join bb2store[target] with sigma_prime and add target to worklist if changed
-        // TODO - Check if usage of bbs_to_output can be removed
         if (!execute_final) {
             
             bool store_changed_tt = joinAbsStore(bb2store[branch_inst->tt], sigma_prime);
             bool store_changed_ff = joinAbsStore(bb2store[branch_inst->ff], sigma_prime);
-            // std::cout << "Joining for branch true : " << branch_inst->tt << std::endl;
+
             if (store_changed_tt || bbs_to_output.count(branch_inst->tt) == 0) {
                 worklist.push_back(branch_inst->tt);
                 bbs_to_output.insert(branch_inst->tt);
             }
 
-            // std::cout << "Joining for branch false: " << branch_inst->ff << std::endl;
             if (store_changed_ff || bbs_to_output.count(branch_inst->ff) == 0) {
                 worklist.push_back(branch_inst->ff);
                 bbs_to_output.insert(branch_inst->ff);
@@ -706,31 +500,10 @@ void execute(
             USE.insert(ret_inst->op->var);
         
         if (execute_final) {
-            /*std::cout << "pp: " << pp << " Ret inst " << std::endl;
-            std::cout << "Before joining soln[pp]: " << std::endl;
-            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                std::cout << *it << " ";
-            }
-            std::cout << "USE: " <<std::endl;
-            for (Variable *v : USE) {
-                std::cout << "Joining for variable: " << v->name << std::endl;
-                std::cout << "Sigma prime " << std::endl;
-                for (auto it = sigma_prime[v->name].begin(); it != sigma_prime[v->name].end(); it++) {
-                    std::cout << *it << " ";
-                }
-                std::cout << std::endl;
-            }*/
-
             for (Variable *v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
                 joinSets(soln[pp], sigma_prime[v->name]);
             }
-
-            /*std::cout << "After joining soln[pp]: " << std::endl;
-            for(auto it = soln[pp].begin(); it != soln[pp].end(); it++) {
-                std::cout << *it << " ";
-            }
-            std::cout << std::endl;*/
         }
     }
     else if ((*terminal_instruction).instrType == InstructionType::CallDirInstrType)
@@ -738,7 +511,6 @@ void execute(
         CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal_instruction;
 
         std::set<Variable*> USE;
-        // TODO: This needs to be updated with pointer information
         /*
             * SDEF = {x} - Strong defs - definitely updating the variable
             * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
@@ -820,7 +592,6 @@ void execute(
         CallIdrInstruction *callidir_inst = (CallIdrInstruction *) terminal_instruction;
 
         std::set<Variable*> USE;
-        // TODO: This needs to be updated with pointer information
         /*
             * SDEF = {x} - Strong defs - definitely updating the variable
             * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
@@ -900,17 +671,5 @@ void execute(
     {
         std::cout << "Unknown terminal instruction type" << std::endl;
     }
-    
-    /*if (!execute_final) {
-        std::cout << "Sigma prime for bb: " << bb->label << std::endl;
-        for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
-            std::cout << it->first << " -> {";
-            for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-                std::cout << *it2 << " ";
-            }
-            std::cout << "}" << std::endl;
-        } 
-    }*/
-    
     return;
 }

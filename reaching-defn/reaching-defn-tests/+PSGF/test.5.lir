@@ -1,0 +1,48 @@
+struct st1 {
+  f1:int
+  f2:&int
+}
+
+struct st2 {
+  f1:&st1
+}
+
+f1:&(&st2) -> int
+f2:&(int, &int) -> int
+g1:int
+g2:&int
+g3:&st1
+g4:&st2
+test:&() -> int
+
+extern e1:(&st1) -> int
+extern e2:(int) -> int
+
+fn f1(p:&st2) -> int {
+entry:
+  $ret 0
+}
+
+fn f2(p:int, q:&int) -> int {
+entry:
+  $ret 0
+}
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let _lo1:int, _lo2:int, _lo3:int, _t10:int, _t100:int, _t101:int, _t102:int, _t103:int, _t104:&int, _t105:int, _t106:&&st2, _t107:&st2, _t108:int, _t109:&&int, _t11:&int, _t110:&int, _t111:int, _t112:int, _t113:int, _t114:int, _t115:&int, _t116:int, _t117:int, _t118:int, _t119:&&st1, _t12:int, _t120:&st1, _t121:int, _t122:&&int, _t123:&int, _t124:int, _t13:int, _t14:int, _t15:&&int, _t16:&int, _t17:&int, _t18:&&int, _t19:&&() -> int, _t20:&&&st2, _t21:&&&st2, _t22:&&st2, _t23:&int, _t24:int, _t25:&&st2, _t26:&st2, _t27:&&st2, _t28:&st2, _t29:&&() -> int, _t30:int, _t31:&() -> int, _t32:int, _t33:&&st1, _t34:&st1, _t35:&int, _t36:int, _t37:int, _t38:&&int, _t39:&int, _t4:&&&st1, _t40:int, _t41:int, _t42:&int, _t43:int, _t44:int, _t45:int, _t46:int, _t47:&&int, _t48:&int, _t49:&int, _t5:&&st1, _t50:int, _t51:int, _t52:&(&st2) -> int, _t53:&&int, _t54:int, _t55:&int, _t56:int, _t57:int, _t58:int, _t59:int, _t6:&st1, _t60:int, _t61:int, _t62:&int, _t63:int, _t64:int, _t65:int, _t66:int, _t67:&int, _t68:int, _t69:&&st2, _t7:&&st1, _t70:&st2, _t71:&&st1, _t72:&st1, _t73:&int, _t74:int, _t75:&&int, _t76:&int, _t77:int, _t78:int, _t79:&&int, _t8:int, _t80:&int, _t81:int, _t82:&int, _t83:int, _t84:int, _t85:int, _t86:&&&int, _t87:&&int, _t88:&&int, _t89:&int, _t9:&&(&st2) -> int, _t90:&int, _t91:&&() -> int, _t92:&() -> int, _t93:int, _t94:&&int, _t95:&int, _t96:&int, _t97:int, _t98:&&() -> int, _t99:&() -> int, id0:&&() -> int, id1:&st1, id10:&int, id11:int, id12:int, id13:&&int, id14:&&(&st2) -> int, id15:&&(&st2) -> int, id16:&st2, id17:&int, id18:&int, id19:&&int, id2:&&&st1, id20:&&&int, id21:&() -> int, id22:&st1, id23:&st1, id24:&&st2, id25:&&st2, id26:&(int, &int) -> int, id27:&&&int, id28:&&() -> int, id29:&&st2, id3:int, id30:&st2, id31:&st2, id32:&&st2, id33:&&&st2, id34:&&st2, id35:&(int, &int) -> int, id36:&() -> int, id37:&st2, id4:&&st1, id5:&st1, id6:&() -> int, id7:int, id8:&(int, &int) -> int, id9:&int
+
+bb1:
+  $ret 0
+
+entry:
+  id5 = $copy id1
+  _t7 = $addrof id5
+  _t13 = $cmp gt id7 _t12
+  _t14 = $call_ext e2(_t13)
+  $jump bb1
+}

@@ -80,9 +80,6 @@ public:
      * Get all address taken local variable + function parameters + global variables
     */
     void get_addr_taken(std::unordered_set<Variable*> &addr_taken) {  
-        //program.funcs[func_name]->bbs["entry"]->pretty_print(json::parse("{\"structs\": \"false\",\"globals\": \"false\",\"functions\": {\"bbs\": {\"instructions\" : \"true\"}},\"externs\": \"false\"}"));
-        
-        // TODO: Handle scenario where there are variables with same name in different scopes
         for (auto basic_block : program.funcs[funcname]->bbs) {
             for (auto instruction = basic_block.second->instructions.begin(); instruction != basic_block.second->instructions.end(); ++instruction) {
                 if ((*instruction)->instrType == InstructionType::AddrofInstrType) {
@@ -135,7 +132,7 @@ public:
             std::string a2 = a.substr(a.rfind(".") + 1);
             std::string b1 = b.substr(0, b.rfind("."));
             std::string b2 = b.substr(b.rfind(".") + 1);
-            // std::cout << "a1: " << a1 << " a2: " << a2 << " b1: " << b1 << " b2: " << b2 << std::endl;
+
             if (a1 == b1) {
                 if (a2 != "term" && b2 != "term")
                     return std::stoi(a2) < std::stoi(b2);
@@ -165,7 +162,6 @@ public:
 
         // data structures required for prep stage
         std::unordered_set<Variable*> addr_taken; // contains all variables that are address taken i.e addrof is used on them
-        // TODO: This can be converted to an unordered set of type ReachableType with it's own hash function. Need to figure out how to do it
         std::unordered_set<ReachableType*> reachable_types; // reachable data types from all pointers in the function
         
         // Prep steps:
@@ -175,17 +171,9 @@ public:
         
         // 2. Compute reachable types from all pointers in the function
         std::unordered_set<Variable*> PTRS = get_ptrs(); // Get all pointer typed globals, parameters, locals of the function
-        /*std::cout << "PTRS: " << std::endl;
-        for (auto ptr : PTRS) {
-            std::cout << "PTR: " << ptr->name << std::endl;
-        }*/
 
         // 3. Get reachable types for all ptr typed variables in the function
         get_reachable_types(PTRS, reachable_types, &program);
-        /*std::cout << "Reachable types: " << reachable_types.size() << std::endl;
-        for (auto rtype : reachable_types) {
-            rtype->pretty_print();
-        }*/
         
         // 4. Put all fake variables in the address taken set
         int i=0;
@@ -195,11 +183,6 @@ public:
             addr_taken.insert(new Variable("fake_var_" + std::to_string(i), (Type*) faketype));
             i += 1;
         }
-
-        /*std::cout << "Address taken variables: " << addr_taken.size() << std::endl;
-        for (auto var : addr_taken) {
-            var->pretty_print();
-        }*/
 
         /*
             Setup steps
@@ -233,12 +216,9 @@ public:
                     soln
                     );
 
-            //std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {
-                //std::cout << i << " ";
                 bbs_to_output.insert(i);
             }
-            //std::cout << std::endl;
         }
 
         /*

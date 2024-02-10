@@ -223,15 +223,6 @@ public:
             worklist.pop_front();
 
             // Perform the transfer function on the current basic block
-            /*std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
-            for (auto def : bb2store[current_bb]) {
-                std::cout << def.first << " -> {";
-                for(auto def : def.second)
-                {
-                    std::cout << def << ",";
-                }
-                std::cout << "}" << std::endl;
-            }*/
             
             execute(&program,
                     func->bbs[current_bb],
@@ -241,16 +232,6 @@ public:
                     bbs_to_output,
                     soln
                     );
-
-            /*std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
-            for (auto def : bb2store[current_bb]) {
-                std::cout << def.first << " -> {";
-                for(auto def : def.second)
-                {
-                    std::cout << def << ",";
-                }
-                std::cout << "}" << std::endl;
-            }*/
 
             //std::cout << "This is the worklist now:" << std::endl;
             for (const auto &i: worklist) {

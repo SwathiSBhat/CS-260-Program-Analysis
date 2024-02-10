@@ -115,7 +115,7 @@ class ReachableType: public Type {
             for (auto field = program->structs[struct_name]->fields.begin(); field != program->structs[struct_name]->fields.end(); field++)
             {
                 ReachableType *rtype = new ReachableType(new ReachableType((*field)->type->type, (*field)->type->ptr_type, (*field)->type->indirection));
-                if (!isPresentInSet(rset,rtype) && !((*field)->type->type == DataType::StructType))
+                if (!isPresentInSet(rset,rtype) && !((*field)->type->type == DataType::StructType && (*field)->type->indirection == 0))
                 {
                     rset.insert(rtype);
                 }

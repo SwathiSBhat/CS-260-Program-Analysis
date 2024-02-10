@@ -57,13 +57,6 @@ public:
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
             worklist.pop_front();
-
-            // Perform the transfer function on the current basic block
-            /*std::cout << "Abstract store of " << current_bb << " before transfer function: " << std::endl;
-            for(auto &it: bb2store[current_bb]) {
-                std::cout << it << " ";
-            }
-            std::cout << std::endl;*/
             
             std::set<std::string> sigma_prime = bb2store[current_bb];
             sigma_prime.insert(current_bb);
@@ -136,29 +129,9 @@ public:
                     worklist.push_back(call_idr_inst->next_bb);
                 }
             }
-
-            /*std::cout << "Abstract store of " << current_bb << " after transfer function: " << std::endl;
-            for(auto &it: sigma_prime) {
-                std::cout << it << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "This is the worklist now:" << std::endl;
-            for (const auto &i: worklist) {
-                std::cout << i << " ";
-            }
-            std::cout << std::endl;*/
         }
 
-        /* Print out bb2store which now gives the dominators without reflexive behavior i.e we need to add the curr bb ourself to bb2store */
-        /*for (const auto &it : bb2store) {
-            std::cout << it.first << " -> {";
-            for(auto &it2: it.second) {
-                std::cout << it2 << ", ";
-            }
-            std::cout << "}" << std::endl;
-        }*/
-
+        /* BB2store now gives the dominators without reflexive behavior i.e we need to add the curr bb ourself to bb2store */
         // Add the current basic block to the dominator set
         for (const auto &[bb, doms] : bb2store) {
             bb2store[bb].insert(bb);
@@ -214,7 +187,6 @@ public:
         /*
         * The solution is the contents of dominance_frontier
         */
-        // std::cout << "Dominance frontier: " << std::endl;
         for (const auto &[bb, doms] : dominance_frontier) {
             std::cout << bb << " -> {";
             for(auto it = doms.begin(); it != doms.end(); it++) {

@@ -157,16 +157,6 @@ public:
 
         std::map<std::string, std::set<std::string>> cfg_preds = get_predecessors(program.funcs[funcname]);
 
-        /* Print CFG predecessors */
-        /*std::cout << "CFG predecessors: " << std::endl;
-        for (const auto &[bb, preds] : cfg_preds) {
-            std::cout << bb << " -> {";
-            for(auto &it: preds) {
-                std::cout << it << ", ";
-            }
-            std::cout << "}" << std::endl;
-        }*/
-
         for (const auto &[bb, bb_doms] : bb2store) {
 
             std::set<std::string> strict_bb_doms = bb_doms;

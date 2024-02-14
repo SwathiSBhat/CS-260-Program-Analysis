@@ -14,21 +14,21 @@ ADD_EXECUTABLE(assn0
 #	headers/abstract_store.hpp
 #)
 
-ADD_EXECUTABLE(assn1_constant_analysis
-	constant-analysis/constant_analysis.cpp
-    headers/abstract_store.hpp
-    headers/datatypes.h
-	headers/execute.hpp
-)
+#ADD_EXECUTABLE(assn1_constant_analysis
+#	constant-analysis/constant_analysis.cpp
+#    headers/abstract_store.hpp
+#    headers/datatypes.h
+#	headers/execute.hpp
+#)
 
-ADD_EXECUTABLE(assn1_interval_analysis
+#ADD_EXECUTABLE(assn1_interval_analysis
 	#interval-analysis/interval_analysis.cpp
-	interval-analysis/new_interval_analysis.cpp
-	interval-analysis/interval_analysis.hpp
-	interval-analysis/alpha.hpp
-	interval-analysis/interval_execute.hpp
-	headers/datatypes.h
-)
+#	interval-analysis/new_interval_analysis.cpp
+#	interval-analysis/interval_analysis.hpp
+#	interval-analysis/alpha.hpp
+#	interval-analysis/interval_execute.hpp
+#	headers/datatypes.h
+#)
 
 ADD_EXECUTABLE(assn2_reaching_defs
 	reaching-definitions/reaching_definitions.cpp
@@ -41,12 +41,19 @@ ADD_EXECUTABLE(assn2_control_flow_analysis
 	headers/datatypes.h
 )
 
-ADD_EXECUTABLE(test_interval_join
-	interval-analysis/test_interval_join.cpp
-	interval-analysis/interval_analysis.hpp
+ADD_EXECUTABLE(assn2_reaching_def
+	reaching-defn/reachingdef.cpp
+	reaching-defn/rtype.hpp
+	reaching-defn/execute_rdef.hpp
+	headers/datatypes.h
 )
 
-ADD_EXECUTABLE(test_widen
-	interval-analysis/test_widen.cpp
-	interval-analysis/interval_analysis.hpp
-)
+#ADD_EXECUTABLE(test_interval_join
+#	interval-analysis/test_interval_join.cpp
+#	interval-analysis/interval_analysis.hpp
+#)
+
+#ADD_EXECUTABLE(test_widen
+#	interval-analysis/test_widen.cpp
+#	interval-analysis/interval_analysis.hpp
+#)

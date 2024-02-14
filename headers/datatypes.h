@@ -106,6 +106,8 @@ class Type {
                 }
                 std::string name;
         };
+
+        Type() {};
         
         Type(json type_json) : indirection(0) {
             // TODO : Need to check if any other types are defined this way
@@ -151,6 +153,57 @@ class Type {
             }
             else std::cout << "Error: Type not found" << std::endl;
         };
+
+        static bool isEqualType(Type* type1, Type *type2)
+        {
+            if (type1->type != type2->type)
+                return false;
+            else if (type1->type == DataType::IntType && 
+            type1->indirection == type2->indirection && 
+            type1->ptr_type == type2->ptr_type)
+                return true; 
+            else if (type1->type == DataType::FuncType && type1->indirection == type2->indirection)
+            {
+                FunctionType *f1 = (FunctionType*)type1->ptr_type;
+                FunctionType *f2 = (FunctionType*)type2->ptr_type;
+
+                if (f1->ret->type == f2->ret->type && f1->ret->indirection == f2->ret->indirection)
+                {
+                    if (f1->ret->type == DataType::StructType)
+                    {
+                        if (((StructType*)f1->ret->ptr_type)->name != ((StructType*)f2->ret->ptr_type)->name)
+                        {
+                            return false;
+                        }
+                    }
+
+                    if (f1->params.size() == f2->params.size())
+                    {
+                        bool areParamsEqual = true;
+                        for (int i = 0; i < f1->params.size(); i++)
+                        {
+                            if (!isEqualType((f1->params)[i], (f2->params)[i]))
+                            {
+                                areParamsEqual = false;
+                                break;
+                            }
+                        }
+                        if (areParamsEqual) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            else if (type1->type == DataType::StructType && type1->indirection == type2->indirection)
+            {
+                if (((StructType*)type1->ptr_type)->name != ((StructType*)type2->ptr_type)->name)
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
 
         void pretty_print()
         {
@@ -1118,7 +1171,6 @@ class Program {
                     Struct *st = new Struct(st_val);
                     structs[st_key] = st;
                     structs[st_key]->name = st_key;
-                    //structs[st_key]->pretty_print();
                 }
             }
             if (program_json["globals"] != nullptr) {

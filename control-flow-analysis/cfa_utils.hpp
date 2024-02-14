@@ -26,22 +26,8 @@ Joining a with b will result in the set intersection being stored in a and the r
 */
 bool join(std::set<std::string> &a, std::set<std::string> &b) {
     int initial_size = a.size();
-    /*std::cout << "Joining: " << std::endl;
-    for(auto &it: a) {
-        std::cout << it << " ";
-    }
-    std::cout << std::endl;
-    for(auto &it: b) {
-        std::cout << it << " ";
-    }
-    std::cout << std::endl;*/
     std::set<std::string> result;
     std::set_intersection(a.begin(), a.end(), b.begin(), b.end(), std::inserter(result, result.begin()));
-    /*std::cout << "Result: " << std::endl;
-    for(auto &it: result) {
-        std::cout << it << " ";
-    }
-    std::cout << std::endl;*/
     a = result;
     return result.size() != initial_size;
 }

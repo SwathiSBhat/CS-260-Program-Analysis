@@ -1,0 +1,2223 @@
+{
+    "structs": {
+        "st": [
+            {
+                "name": "f1",
+                "typ": "Int"
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": "Int"
+                }
+            }
+        ]
+    },
+    "globals": [
+        {
+            "name": "test",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": "Int",
+                        "param_ty": []
+                    }
+                }
+            },
+            "scope": null
+        }
+    ],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "test": {
+            "id": "test",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "_lo1",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo2",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo3",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t10",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "st"
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t11",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "st"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t12",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t13",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t14",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t15",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t16",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t17",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t18",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t19",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t20",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t21",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t22",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t23",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t24",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t25",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t26",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t27",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t28",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t29",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t30",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t31",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t32",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "st"
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t33",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t34",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": {
+                                    "Struct": "st"
+                                }
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t35",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "st"
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t36",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t37",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t38",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t39",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "st"
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t40",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t41",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t42",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "st"
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t43",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "st"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t44",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t45",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t46",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t47",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t48",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t49",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t5",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "st"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t50",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t51",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t6",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t7",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t8",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t9",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id0",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id1",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "st"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id10",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": {
+                                    "Struct": "st"
+                                }
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id11",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id12",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id13",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id14",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "st"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id2",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "st"
+                            }
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id4",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id5",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id6",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id7",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id8",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id9",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_lo1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb5",
+                            "ff": "bb6"
+                        }
+                    }
+                },
+                "bb10": {
+                    "id": "bb10",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb13"
+                    }
+                },
+                "bb11": {
+                    "id": "bb11",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb10"
+                    }
+                },
+                "bb12": {
+                    "id": "bb12",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb10"
+                    }
+                },
+                "bb13": {
+                    "id": "bb13",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_lo3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb14",
+                            "ff": "bb15"
+                        }
+                    }
+                },
+                "bb14": {
+                    "id": "bb14",
+                    "insts": [
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t16",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id4",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t17",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "rhs": {
+                                    "name": "id5",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t18",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t17",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t19",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t16",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t18",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t15",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id3",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t19",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t20",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "rhs": {
+                                    "name": "id6",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t21",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t20",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "_t15",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t21",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t22",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "rhs": {
+                                    "name": "id6",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t23",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t22",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t24",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "GreaterEq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "id6",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t23",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t25",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id9",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t24",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t26",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t25",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Gfp": {
+                                "lhs": {
+                                    "name": "_t27",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id1",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "field": {
+                                    "name": "f2",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t28",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t27",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t29",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t26",
+                                        "typ": {
+                                            "Pointer": "Int"
+                                        },
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t28",
+                                        "typ": {
+                                            "Pointer": "Int"
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id8",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t29",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Gfp": {
+                                "lhs": {
+                                    "name": "_t30",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id1",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "field": {
+                                    "name": "f1",
+                                    "typ": "Int"
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t31",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 10
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "_t30",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t31",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t33",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 9
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t32",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id2",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t33",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t34",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Pointer": {
+                                                    "Struct": "st"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id10",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Pointer": {
+                                                    "Struct": "st"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "id7",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t35",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t34",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Pointer": {
+                                                    "Struct": "st"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t36",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id3",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t37",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id11",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t36",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t38",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t37",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t39",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "id6",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t40",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t38",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t39",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t41",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t40",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t42",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t35",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t41",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t43",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t42",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "_t32",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t43",
+                                        "typ": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id0",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id5",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t44",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 6
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t44",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb17",
+                            "ff": "bb18"
+                        }
+                    }
+                },
+                "bb15": {
+                    "id": "bb15",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb7"
+                    }
+                },
+                "bb16": {
+                    "id": "bb16",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb13"
+                    }
+                },
+                "bb17": {
+                    "id": "bb17",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb16"
+                    }
+                },
+                "bb18": {
+                    "id": "bb18",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo3",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb16"
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                },
+                "bb3": {
+                    "id": "bb3",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                },
+                "bb4": {
+                    "id": "bb4",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id0",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_lo2",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb7"
+                    }
+                },
+                "bb5": {
+                    "id": "bb5",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb4"
+                    }
+                },
+                "bb6": {
+                    "id": "bb6",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb4"
+                    }
+                },
+                "bb7": {
+                    "id": "bb7",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t8",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 4
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t9",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "GreaterEq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t8",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 9
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t10",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id2",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t9",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t11",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t10",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Gfp": {
+                                "lhs": {
+                                    "name": "_t12",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t11",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "field": {
+                                    "name": "f1",
+                                    "typ": "Int"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t13",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t12",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t13",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb8",
+                            "ff": "bb9"
+                        }
+                    }
+                },
+                "bb8": {
+                    "id": "bb8",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t14",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 6
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t14",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb11",
+                            "ff": "bb12"
+                        }
+                    }
+                },
+                "bb9": {
+                    "id": "bb9",
+                    "insts": [
+                        {
+                            "Gfp": {
+                                "lhs": {
+                                    "name": "_t46",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id14",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "field": {
+                                    "name": "f1",
+                                    "typ": "Int"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t47",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t46",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t48",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "rop": "Neq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "id8",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t47",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t45",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id12",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "_t48",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Alloc": {
+                                "lhs": {
+                                    "name": "_t49",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "num": {
+                                    "CInt": 1
+                                },
+                                "id": {
+                                    "name": "_alloc1",
+                                    "typ": "Int",
+                                    "scope": null
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "_t45",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t49",
+                                        "typ": {
+                                            "Pointer": "Int"
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t50",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "rhs": {
+                                    "name": "id7",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t51",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t50",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "_t51",
+                                "typ": "Int",
+                                "scope": "test"
+                            }
+                        }
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "_t4",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id2",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "id0",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t5",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t4",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        }
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id1",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t5",
+                                        "typ": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id4",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id3",
+                                        "typ": {
+                                            "Pointer": "Int"
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id3",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id4",
+                                        "typ": {
+                                            "Pointer": "Int"
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id5",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id5",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id6",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id7",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id8",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id11",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id11",
+                                        "typ": {
+                                            "Pointer": {
+                                                "Pointer": "Int"
+                                            }
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id13",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id11",
+                                        "typ": {
+                                            "Pointer": {
+                                                "Pointer": "Int"
+                                            }
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id12",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id13",
+                                        "typ": {
+                                            "Pointer": {
+                                                "Pointer": "Int"
+                                            }
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "id14",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "id1",
+                                        "typ": {
+                                            "Pointer": {
+                                                "Struct": "st"
+                                            }
+                                        },
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Gfp": {
+                                "lhs": {
+                                    "name": "_t6",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id1",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "st"
+                                        }
+                                    },
+                                    "scope": "test"
+                                },
+                                "field": {
+                                    "name": "f1",
+                                    "typ": "Int"
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t7",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "_t6",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "_t7",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                }
+                            },
+                            "tt": "bb2",
+                            "ff": "bb3"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

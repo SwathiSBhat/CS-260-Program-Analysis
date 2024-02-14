@@ -1,0 +1,28 @@
+fn main() -> int {
+        entry:
+        $ret 0
+}
+
+fn test(p:int, q:&int) -> int {
+        let a:int, b:int, c:&int, _t1:int, _t2:int, _t3:int, _t4:int
+        entry:
+        _t1 = $load q
+        a = $arith sub p _t1
+        b = $copy a
+        c = $addrof b
+        $jump while.hdr
+
+        while.hdr:
+        _t2 = $cmp lt a p
+        $branch _t2 while.body exit
+
+        while.body:
+        _t3 = $arith add b a
+        $store c _t3
+        a = $arith add a 1
+        $jump while.hdr
+
+        exit:
+        _t4 = $load c
+        $ret _t4
+}

@@ -1,0 +1,13 @@
+fn main() -> int {
+    entry:
+    $ret 0
+}
+
+fn test() -> _ {
+    let id3:&int, _t19:int, _t15:&int, id1:&int, id2:int
+    entry:
+    id3 = $copy id1
+    _t19 = $copy id2
+    _t15 = $gep id3 _t19
+    $ret
+}

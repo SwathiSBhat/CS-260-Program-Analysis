@@ -52,3 +52,7 @@ ADD_EXECUTABLE(assn2_reaching_def
 #	interval-analysis/test_widen.cpp
 #	interval-analysis/interval_analysis.hpp
 #)
+
+ADD_EXECUTABLE(assn3-constraint-generator
+		constraint-generator/constraint-generator.cpp
+)

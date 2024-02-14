@@ -30,11 +30,6 @@ ADD_EXECUTABLE(assn0
 #	headers/datatypes.h
 #)
 
-ADD_EXECUTABLE(assn2_reaching_defs
-	reaching-definitions/reaching_definitions.cpp
-	reaching-definitions/reaching_definitions.hpp
-)
-
 ADD_EXECUTABLE(assn2_control_flow_analysis
 	control-flow-analysis/control_flow_analysis.cpp
 	control-flow-analysis/cfa_utils.hpp

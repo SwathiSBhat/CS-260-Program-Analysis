@@ -22,7 +22,8 @@ std::deque<Node*> worklist;
 * 3. Any other edge is a successor edge
 */
 void AddEdge(Node* lhs, Node* rhs) {
-    if (lhs->IsConstructor() && rhs->IsConstructor() && lhs->Name() == rhs->Name())
+    if (((lhs->IsConstructor() && rhs->IsConstructor()) || (lhs->IsLam() && rhs->IsLam())) 
+        && lhs->Name() == rhs->Name())
     {
         if (lhs->Name() == "ref")
         {
@@ -32,18 +33,30 @@ void AddEdge(Node* lhs, Node* rhs) {
                 AddEdge(std::get<Node*>(lhs->CallArgs().at(1)), std::get<Node*>(rhs->CallArgs().at(1)));
             }
         }
-        // TODO - Need to handle lam constructor call case
-        // Map for ref can be removed
-        // TODO: Args should also be of type Node* 
-        /*for(int i = 0; i < cons->Arity(); i++) {
-        if(!cons->IsContraPos(i)) {
-            AddEdge(lhs->CallArgs().at(i), rhs->CallArgs().at(i));
-        } else {
-            AddEdge(rhs->CallArgs().at(i), lhs->CallArgs().at(i));
+        else if (lhs->Name() == "lam_")
+        {
+            int start_idx = 2;
+            // If ret value is present, all arguments from index 2 are contravariant, else all arguments from index 1 are contravariant
+            if (!lhs->HasRetVal())
+                start_idx = 1;
+            else
+            {
+                if (std::holds_alternative<Node*>(lhs->GetArgAt(1)) && std::holds_alternative<Node*>(rhs->GetArgAt(1)))
+                {
+                    AddEdge(std::get<Node*>(lhs->CallArgs().at(1)), std::get<Node*>(rhs->CallArgs().at(1)));
+                }
+            }
+
+            for (int i = start_idx; i < lhs->CallArgs().size(); i++)
+            {
+                if (std::holds_alternative<Node*>(lhs->GetArgAt(i)) && std::holds_alternative<Node*>(rhs->GetArgAt(i)))
+                {
+                    AddEdge(std::get<Node*>(rhs->CallArgs().at(i)), std::get<Node*>(lhs->CallArgs().at(i)));
+                }
+            }
         }
-        }*/
     }
-    else if (lhs->IsConstructor() || rhs->IsProjection())
+    else if ((lhs->IsConstructor() || lhs->IsLam()) || rhs->IsProjection())
     {
         if (!rhs->HasPredecessor(lhs))
         {
@@ -119,6 +132,47 @@ Node* parseExpression(vector<string>& tokens) {
         // Add projection reference to set variable whose projection it is
         get_sv(sv_name)->proj_sv_refs.insert(proj);
         return proj;
+    }
+    else if (type == "lam_") {
+        util::Tokenizer::ConsumeToken(tokens, "[");
+        util::Tokenizer::ConsumeToken(tokens, "(");
+
+        std::vector<std::string> param_types;
+        while(tokens.back() != ")") {
+            std::string param_type = util::Tokenizer::Consume(tokens);
+            param_types.push_back(param_type);
+            if (tokens.back() != ")") {
+                util::Tokenizer::ConsumeToken(tokens, ",");
+            }
+        }
+        util::Tokenizer::ConsumeToken(tokens, ")");
+        util::Tokenizer::ConsumeToken(tokens, "->");
+
+        std::string retval_type = util::Tokenizer::Consume(tokens);
+
+        util::Tokenizer::ConsumeToken(tokens, "]");
+        util::Tokenizer::ConsumeToken(tokens, "(");
+
+        std::vector<std::variant<std::string, Node*>> args;
+        int i = 0;
+        while(tokens.back() != ")") {
+            std::string arg = util::Tokenizer::Consume(tokens);
+
+            if (tokens.back() != ")") {
+                util::Tokenizer::ConsumeToken(tokens, ",");
+            }
+            
+            // Push string to arg only for function name which is the first argument, the rest will be set variables
+            if (i == 0)
+                args.push_back(arg);
+            else
+                args.push_back(get_sv(arg));
+        }
+        util::Tokenizer::ConsumeToken(tokens, ")");
+
+        // TODO - Need to handle lam constructors of different types
+        Node *lam = new Node("lam_", args, retval_type, param_types);
+        return lam;
     }
     else {
         std::string sv_name = type;
@@ -196,8 +250,7 @@ int main(int argc, char* argv[]) {
     std::ifstream f(argv[1]);
     std::string input_str(std::istreambuf_iterator<char>{f}, {});
     // The input tokenizer to parse the input string.
-    // TODO - This needs to handle delimiters for lam constructors
-    util::Tokenizer tk(input_str, {' '}, {"(", ")", "<=", ","}, {});
+    util::Tokenizer tk(input_str, {' '}, {"(", ")", "<=", ",", "->", "[", "]"}, {});
     vector<string> tokens = tk.Tokens();
 
     while(!tokens.empty()) {
@@ -218,7 +271,7 @@ int main(int argc, char* argv[]) {
     std::map<std::string, std::set<std::string>> solution;
     for (auto const& [name, node] : set_var_map) {
         for (auto pred : node->predecessor_nodes) {
-            if (pred->IsConstructor()) {
+            if (pred->IsConstructor() || pred->IsLam()) {
                 if (std::holds_alternative<std::string>(pred->GetArgAt(0))) {
                     std::string arg_name = std::get<std::string>(pred->GetArgAt(0));
                     solution[name].insert(arg_name);

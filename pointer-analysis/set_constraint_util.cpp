@@ -15,7 +15,8 @@
 enum NodeType {
     SET_VAR,
     CONSTRUCTOR,
-    PROJECTION
+    PROJECTION,
+    LAM
 };
 
 /*
@@ -57,6 +58,16 @@ class Node {
         type = NodeType::PROJECTION;
     }
 
+    Node(const std::string name, const std::vector<std::variant<std::string, Node*>> args, const std::string ret_type, const std::vector<std::string> param_types) :
+    name(name), args(args), ret_type(ret_type), param_types(param_types) {
+        type = NodeType::LAM;
+        // If the return type is a pointer, argument at index 1 = return value which is covariant, else all arguments from index 1 are contravariant
+        if (ret_type[0] == '&')
+            does_ret_val = true;
+        else
+            does_ret_val = false;
+    }
+
     const std::string Name() const { return name; }
     std::vector<std::variant<std::string, Node*>> CallArgs() { return args; }
     std::variant<std::string, Node*> GetArgAt(int pos) { return args.at(pos); }
@@ -66,6 +77,7 @@ class Node {
     const bool IsSetVar() const { return type == NodeType::SET_VAR; }
     const bool IsConstructor() const { return type == NodeType::CONSTRUCTOR; }
     const bool IsProjection() const { return type == NodeType::PROJECTION; }
+    const bool IsLam() const { return type == NodeType::LAM; }
 
     const bool HasPredecessor(Node* node) {
         return predecessor_nodes.find(node) != predecessor_nodes.end();
@@ -74,11 +86,15 @@ class Node {
         return successor_nodes.find(node) != successor_nodes.end();
     }
 
+    const bool HasRetVal() const { return does_ret_val; }
+
     private:
     NodeType type;
     std::string name;
     std::vector<std::variant<std::string, Node*>> args;
     std::string proj_sv_;
     int proj_idx_;
-
+    std::string ret_type;
+    std::vector<std::string> param_types;
+    bool does_ret_val;
 };

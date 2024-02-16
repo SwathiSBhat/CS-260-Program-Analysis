@@ -2,6 +2,7 @@
 #include<string>
 #include<vector>
 #include<set>
+#include<variant>
 /*
 * Defining set constraint language
 * x = set variable 
@@ -48,7 +49,7 @@ class Node {
         type = NodeType::SET_VAR;
     }
 
-    Node(const std::string name, const std::vector<std::string> args) : name(name), args(args) {
+    Node(const std::string name, const std::vector<std::variant<std::string, Node*>> args) : name(name), args(args) {
         type = NodeType::CONSTRUCTOR;
     }
 
@@ -57,8 +58,8 @@ class Node {
     }
 
     const std::string Name() const { return name; }
-    std::vector<std::string> CallArgs() { return args; }
-    std::string GetArgAt(int pos) { return args.at(pos); }
+    std::vector<std::variant<std::string, Node*>> CallArgs() { return args; }
+    std::variant<std::string, Node*> GetArgAt(int pos) { return args.at(pos); }
     const std::string ProjSV() const { return proj_sv_; }
     const int ProjIdx() const { return proj_idx_; }
 
@@ -76,7 +77,7 @@ class Node {
     private:
     NodeType type;
     std::string name;
-    std::vector<std::string> args;
+    std::vector<std::variant<std::string, Node*>> args;
     std::string proj_sv_;
     int proj_idx_;
 

@@ -4,6 +4,8 @@
 #include "./set_constraint_util.cpp"
 #include <map>
 #include <queue>
+#include<variant>
+
 
 std::map<std::string, Node*> set_var_map;
 std::map<std::string, Node*> constructor_map;
@@ -22,7 +24,15 @@ std::deque<Node*> worklist;
 void AddEdge(Node* lhs, Node* rhs) {
     if (lhs->IsConstructor() && rhs->IsConstructor() && lhs->Name() == rhs->Name())
     {
-        // TODO - Need to handle contravariant positions and store constructors in Constructor class. Maintain a map for that too.
+        if (lhs->Name() == "ref")
+        {
+            // Add edge between second argument which is a set variable. This argument is covariant so the edge will be from lhs -> rhs
+            if (std::holds_alternative<Node*>(lhs->GetArgAt(1)) && std::holds_alternative<Node*>(rhs->GetArgAt(1)))
+            {
+                AddEdge(std::get<Node*>(lhs->CallArgs().at(1)), std::get<Node*>(rhs->CallArgs().at(1)));
+            }
+        }
+        // TODO - Need to handle lam constructor call case
         // Map for ref can be removed
         // TODO: Args should also be of type Node* 
         /*for(int i = 0; i < cons->Arity(); i++) {
@@ -71,25 +81,30 @@ Node* get_sv(std::string sv_name) {
 
 Node* parseExpression(vector<string>& tokens) {
     std::string type = util::Tokenizer::Consume(tokens);
-    std::cout << "Type: " << type << std::endl;
+    // std::cout << "Type: " << type << std::endl;
     if (type == "ref") {
-        std::cout << "Identified ref" << std::endl;
+        // std::cout << "Identified ref" << std::endl;
         util::Tokenizer::ConsumeToken(tokens, "(");
         std::string const_name = util::Tokenizer::Consume(tokens);
         util::Tokenizer::ConsumeToken(tokens, ",");
         std::string sv_name = util::Tokenizer::Consume(tokens);
         util::Tokenizer::ConsumeToken(tokens, ")");
-        std::vector<std::string>args;
+        
+        std::vector<std::variant<std::string, Node*>> args;
+        // We know that ref has two arguments, so we just hardcode it here 
+        // the first argument is the constant name which refers to the corresponding program variable
+        // the second argument is the set variable 
         args.push_back(const_name);
-        args.push_back(sv_name);
-        std::cout << "Const name: " << const_name << " sv_name: " << sv_name << std::endl;
+        args.push_back(get_sv(sv_name));
+
+        // std::cout << "Const name: " << const_name << " sv_name: " << sv_name << std::endl;
         if (!constructor_map.count(const_name)) {
             constructor_map["ref"] = new Node("ref", args);
         }
         return constructor_map["ref"];
     }
     else if (type == "proj") {
-        std::cout << "Identified proj" << std::endl;
+        // std::cout << "Identified proj" << std::endl;
         util::Tokenizer::ConsumeToken(tokens, "(");
         std::string ref_name = util::Tokenizer::Consume(tokens);
         util::Tokenizer::ConsumeToken(tokens, ",");
@@ -98,7 +113,7 @@ Node* parseExpression(vector<string>& tokens) {
         std::string sv_name = util::Tokenizer::Consume(tokens);
         util::Tokenizer::ConsumeToken(tokens, ")");
 
-        std::cout << "Ref name: " << ref_name << " idx: " << proj_idx << " sv_name " << sv_name << std::endl;
+        // std::cout << "Ref name: " << ref_name << " idx: " << proj_idx << " sv_name " << sv_name << std::endl;
 
         Node *proj = new Node(ref_name, sv_name, proj_idx);
         // Add projection reference to set variable whose projection it is
@@ -107,11 +122,10 @@ Node* parseExpression(vector<string>& tokens) {
     }
     else {
         std::string sv_name = type;
-        std::cout << "Identified set variable: " << sv_name << std::endl;
+        // std::cout << "Identified set variable: " << sv_name << std::endl;
         return get_sv(sv_name);
     }
 }
-
 
 /*
 * Solver algorithm
@@ -143,8 +157,22 @@ void Solve() {
 
         // Step 2.c
         for (auto proj_sv_ref : sv_node->proj_sv_refs) {
-            // TODO - Check if this is the value of the projection
-            std::set<Node*> Y = getValueOfProjection(proj_sv_ref);
+            std::set<Node*> Y;
+            // Get the set variable for the projection
+            Node *sv_for_proj = set_var_map[proj_sv_ref->ProjSV()];
+            // For every predecessor of the set variable that is a constructor and the name matches the projection name,
+            // compute the value of the projection
+            for (auto pred : sv_for_proj->predecessor_nodes) {
+                if (pred->IsConstructor() && pred->Name() == proj_sv_ref->Name()) {
+                    // Projections are always only on ref constructor calls with position 1 => this will always be a set variable
+                    std::variant<std::string, Node*> arg = pred->GetArgAt(proj_sv_ref->ProjIdx());
+                    if (std::holds_alternative<Node*>(arg)) {
+                        Node* arg_node = std::get<Node*>(arg);
+                        Y.insert(arg_node);
+                    }
+                }
+            }
+
             for (auto yi : Y)
             {
                 for (auto pred : proj_sv_ref->predecessor_nodes) {
@@ -169,8 +197,6 @@ int main(int argc, char* argv[]) {
     std::string input_str(std::istreambuf_iterator<char>{f}, {});
     // The input tokenizer to parse the input string.
     // TODO - This needs to handle delimiters for lam constructors
-    // TODO - Currently, args for constructor is of type string. This will need to be changed to Node* type and if 
-    // the arg references a set variable which is not yet present in the map, Node* needs to be created for that set variable and added to map
     util::Tokenizer tk(input_str, {' '}, {"(", ")", "<=", ","}, {});
     vector<string> tokens = tk.Tokens();
 
@@ -183,4 +209,37 @@ int main(int argc, char* argv[]) {
         // Add edge between lhs and rhs
         AddEdge(lhs_expr, rhs_expr);
     }
+
+    // Solve the constraints
+    Solve();
+
+    // Solution is the predecessor edges of all set variable which are constructors
+    // for a ref constructor, it is the first argument and for lam constructor, it is the first argument as well
+    std::map<std::string, std::set<std::string>> solution;
+    for (auto const& [name, node] : set_var_map) {
+        for (auto pred : node->predecessor_nodes) {
+            if (pred->IsConstructor()) {
+                if (std::holds_alternative<std::string>(pred->GetArgAt(0))) {
+                    std::string arg_name = std::get<std::string>(pred->GetArgAt(0));
+                    solution[name].insert(arg_name);
+                }
+            }
+        }
+    }
+
+    // Print solution
+    for (auto const& [name, preds] : solution) {
+        std::cout << name << " -> {";
+        int i = 0;
+        for (auto pred : preds) {
+            if (i != preds.size() - 1) {
+                std::cout << pred << ", ";
+            } else {
+                std::cout << pred;
+            }
+            i += 1;
+        }
+        std::cout << "}" << std::endl;
+    }
+    std::cout << std::endl;
 }

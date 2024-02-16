@@ -4,10 +4,10 @@ project(CS260ProgramAnalysis)
 
 SET(CMAKE_CXX_STANDARD 17)
 
-ADD_EXECUTABLE(assn0
-	assn0.cpp
-	headers/json.hpp
-)
+#ADD_EXECUTABLE(assn0
+#	assn0.cpp
+#	headers/json.hpp
+#)
 
 #ADD_EXECUTABLE(test_abstract_store
 #	tests/test_abstract_store.cpp
@@ -30,25 +30,21 @@ ADD_EXECUTABLE(assn0
 #	headers/datatypes.h
 #)
 
-ADD_EXECUTABLE(assn2_control_flow_analysis
-	control-flow-analysis/control_flow_analysis.cpp
-	control-flow-analysis/cfa_utils.hpp
-	headers/datatypes.h
-)
-
-ADD_EXECUTABLE(assn2_reaching_def
-	reaching-defn/reachingdef.cpp
-	reaching-defn/rtype.hpp
-	reaching-defn/execute_rdef.hpp
-	headers/datatypes.h
-)
-
-#ADD_EXECUTABLE(test_interval_join
-#	interval-analysis/test_interval_join.cpp
-#	interval-analysis/interval_analysis.hpp
+#ADD_EXECUTABLE(assn2_control_flow_analysis
+#	control-flow-analysis/control_flow_analysis.cpp
+#	control-flow-analysis/cfa_utils.hpp
+#	headers/datatypes.h
 #)
 
-#ADD_EXECUTABLE(test_widen
-#	interval-analysis/test_widen.cpp
-#	interval-analysis/interval_analysis.hpp
+#ADD_EXECUTABLE(assn2_reaching_def
+#	reaching-defn/reachingdef.cpp
+#	reaching-defn/rtype.hpp
+#	reaching-defn/execute_rdef.hpp
+#	headers/datatypes.h
 #)
+
+ADD_EXECUTABLE(assn3_constraint_solver
+	pointer-analysis/constraint_solver.cpp
+	pointer-analysis/set_constraint_util.cpp
+	headers/tokenizer.hpp
+)

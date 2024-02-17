@@ -158,11 +158,11 @@ class ConstraintGenerator {
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        std::cerr << "Usage: constraint-solver <file path>" << std::endl;
+        std::cerr << "Usage: constraint-generator <lir file path> <lirjson file path>" << std::endl;
         return EXIT_FAILURE;
     }
 
-    std::ifstream f(argv[1]);
+    std::ifstream f(argv[2]);
     json lir_json = json::parse(f);
 
     Program program = Program(lir_json);

@@ -1,0 +1,7 @@
+foo <= main.f
+foo.p3 <= foo.r
+main.a <= proj(ref,1,main.f)
+proj(ref,1,main.d) <= main.e
+ref(_alloc1,_alloc1) <= main.a
+ref(_alloc2,_alloc2) <= main.b
+ref(_alloc3,_alloc3) <= main.d

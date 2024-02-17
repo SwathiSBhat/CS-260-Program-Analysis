@@ -12,7 +12,6 @@ std::map<std::string, Node*> constructor_map;
 
 std::deque<Node*> worklist;
 
-
 /*
 * AddEdge adds an edge between two nodes in the graph
 * The rules for determining whether it should be stored as a successor or predecessor edge are:
@@ -25,7 +24,6 @@ void AddEdge(Node* lhs, Node* rhs, bool is_init = false) {
     if (((lhs->IsConstructor() && rhs->IsConstructor()) || (lhs->IsLam() && rhs->IsLam())) 
         && lhs->Name() == rhs->Name())
     {
-        // std::cout << "Adding edge between " << lhs->Name() << " and " << rhs->Name() << std::endl;
         if (lhs->Name() == "ref")
         {
             // Add edge between second argument which is a set variable. This argument is covariant so the edge will be from lhs -> rhs
@@ -42,12 +40,10 @@ void AddEdge(Node* lhs, Node* rhs, bool is_init = false) {
                 start_idx = 1;
             else
             {
-                // std::cout << "is node pointer: " << std::holds_alternative<Node*>(lhs->CallArgs().at(1)) << std::endl;
                 if (std::holds_alternative<Node*>(lhs->CallArgs().at(1)) && std::holds_alternative<Node*>(rhs->CallArgs().at(1)))
                 {
                     Node* lhs_retval = std::get<Node*>(lhs->CallArgs().at(1));
                     Node* rhs_retval = std::get<Node*>(rhs->CallArgs().at(1));
-                    // std::cout << "Adding edge for ret val " << lhs_retval->Name() << " and " << rhs_retval->Name() << std::endl;
                     AddEdge(lhs_retval, rhs_retval);
                 }
             }
@@ -69,7 +65,6 @@ void AddEdge(Node* lhs, Node* rhs, bool is_init = false) {
             if (rhs->IsSetVar() && !is_init)
             {
                 worklist.push_back(rhs);
-                // std::cout << "Added rhs to worklist: " << rhs->Name() << std::endl;
             }
         }
     }
@@ -81,7 +76,6 @@ void AddEdge(Node* lhs, Node* rhs, bool is_init = false) {
             if (lhs->IsSetVar() && !is_init)
             {
                 worklist.push_back(lhs);
-                // std::cout << "Added lhs to worklist: " << lhs->Name() << std::endl;
             }
         }
     }
@@ -117,14 +111,13 @@ Node* parseExpression(vector<string>& tokens) {
         args.push_back(const_name);
         args.push_back(get_sv(sv_name));
 
-        // std::cout << "Const name: " << const_name << " sv_name: " << sv_name << std::endl;
         if (!constructor_map.count(const_name)) {
             constructor_map["ref"] = new Node("ref", args);
         }
         return constructor_map["ref"];
     }
     else if (type == "proj") {
-        // std::cout << "Identified proj" << std::endl;
+
         util::Tokenizer::ConsumeToken(tokens, "(");
         std::string ref_name = util::Tokenizer::Consume(tokens);
         util::Tokenizer::ConsumeToken(tokens, ",");
@@ -176,7 +169,6 @@ Node* parseExpression(vector<string>& tokens) {
         }
         util::Tokenizer::ConsumeToken(tokens, ")");
 
-        // TODO - Need to handle lam constructors of different types
         Node *lam = new Node("lam_", args, retval_type, param_types);
         return lam;
     }
@@ -208,14 +200,13 @@ void Solve() {
     for (auto const& [name, node] : set_var_map) {
         if (!node->predecessor_nodes.empty()) {
             worklist.push_back(node);
-            // std::cout << "Added to worklist: " << node->Name() << std::endl;
         }
     }
 
     while(!worklist.empty()) {
         Node* sv_node = worklist.front();
         worklist.pop_front();
-        //std::cout << "Popped from worklist: " << sv_node->Name() << std::endl;
+
         // Step 2.b
         for (auto pred : sv_node->predecessor_nodes) {
             for (auto succ : sv_node->successor_nodes) {
@@ -233,6 +224,7 @@ void Solve() {
             // We don't consider lams here because projections are only on ref constructor calls
             for (auto pred : sv_for_proj->predecessor_nodes) {
                 if (pred->IsConstructor() && pred->Name() == proj_sv_ref->Name()) {
+
                     // Projections are always only on ref constructor calls with position 1 => this will always be a set variable
                     std::variant<std::string, Node*> arg = pred->GetArgAt(proj_sv_ref->ProjIdx());
                     if (std::holds_alternative<Node*>(arg)) {
@@ -247,24 +239,21 @@ void Solve() {
                 int num_of_edges_yi = yi->predecessor_nodes.size() + yi->successor_nodes.size();
                 for (auto pred : proj_sv_ref->predecessor_nodes) {
                     int num_of_edges_pred = pred->predecessor_nodes.size() + pred->successor_nodes.size();
-                    // std::cout << "Adding edge between pred: " << pred->Name() << " and yi: " << yi->Name() << std::endl;
                     AddEdge(pred, yi, true);
                     if (pred->IsSetVar() && pred->predecessor_nodes.size() + pred->successor_nodes.size() > num_of_edges_pred) {
-                        // std::cout << "Added pred to worklist: " << pred->Name() << std::endl;
                         worklist.push_back(pred);
                     }
                 }
                 for (auto succ : proj_sv_ref->successor_nodes) {
                     int num_of_edges_succ = succ->predecessor_nodes.size() + succ->successor_nodes.size();
-                    // std::cout << "Adding edge between yi: " << yi->Name() << " and succ: " << succ->Name() << std::endl;
+                    // Pass is_init as true since we don't want this function to control adding to the worklist
                     AddEdge(yi, succ, true);
                     if (succ->IsSetVar() && succ->predecessor_nodes.size() + succ->successor_nodes.size() > num_of_edges_succ) {
-                        // std::cout << "Added succ to worklist: " << succ->Name() << std::endl;
                         worklist.push_back(succ);
                     }
                 }
+                // Add yi to worklist if the edges have changed
                 if (yi->predecessor_nodes.size() + yi->successor_nodes.size() > num_of_edges_yi) {
-                    // std::cout << "Added yi to worklist: " << yi->Name() << std::endl;
                     worklist.push_back(yi);
                 }
             }

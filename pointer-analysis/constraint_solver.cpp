@@ -21,10 +21,11 @@ std::deque<Node*> worklist;
 * 2. Any edge where the rhs is a projection is a predecessor edge
 * 3. Any other edge is a successor edge
 */
-void AddEdge(Node* lhs, Node* rhs) {
+void AddEdge(Node* lhs, Node* rhs, bool is_init = false) {
     if (((lhs->IsConstructor() && rhs->IsConstructor()) || (lhs->IsLam() && rhs->IsLam())) 
         && lhs->Name() == rhs->Name())
     {
+        // std::cout << "Adding edge between " << lhs->Name() << " and " << rhs->Name() << std::endl;
         if (lhs->Name() == "ref")
         {
             // Add edge between second argument which is a set variable. This argument is covariant so the edge will be from lhs -> rhs
@@ -41,9 +42,13 @@ void AddEdge(Node* lhs, Node* rhs) {
                 start_idx = 1;
             else
             {
-                if (std::holds_alternative<Node*>(lhs->GetArgAt(1)) && std::holds_alternative<Node*>(rhs->GetArgAt(1)))
+                // std::cout << "is node pointer: " << std::holds_alternative<Node*>(lhs->CallArgs().at(1)) << std::endl;
+                if (std::holds_alternative<Node*>(lhs->CallArgs().at(1)) && std::holds_alternative<Node*>(rhs->CallArgs().at(1)))
                 {
-                    AddEdge(std::get<Node*>(lhs->CallArgs().at(1)), std::get<Node*>(rhs->CallArgs().at(1)));
+                    Node* lhs_retval = std::get<Node*>(lhs->CallArgs().at(1));
+                    Node* rhs_retval = std::get<Node*>(rhs->CallArgs().at(1));
+                    // std::cout << "Adding edge for ret val " << lhs_retval->Name() << " and " << rhs_retval->Name() << std::endl;
+                    AddEdge(lhs_retval, rhs_retval);
                 }
             }
 
@@ -61,10 +66,10 @@ void AddEdge(Node* lhs, Node* rhs) {
         if (!rhs->HasPredecessor(lhs))
         {
             rhs->predecessor_nodes.insert(lhs);
-            if (rhs->IsSetVar())
+            if (rhs->IsSetVar() && !is_init)
             {
                 worklist.push_back(rhs);
-                std::cout << "Added rhs to worklist: " << rhs->Name() << std::endl;
+                // std::cout << "Added rhs to worklist: " << rhs->Name() << std::endl;
             }
         }
     }
@@ -73,10 +78,10 @@ void AddEdge(Node* lhs, Node* rhs) {
         if (!lhs->HasSuccessor(rhs))
         {
             lhs->successor_nodes.insert(rhs);
-            if (lhs->IsSetVar())
+            if (lhs->IsSetVar() && !is_init)
             {
                 worklist.push_back(lhs);
-                std::cout << "Added lhs to worklist: " << lhs->Name() << std::endl;
+                // std::cout << "Added lhs to worklist: " << lhs->Name() << std::endl;
             }
         }
     }
@@ -95,10 +100,10 @@ Node* get_sv(std::string sv_name) {
 }
 
 Node* parseExpression(vector<string>& tokens) {
+    
     std::string type = util::Tokenizer::Consume(tokens);
-    // std::cout << "Type: " << type << std::endl;
+
     if (type == "ref") {
-        // std::cout << "Identified ref" << std::endl;
         util::Tokenizer::ConsumeToken(tokens, "(");
         std::string const_name = util::Tokenizer::Consume(tokens);
         util::Tokenizer::ConsumeToken(tokens, ",");
@@ -127,8 +132,6 @@ Node* parseExpression(vector<string>& tokens) {
         util::Tokenizer::ConsumeToken(tokens, ",");
         std::string sv_name = util::Tokenizer::Consume(tokens);
         util::Tokenizer::ConsumeToken(tokens, ")");
-
-        // std::cout << "Ref name: " << ref_name << " idx: " << proj_idx << " sv_name " << sv_name << std::endl;
 
         Node *proj = new Node(ref_name, sv_name, proj_idx);
         // Add projection reference to set variable whose projection it is
@@ -169,6 +172,7 @@ Node* parseExpression(vector<string>& tokens) {
                 args.push_back(arg);
             else
                 args.push_back(get_sv(arg));
+            i += 1;
         }
         util::Tokenizer::ConsumeToken(tokens, ")");
 
@@ -178,14 +182,13 @@ Node* parseExpression(vector<string>& tokens) {
     }
     else {
         std::string sv_name = type;
-        // std::cout << "Identified set variable: " << sv_name << std::endl;
         return get_sv(sv_name);
     }
 }
 
 /*
 * Solver algorithm
-* 1. Worklist is initialized with all set variables that have a predecessor edge (done in AddEdge)
+* 1. Worklist is initialized with all set variables that have a predecessor edge 
 * 2. While worklist is not empty, 
     2.a. Pop a set variable X from the worklist
     2.b. Add edges from X's predecessor edges to it's successor edges
@@ -200,10 +203,19 @@ Node* parseExpression(vector<string>& tokens) {
             2.c.2.5 If yi has new edges, add yi to the worklist (if it's a set variable)
 */
 void Solve() {
+
+    // Step 1 - Initialoze worklist with all set variables that have a predecessor edge
+    for (auto const& [name, node] : set_var_map) {
+        if (!node->predecessor_nodes.empty()) {
+            worklist.push_back(node);
+            // std::cout << "Added to worklist: " << node->Name() << std::endl;
+        }
+    }
+
     while(!worklist.empty()) {
         Node* sv_node = worklist.front();
         worklist.pop_front();
-        std::cout << "Popped from worklist: " << sv_node->Name() << std::endl;
+        //std::cout << "Popped from worklist: " << sv_node->Name() << std::endl;
         // Step 2.b
         for (auto pred : sv_node->predecessor_nodes) {
             for (auto succ : sv_node->successor_nodes) {
@@ -232,11 +244,28 @@ void Solve() {
 
             for (auto yi : Y)
             {
+                int num_of_edges_yi = yi->predecessor_nodes.size() + yi->successor_nodes.size();
                 for (auto pred : proj_sv_ref->predecessor_nodes) {
-                    AddEdge(pred, yi);
+                    int num_of_edges_pred = pred->predecessor_nodes.size() + pred->successor_nodes.size();
+                    // std::cout << "Adding edge between pred: " << pred->Name() << " and yi: " << yi->Name() << std::endl;
+                    AddEdge(pred, yi, true);
+                    if (pred->IsSetVar() && pred->predecessor_nodes.size() + pred->successor_nodes.size() > num_of_edges_pred) {
+                        // std::cout << "Added pred to worklist: " << pred->Name() << std::endl;
+                        worklist.push_back(pred);
+                    }
                 }
                 for (auto succ : proj_sv_ref->successor_nodes) {
-                    AddEdge(yi, succ);
+                    int num_of_edges_succ = succ->predecessor_nodes.size() + succ->successor_nodes.size();
+                    // std::cout << "Adding edge between yi: " << yi->Name() << " and succ: " << succ->Name() << std::endl;
+                    AddEdge(yi, succ, true);
+                    if (succ->IsSetVar() && succ->predecessor_nodes.size() + succ->successor_nodes.size() > num_of_edges_succ) {
+                        // std::cout << "Added succ to worklist: " << succ->Name() << std::endl;
+                        worklist.push_back(succ);
+                    }
+                }
+                if (yi->predecessor_nodes.size() + yi->successor_nodes.size() > num_of_edges_yi) {
+                    // std::cout << "Added yi to worklist: " << yi->Name() << std::endl;
+                    worklist.push_back(yi);
                 }
             }
         }
@@ -263,8 +292,7 @@ int main(int argc, char* argv[]) {
         util::Tokenizer::ConsumeToken(tokens, "\n");
 
         // Add edge between lhs and rhs
-        std::cout << "Adding edge between " << lhs_expr->Name() << " and " << rhs_expr->Name() << std::endl;
-        AddEdge(lhs_expr, rhs_expr);
+        AddEdge(lhs_expr, rhs_expr, true);
     }
 
     // Solve the constraints

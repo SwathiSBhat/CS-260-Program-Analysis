@@ -8,7 +8,6 @@
 
 
 std::map<std::string, Node*> set_var_map;
-std::map<std::string, Node*> constructor_map;
 
 std::deque<Node*> worklist;
 
@@ -111,10 +110,8 @@ Node* parseExpression(vector<string>& tokens) {
         args.push_back(const_name);
         args.push_back(get_sv(sv_name));
 
-        if (!constructor_map.count(const_name)) {
-            constructor_map["ref"] = new Node("ref", args);
-        }
-        return constructor_map["ref"];
+        Node* newRef = new Node("ref", args);
+        return newRef;
     }
     else if (type == "proj") {
 

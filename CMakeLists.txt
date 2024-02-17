@@ -48,3 +48,8 @@ ADD_EXECUTABLE(assn3_constraint_solver
 	pointer-analysis/set_constraint_util.cpp
 	headers/tokenizer.hpp
 )
+
+ADD_EXECUTABLE(assn3_constraint_generator
+	pointer-analysis/constraint_gen.cpp
+	headers/datatypes.h
+)

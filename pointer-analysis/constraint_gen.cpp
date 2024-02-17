@@ -47,9 +47,11 @@ class ConstraintGenerator {
         */
        for (auto const& func : program.funcs) {
             std::string func_name = func.first;
+            std::cout << "Analyzing function: " << func_name << std::endl;
            for (auto const& bb : func.second->bbs) {
-               // std::cout << "Analyzing basic block: " << bb.first << std::endl;
+               std::cout << "Analyzing basic block: " << bb.first << std::endl;
                for (auto inst = bb.second->instructions.begin(); inst != bb.second->instructions.end(); inst++) {
+                    std::cout << "Analyzing instruction: " << (*inst)->instrType << std::endl;
                     // x = $copy y
                     // [y] <= [x]
                     if ((*inst)->instrType == InstructionType::CopyInstrType)
@@ -107,7 +109,7 @@ class ConstraintGenerator {
                     else if ((*inst)->instrType == InstructionType::StoreInstrType)
                     {
                         StoreInstruction *store_inst = (StoreInstruction *) (*inst);
-                        if (store_inst->op->var->type->indirection == 0)
+                        if (store_inst->op->IsConstInt() || (store_inst->op->var && store_inst->op->var->type->indirection == 0))
                             continue;
                         std::string lhs = func_name + "." + store_inst->op->var->name;
                         std::string rhs = "proj(ref,1," + func_name + "." + store_inst->dst->name + ")";

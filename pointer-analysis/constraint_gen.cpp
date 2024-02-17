@@ -47,11 +47,11 @@ class ConstraintGenerator {
         */
        for (auto const& func : program.funcs) {
             std::string func_name = func.first;
-            std::cout << "Analyzing function: " << func_name << std::endl;
+            // std::cout << "Analyzing function: " << func_name << std::endl;
            for (auto const& bb : func.second->bbs) {
-               std::cout << "Analyzing basic block: " << bb.first << std::endl;
+               // std::cout << "Analyzing basic block: " << bb.first << std::endl;
                for (auto inst = bb.second->instructions.begin(); inst != bb.second->instructions.end(); inst++) {
-                    std::cout << "Analyzing instruction: " << (*inst)->instrType << std::endl;
+                    // std::cout << "Analyzing instruction: " << (*inst)->instrType << std::endl;
                     // x = $copy y
                     // [y] <= [x]
                     if ((*inst)->instrType == InstructionType::CopyInstrType)
@@ -157,7 +157,7 @@ class ConstraintGenerator {
 };
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
+    if (argc != 3) {
         std::cerr << "Usage: constraint-generator <lir file path> <lirjson file path>" << std::endl;
         return EXIT_FAILURE;
     }

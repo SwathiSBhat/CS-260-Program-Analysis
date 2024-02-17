@@ -16,8 +16,32 @@ class ConstraintGenerator {
 
     ConstraintGenerator(Program program) : program(program) {};
 
+    void GetFuncRetVal()
+    {
+        for (auto const& func : program.funcs) {
+            std::string func_name = func.first;
+            for (auto const& bb : func.second->bbs) {
+                Instruction *terminal_instruction = bb.second->terminal;
+                // TODO - Check if other forms of terminals need to be handled
+                if (terminal_instruction->instrType == InstructionType::RetInstrType)
+                {
+                    RetInstruction *ret_inst = (RetInstruction *) terminal_instruction;
+                    if (ret_inst->op && ret_inst->op->var)
+                    {
+                        func_ret_val[func_name] = ret_inst->op->var;
+                    }
+                }
+            }
+        }
+    }
+
     void Analyze()
     {
+        /*
+        * Store the return value of each function in a map
+        */
+        GetFuncRetVal();
+
         /*
         * Since this is an interprocedural analysis, we analyze each function in the program
         */
@@ -26,7 +50,6 @@ class ConstraintGenerator {
            for (auto const& bb : func.second->bbs) {
                // std::cout << "Analyzing basic block: " << bb.first << std::endl;
                for (auto inst = bb.second->instructions.begin(); inst != bb.second->instructions.end(); inst++) {
-                    // std::cout << "Analyzing instruction: " << (*inst)->instrType << std::endl;
                     // x = $copy y
                     // [y] <= [x]
                     if ((*inst)->instrType == InstructionType::CopyInstrType)
@@ -91,14 +114,44 @@ class ConstraintGenerator {
                         result.insert(lhs + " <= " + rhs);
                     }
                }
+
+               Instruction *terminal_instruction = bb.second->terminal;
+
+               if (terminal_instruction->instrType == InstructionType::CallDirInstrType)
+               {
+                    CallDirInstruction *call_dir_inst = (CallDirInstruction *) terminal_instruction;
+                    // Ignore if x is not a pointer or a null pointer 
+                    // TODO - Need to ignore null pointers
+                    if (call_dir_inst->lhs && call_dir_inst->lhs->type->indirection > 0)
+                    {
+                        // [retval] <= [x]
+                        std::string lhs = call_dir_inst->callee + "." + func_ret_val[call_dir_inst->callee]->name;
+                        std::string rhs = func_name + "." + call_dir_inst->lhs->name;
+                        result.insert(lhs + " <= " + rhs);
+                    }
+                    // for all arg in call_dir_inst->args, if arg is a pointer variable, [arg] <= [param] where param is the corresponding parameter in the function
+                    for (int i = 0; i < call_dir_inst->args.size(); i++)
+                    {
+                        if (!call_dir_inst->args[i]->IsConstInt() && call_dir_inst->args[i]->var->type->indirection > 0)
+                        {
+                            std::string lhs = func_name + "." + call_dir_inst->args[i]->var->name;
+                            std::string rhs = call_dir_inst->callee + "." + program.funcs[call_dir_inst->callee]->params[i]->name;
+                            result.insert(lhs + " <= " + rhs);
+                        }
+                    }
+                    
+                }
            }
        }
 
        // print result
-         for (auto const& res : result) {
-              std::cout << res << std::endl;
-         }
+       for (auto const& res : result) {
+           std::cout << res << std::endl;
+       }
     }
+
+    private:
+    std::map<std::string, Variable*> func_ret_val;
 };
 
 int main(int argc, char* argv[]) {

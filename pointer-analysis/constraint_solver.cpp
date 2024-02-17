@@ -64,6 +64,7 @@ void AddEdge(Node* lhs, Node* rhs) {
             if (rhs->IsSetVar())
             {
                 worklist.push_back(rhs);
+                std::cout << "Added rhs to worklist: " << rhs->Name() << std::endl;
             }
         }
     }
@@ -75,6 +76,7 @@ void AddEdge(Node* lhs, Node* rhs) {
             if (lhs->IsSetVar())
             {
                 worklist.push_back(lhs);
+                std::cout << "Added lhs to worklist: " << lhs->Name() << std::endl;
             }
         }
     }
@@ -201,7 +203,7 @@ void Solve() {
     while(!worklist.empty()) {
         Node* sv_node = worklist.front();
         worklist.pop_front();
-
+        std::cout << "Popped from worklist: " << sv_node->Name() << std::endl;
         // Step 2.b
         for (auto pred : sv_node->predecessor_nodes) {
             for (auto succ : sv_node->successor_nodes) {
@@ -216,6 +218,7 @@ void Solve() {
             Node *sv_for_proj = set_var_map[proj_sv_ref->ProjSV()];
             // For every predecessor of the set variable that is a constructor and the name matches the projection name,
             // compute the value of the projection
+            // We don't consider lams here because projections are only on ref constructor calls
             for (auto pred : sv_for_proj->predecessor_nodes) {
                 if (pred->IsConstructor() && pred->Name() == proj_sv_ref->Name()) {
                     // Projections are always only on ref constructor calls with position 1 => this will always be a set variable
@@ -260,6 +263,7 @@ int main(int argc, char* argv[]) {
         util::Tokenizer::ConsumeToken(tokens, "\n");
 
         // Add edge between lhs and rhs
+        std::cout << "Adding edge between " << lhs_expr->Name() << " and " << rhs_expr->Name() << std::endl;
         AddEdge(lhs_expr, rhs_expr);
     }
 

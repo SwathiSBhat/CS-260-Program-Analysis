@@ -16,6 +16,134 @@ class ConstraintGenerator {
 
     ConstraintGenerator(Program program) : program(program) {};
 
+    bool isGlobalVar(std::string func_name, Variable *var)
+    {
+        // If local var with same name exists, return false
+        if (program.funcs[func_name]->locals.find(var->name) != program.funcs[func_name]->locals.end())
+            return false;
+
+        for (auto const& glb : program.globals) {
+            if (glb->globalVar->name == var->name)
+                return true;
+        }
+        return false;
+    }
+
+    std::string CreateFuncTypeString(Type::FunctionType *func_type)
+    {
+        // Build type string and check if a lam already exists for this type, if yes, skip this global variable
+        std::string type_str = "";
+        type_str += "(";
+        
+        int i = 0;
+        for (auto const& param : func_type->params) {
+            
+            if (i > 0)
+            {
+                type_str += ",";
+            }
+
+            if (param->indirection > 0)
+            {
+                type_str += std::string(param->indirection, '&');
+            }
+            // TODO - Handle other types
+            if (param->type == DataType::IntType) {
+                type_str += "int";
+            }
+            i += 1;
+        }
+        type_str += ")->";
+        if (func_type->ret) {
+            if (func_type->ret->indirection > 0)
+            {
+                type_str += std::string(func_type->ret->indirection, '&');
+                // TODO - Handle other types
+                if (func_type->ret->type == DataType::IntType) {
+                    type_str += "int";
+                }
+            }
+        }
+        else
+        {
+            type_str += "_";
+        }
+        return type_str;
+    }
+
+    void CreateLamForGlobalFuncPointers()
+    {
+        for (auto const& glb : program.globals) {
+            if (glb->globalVar->type->indirection > 0 && glb->globalVar->type->type == DataType::FuncType)
+            {
+                // Build type string and check if a lam already exists for this type, if yes, skip this global variable
+                Type::FunctionType *func_type = (Type::FunctionType *) glb->globalVar->type->ptr_type;
+                std::string type_str = CreateFuncTypeString(func_type);
+                /*type_str += "(";
+                
+                int i = 0;
+                for (auto const& param : func_type->params) {
+                    
+                    if (i > 0)
+                    {
+                        type_str += ",";
+                    }
+
+                    if (param->indirection > 0)
+                    {
+                        type_str += std::string(param->indirection, '&');
+                    }
+                    // TODO - Handle other types
+                    if (param->type == DataType::IntType) {
+                        type_str += "int";
+                    }
+                    i += 1;
+                }
+                type_str += ")->";
+                if (func_type->ret) {
+                    if (func_type->ret->indirection > 0)
+                    {
+                        type_str += std::string(func_type->ret->indirection, '&');
+                        // TODO - Handle other types
+                        if (func_type->ret->type == DataType::IntType) {
+                            type_str += "int";
+                        }
+                    }
+                }
+                else
+                {
+                    type_str += "_";
+                }*/
+
+                // If the type already exists, skip this global variable
+                if (func_types.find(type_str) != func_types.end())
+                    continue;
+                func_types.insert(type_str);
+
+                std::string func_name = glb->globalVar->name;
+                std::string lam_args = "(" + func_name;
+
+                // TODO - If the return value is a null pointer, use fake _nil var as retval 
+                if (program.funcs[func_name]->ret && program.funcs[func_name]->ret->indirection > 0)
+                {
+                    lam_args += "," + func_name + "." + func_ret_val[func_name]->name;
+                }
+
+                // args = (func_name, [ret_val], [param1], [param2], ..., )
+                for(auto const& arg : program.funcs[func_name]->params) {
+                    if (arg->type->indirection > 0)
+                    lam_args += "," + func_name + "." + arg->name;
+                }
+
+                lam_args += ")";
+
+                result.insert("lam_[" + type_str + "]" + lam_args + " <= " + func_name);
+            }
+        }
+
+
+    }
+
     void GetFuncRetVal()
     {
         for (auto const& func : program.funcs) {
@@ -41,6 +169,10 @@ class ConstraintGenerator {
         * Store the return value of each function in a map
         */
         GetFuncRetVal();
+        /*
+        * Create lam constructor for global function pointers
+        */
+        CreateLamForGlobalFuncPointers();
 
         /*
         * Since this is an interprocedural analysis, we analyze each function in the program
@@ -60,7 +192,7 @@ class ConstraintGenerator {
                         CopyInstruction *copy_inst = (CopyInstruction *) (*inst);
                         if (copy_inst->lhs->type->indirection == 0)
                             continue;
-                        std::string lhs = func_name + "." + copy_inst->op->var->name;
+                        std::string lhs = isGlobalVar(func_name, copy_inst->op->var) ? copy_inst->op->var->name : func_name + "." + copy_inst->op->var->name;
                         std::string rhs = func_name + "." + copy_inst->lhs->name;
                         result.insert(lhs + " <= " + rhs);
                     }
@@ -87,7 +219,9 @@ class ConstraintGenerator {
                     else if ((*inst)->instrType == InstructionType::AddrofInstrType)
                     {
                         AddrofInstruction *addrof_inst = (AddrofInstruction *) (*inst);
-                        std::string lhs = "ref(" + func_name + "." + addrof_inst->rhs->name + "," + func_name + "." + addrof_inst->rhs->name + ")";
+                        std::string lhs = isGlobalVar(func_name, addrof_inst->rhs) ? 
+                         "ref(" + addrof_inst->rhs->name + "," + addrof_inst->rhs->name + ")" : 
+                         "ref(" + func_name + "." + addrof_inst->rhs->name + "," + func_name + "." + addrof_inst->rhs->name + ")";
                         std::string rhs = func_name + "." + addrof_inst->lhs->name; 
                         result.insert(lhs + " <= " + rhs);
                     }
@@ -152,6 +286,35 @@ class ConstraintGenerator {
                     }
                     
                 }
+                // [x=] $call_idr fp(args...)
+                else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType)
+                {
+                    CallIdrInstruction *call_idr_inst = (CallIdrInstruction *) terminal_instruction;
+                    // For each global function pointer, create lam constructor 
+                    // if fp's type is a function pointer, [fp] <= lam_[(type)](DUMMY, [x], [param1], [param2], ...)
+                    Type::FunctionType *func_type = (Type::FunctionType *) call_idr_inst->fp->type->ptr_type;
+                    std::string lam_args = "(_DUMMY";
+
+                    // Add [x] to lam_args if fp ret type is a pointer. If x does not exist, use DUMMY
+                    if (func_type->ret && func_type->ret->indirection > 0) {
+                        if (call_idr_inst->lhs && call_idr_inst->lhs->type->indirection > 0)
+                            lam_args += "," + func_name + "." + call_idr_inst->lhs->name;
+                        else
+                            lam_args += ",_DUMMY";
+                    }
+
+                    // Add [param1], [param2], ... to lam_args
+                    for (auto const& arg : call_idr_inst->args) {
+                        // TODO - If arg is null pointer, use fake _nil var
+                        if (arg->var && arg->var->type->indirection > 0)
+                            lam_args += "," + func_name + "." + arg->var->name;
+                    }
+
+                    lam_args += ")";
+
+                    std::string type_str = CreateFuncTypeString(func_type);
+                    result.insert(func_name + "." + call_idr_inst->fp->name + " <= lam_[" + type_str + "]" + lam_args);
+                }
            }
        }
 
@@ -163,6 +326,7 @@ class ConstraintGenerator {
 
     private:
     std::map<std::string, Variable*> func_ret_val;
+    std::set<std::string> func_types;
 };
 
 int main(int argc, char* argv[]) {

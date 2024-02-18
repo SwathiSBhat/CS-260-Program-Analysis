@@ -193,7 +193,7 @@ class ConstraintGenerator {
                         if (copy_inst->lhs->type->indirection == 0)
                             continue;
                         std::string lhs = isGlobalVar(func_name, copy_inst->op->var) ? copy_inst->op->var->name : func_name + "." + copy_inst->op->var->name;
-                        std::string rhs = func_name + "." + copy_inst->lhs->name;
+                        std::string rhs = isGlobalVar(func_name, copy_inst->lhs) ? copy_inst->lhs->name : func_name + "." + copy_inst->lhs->name;
                         result.insert(lhs + " <= " + rhs);
                     }
                     // x = $gep y op

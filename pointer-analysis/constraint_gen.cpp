@@ -51,6 +51,11 @@ class ConstraintGenerator {
             if (param->type == DataType::IntType) {
                 type_str += "int";
             }
+            // If its a struct type parameter it must be a pointer to a struct
+            else if (param->type == DataType::StructType) {
+                Type::StructType *struct_type = (Type::StructType *) param->ptr_type;
+                type_str += struct_type->name;
+            }
             i += 1;
         }
         type_str += ")->";
@@ -61,6 +66,11 @@ class ConstraintGenerator {
                 // TODO - Handle other types
                 if (func_type->ret->type == DataType::IntType) {
                     type_str += "int";
+                }
+                // If its a struct type ret it must be a pointer to a struct
+                else if (func_type->ret->type == DataType::StructType) {
+                    Type::StructType *struct_type = (Type::StructType *) func_type->ret->ptr_type;
+                    type_str += struct_type->name;
                 }
             }
         }
@@ -79,41 +89,6 @@ class ConstraintGenerator {
                 // Build type string and check if a lam already exists for this type, if yes, skip this global variable
                 Type::FunctionType *func_type = (Type::FunctionType *) glb->globalVar->type->ptr_type;
                 std::string type_str = CreateFuncTypeString(func_type);
-                /*type_str += "(";
-                
-                int i = 0;
-                for (auto const& param : func_type->params) {
-                    
-                    if (i > 0)
-                    {
-                        type_str += ",";
-                    }
-
-                    if (param->indirection > 0)
-                    {
-                        type_str += std::string(param->indirection, '&');
-                    }
-                    // TODO - Handle other types
-                    if (param->type == DataType::IntType) {
-                        type_str += "int";
-                    }
-                    i += 1;
-                }
-                type_str += ")->";
-                if (func_type->ret) {
-                    if (func_type->ret->indirection > 0)
-                    {
-                        type_str += std::string(func_type->ret->indirection, '&');
-                        // TODO - Handle other types
-                        if (func_type->ret->type == DataType::IntType) {
-                            type_str += "int";
-                        }
-                    }
-                }
-                else
-                {
-                    type_str += "_";
-                }*/
 
                 // If the type already exists, skip this global variable
                 if (func_types.find(type_str) != func_types.end())

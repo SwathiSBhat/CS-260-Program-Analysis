@@ -254,7 +254,7 @@ class ConstraintGenerator {
                         StoreInstruction *store_inst = (StoreInstruction *) (*inst);
                         if (store_inst->op->IsConstInt() || (store_inst->op->var && store_inst->op->var->type->indirection == 0))
                             continue;
-                        std::string lhs = func_name + "." + store_inst->op->var->name;
+                        std::string lhs = isGlobalVar(func_name, store_inst->op->var) ? store_inst->op->var->name : func_name + "." + store_inst->op->var->name;
                         std::string rhs = "proj(ref,1," + func_name + "." + store_inst->dst->name + ")";
                         result.insert(lhs + " <= " + rhs);
                     }

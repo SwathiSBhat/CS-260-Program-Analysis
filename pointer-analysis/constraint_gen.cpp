@@ -73,6 +73,15 @@ class ConstraintGenerator {
                         std::string rhs = func_name + "." + gep_inst->lhs->name;
                         result.insert(lhs + " <= " + rhs);
                     }
+                    // x = $gfp y <fieldname> 
+                    // [y] <= [x]
+                    else if ((*inst)->instrType == InstructionType::GfpInstrType)
+                    {
+                        GfpInstruction *gfp_inst = (GfpInstruction *) (*inst);
+                        std::string lhs = func_name + "." + gfp_inst->src->name;
+                        std::string rhs = func_name + "." + gfp_inst->lhs->name;
+                        result.insert(lhs + " <= " + rhs);
+                    }
                     // x = $addrof y
                     // ref(const(y), [y]) <= [x]
                     else if ((*inst)->instrType == InstructionType::AddrofInstrType)

@@ -9,7 +9,7 @@
 /*
  * For debugging.
  */
-#define DEBUG(x) std::cout << "(" << __FILE_NAME__ << ":" << __LINE__ << ") " << x << std::endl
+//#define DEBUG(x) std::cout << "(" << __FILE_NAME__ << ":" << __LINE__ << ") " << x << std::endl
 
 /*
  * For globals and $alloc identifiers, func_name will be the empty string.
@@ -112,6 +112,19 @@ Statement get_gep_constraint(GepInstruction gep, std::string func_name) {
     x.func_name = func_name;
     SetVariable y;
     y.var_name = gep.src->name;
+    y.func_name = func_name;
+    Statement s;
+    s.e1 = y;
+    s.e2 = x;
+    return s;
+}
+
+Statement get_gfp_constraint(GfpInstruction gfp, std::string func_name) {
+    SetVariable x;
+    x.var_name = gfp.lhs->name;
+    x.func_name = func_name;
+    SetVariable y;
+    y.var_name = gfp.src->name;
     y.func_name = func_name;
     Statement s;
     s.e1 = y;
@@ -301,6 +314,10 @@ int main(int argc, char *argv[]) {
                         constraints.push_back(get_gep_constraint(*((GepInstruction *) instruction), func_name));
                         break;
                     }
+                    case GfpInstrType: {
+                        constraints.push_back(get_gfp_constraint(*((GfpInstruction *) instruction), func_name));
+                        break;
+                    }
                     case LoadInstrType: {
                         LoadInstruction *load = (LoadInstruction *) instruction;
 
@@ -326,7 +343,6 @@ int main(int argc, char *argv[]) {
                         break;
                     }
                     default: {
-                        DEBUG("Unrecognized instruction type");
                         break;
                     }
                 } // End of switch-case

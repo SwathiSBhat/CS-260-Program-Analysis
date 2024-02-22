@@ -1,0 +1,8 @@
+foo.h <= main.f
+foo.p1 <= proj(ref,1,foo.p2)
+main.b <= foo.p1
+main.e <= foo.p2
+proj(ref,1,foo.p2) <= foo.h
+ref(main.a,main.a) <= main.b
+ref(main.c,main.c) <= main.d
+ref(main.d,main.d) <= main.e

@@ -47,7 +47,7 @@ class ConstraintGenerator {
             {
                 type_str += std::string(param->indirection, '&');
             }
-            // TODO - Handle other types
+
             if (param->type == DataType::IntType) {
                 type_str += "int";
             }
@@ -125,7 +125,7 @@ class ConstraintGenerator {
             std::string func_name = func.first;
             for (auto const& bb : func.second->bbs) {
                 Instruction *terminal_instruction = bb.second->terminal;
-                // TODO - Check if other forms of terminals need to be handled
+
                 if (terminal_instruction->instrType == InstructionType::RetInstrType)
                 {
                     RetInstruction *ret_inst = (RetInstruction *) terminal_instruction;
@@ -154,11 +154,8 @@ class ConstraintGenerator {
         */
        for (auto const& func : program.funcs) {
             std::string func_name = func.first;
-            // std::cout << "Analyzing function: " << func_name << std::endl;
            for (auto const& bb : func.second->bbs) {
-               // std::cout << "Analyzing basic block: " << bb.first << std::endl;
                for (auto inst = bb.second->instructions.begin(); inst != bb.second->instructions.end(); inst++) {
-                    // std::cout << "Analyzing instruction: " << (*inst)->instrType << std::endl;
                     // x = $copy y
                     // [y] <= [x]
                     if ((*inst)->instrType == InstructionType::CopyInstrType)
@@ -241,7 +238,6 @@ class ConstraintGenerator {
                {
                     CallDirInstruction *call_dir_inst = (CallDirInstruction *) terminal_instruction;
                     // Ignore if x is not a pointer or a null pointer 
-                    // TODO - Need to ignore null pointers
                     if (call_dir_inst->lhs && call_dir_inst->lhs->type->indirection > 0)
                     {
                         // [retval] <= [x]

@@ -97,18 +97,36 @@ Statement get_addrof_constraint(AddrofInstruction addrof, std::string func_name)
     return s;
 }
 
-Statement get_alloc_constraint(AllocInstruction alloc) {
+Statement get_alloc_constraint(AllocInstruction alloc, std::string func_name) {
     DEBUG("Getting $alloc constraint");
+    SetVariable x;
+    x.var_name = alloc.lhs->name;
+    x.func_name = func_name;
+    Constructor y;
+    y.name = "ref";
+    SetVariable y_arg;
+    y_arg.var_name = alloc.id->name;
+
+    /*
+     * TODO We don't want to print out a dot here.
+     */
+    y_arg.func_name = "";
+    y.args.push_back(y_arg);
+    y.args.push_back(y_arg);
+    Statement s;
+    s.e1 = y;
+    s.e2 = x;
+    return s;
 }
 
-Statement get_gep_constraint(GepInstruction gep) {
+Statement get_gep_constraint(GepInstruction gep, std::string func_name) {
     DEBUG("Getting $gep constraint");
     SetVariable x;
     x.var_name = gep.lhs->name;
-    x.func_name = "";
+    x.func_name = func_name;
     SetVariable y;
     y.var_name = gep.src->name;
-    y.func_name = "";
+    y.func_name = func_name;
     Statement s;
     s.e1 = y;
     s.e2 = x;
@@ -214,12 +232,12 @@ int main(int argc, char *argv[]) {
                 }
                 case AllocInstrType: {
                     DEBUG("Saw a $alloc");
-                    //constraints.push_back(get_alloc_constraint(*((AllocInstruction *) instruction)));
+                    constraints.push_back(get_alloc_constraint(*((AllocInstruction *) instruction), p.funcs[argv[2]]->name));
                     break;
                 }
                 case GepInstrType: {
                     DEBUG("Saw a $gep");
-                    //constraints.push_back(get_gep_constraint(*((GepInstruction *) instruction)));
+                    constraints.push_back(get_gep_constraint(*((GepInstruction *) instruction), p.funcs[argv[2]]->name));
                     break;
                 }
                 case LoadInstrType: {

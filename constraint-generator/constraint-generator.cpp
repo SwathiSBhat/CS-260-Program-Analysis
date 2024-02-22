@@ -133,12 +133,48 @@ Statement get_gep_constraint(GepInstruction gep, std::string func_name) {
     return s;
 }
 
-Statement get_load_constraint(LoadInstruction load) {
+Statement get_load_constraint(LoadInstruction load, std::string func_name) {
     DEBUG("Getting $load constraint");
+    SetVariable x;
+    x.var_name = load.lhs->name;
+    x.func_name = func_name;
+    Projection y;
+    y.arg = 1;
+
+    /*
+     * TODO What should I put in the args field?
+     */
+    Constructor y_constructor;
+    y_constructor.name = "ref";
+    y.c = y_constructor;
+    SetVariable y_set_var;
+    y_set_var.var_name = load.src->name;
+    y_set_var.func_name = func_name;
+    y.v = y_set_var;
+    Statement s;
+    s.e1 = y;
+    s.e2 = x;
+    return s;
 }
 
-Statement get_store_constraint(StoreInstruction store) {
+Statement get_store_constraint(StoreInstruction store, std::string func_name) {
     DEBUG("Getting $store constraint");
+    SetVariable y;
+    y.var_name = store.op->var->name;
+    y.func_name = func_name;
+    Projection x;
+    x.arg = 1;
+    Constructor x_constructor;
+    x_constructor.name = "ref";
+    x.c = x_constructor;
+    SetVariable x_set_var;
+    x_set_var.var_name = store.dst->name;
+    x_set_var.func_name = func_name;
+    x.v = x_set_var;
+    Statement s;
+    s.e1 = y;
+    s.e2 = x;
+    return s;
 }
 
 /*
@@ -167,6 +203,17 @@ void print_constraint(Statement c) {
             }
             e1_str += ")";
         }
+    } else if (std::holds_alternative<Projection>(c.e1)) {
+        Projection e1_proj = std::get<Projection>(c.e1);
+        e1_str = "proj(";
+        e1_str += e1_proj.c.name;
+        e1_str += ",";
+        e1_str += std::to_string(e1_proj.arg);
+        e1_str += ",";
+        e1_str += e1_proj.v.func_name;
+        e1_str += ".";
+        e1_str += e1_proj.v.var_name;
+        e1_str += ")";
     }
 
     /*
@@ -186,6 +233,17 @@ void print_constraint(Statement c) {
             }
             e2_str += ")";
         }
+    } else if (std::holds_alternative<Projection>(c.e2)) {
+        Projection e2_proj = std::get<Projection>(c.e2);
+        e2_str = "proj(";
+        e2_str += e2_proj.c.name;
+        e2_str += ",";
+        e2_str += std::to_string(e2_proj.arg);
+        e2_str += ",";
+        e2_str += e2_proj.v.func_name;
+        e2_str += ".";
+        e2_str += e2_proj.v.var_name;
+        e2_str += ")";
     }
 
     /*
@@ -242,12 +300,28 @@ int main(int argc, char *argv[]) {
                 }
                 case LoadInstrType: {
                     DEBUG("Saw a $load");
-                    //constraints.push_back(get_load_constraint(*((LoadInstruction *) instruction)));
+                    LoadInstruction *load = (LoadInstruction *) instruction;
+
+                    /*
+                     * Check that the lhs is a pointer.
+                     */
+                    if (load->lhs->type->indirection != 0) {
+                        constraints.push_back(get_load_constraint(*load, p.funcs[argv[2]]->name));
+                    }
                     break;
                 }
                 case StoreInstrType: {
                     DEBUG("Saw a $store");
-                    //constraints.push_back(get_store_constraint(*((StoreInstruction *) instruction)));
+                    StoreInstruction *store = (StoreInstruction *) instruction;
+
+                    /*
+                     * Check that the value being stored is also a pointer.
+                     */
+                    if (!store->op->IsConstInt()) {
+                        if (store->op->var->type->indirection != 0) {
+                            constraints.push_back(get_store_constraint(*store, p.funcs[argv[2]]->name));
+                        }
+                    }
                     break;
                 }
                 default: {

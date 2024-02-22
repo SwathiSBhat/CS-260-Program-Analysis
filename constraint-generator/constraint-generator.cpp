@@ -62,10 +62,6 @@ Statement get_copy_constraint(CopyInstruction copy, std::string func_name) {
     DEBUG("Getting $copy constraint");
     SetVariable x;
     x.var_name = copy.lhs->name;
-
-    /*
-     * TODO Get function name somehow.
-     */
     x.func_name = func_name;
     SetVariable y;
     y.var_name = copy.op->var->name;
@@ -80,8 +76,25 @@ Statement get_copy_constraint(CopyInstruction copy, std::string func_name) {
  * TODO Add function name argument to all of these.
  */
 
-Statement get_addrof_constraint(AddrofInstruction addrof) {
+/*
+ * TODO I'm not sure this is correct.
+ */
+Statement get_addrof_constraint(AddrofInstruction addrof, std::string func_name) {
     DEBUG("Getting $addrof constraint");
+    SetVariable x;
+    x.var_name = addrof.lhs->name;
+    x.func_name = func_name;
+    Constructor y;
+    y.name = "ref";
+    SetVariable y_arg;
+    y_arg.var_name = addrof.rhs->name;
+    y_arg.func_name = func_name;
+    y.args.push_back(y_arg);
+    y.args.push_back(y_arg);
+    Statement s;
+    s.e1 = y;
+    s.e2 = x;
+    return s;
 }
 
 Statement get_alloc_constraint(AllocInstruction alloc) {
@@ -111,7 +124,7 @@ Statement get_store_constraint(StoreInstruction store) {
 }
 
 /*
- * TODO I should refactor this.
+ * TODO I should refactor this. And add comments.
  */
 void print_constraint(Statement c) {
 
@@ -124,6 +137,17 @@ void print_constraint(Statement c) {
         if (std::holds_alternative<SetVariable>(e1_term)) {
             SetVariable e1_set_var = std::get<SetVariable>(e1_term);
             e1_str = e1_set_var.func_name + "." + e1_set_var.var_name;
+        } else if (std::holds_alternative<Constructor>(e1_term)) {
+            Constructor e1_constructor = std::get<Constructor>(e1_term);
+            e1_str = e1_constructor.name + "(";
+            for (const Term &term : e1_constructor.args) {
+
+                /*
+                 * TODO I could factor this out.
+                 */
+                e1_str += std::get<SetVariable>(term).func_name + "." + std::get<SetVariable>(term).var_name + ",";
+            }
+            e1_str += ")";
         }
     }
 
@@ -136,6 +160,13 @@ void print_constraint(Statement c) {
         if (std::holds_alternative<SetVariable>(e2_term)) {
             SetVariable e2_set_var = std::get<SetVariable>(e2_term);
             e2_str = e2_set_var.func_name + "." + e2_set_var.var_name;
+        } else if (std::holds_alternative<Constructor>(e2_term)) {
+            Constructor e2_constructor = std::get<Constructor>(e2_term);
+            e2_str = e2_constructor.name + "(";
+            for (const Term &term: e2_constructor.args) {
+                e2_str += std::get<SetVariable>(term).func_name + "." + std::get<SetVariable>(term).var_name + ",";
+            }
+            e2_str += ")";
         }
     }
 
@@ -143,13 +174,6 @@ void print_constraint(Statement c) {
      * Now let's actually print out our constraint.
      */
     std::cout << e1_str << " <= " << e2_str << std::endl;
-}
-
-/*
- * Print a set variable without a trailing newline.
- */
-void print_set_var(SetVariable s) {
-    std::cout << s.func_name << "." << s.var_name;
 }
 
 int main(int argc, char *argv[]) {
@@ -185,7 +209,7 @@ int main(int argc, char *argv[]) {
                 }
                 case AddrofInstrType: {
                     DEBUG("Saw a $addrof");
-                    //constraints.push_back(get_addrof_constraint(*((AddrofInstruction *) instruction)));
+                    constraints.push_back(get_addrof_constraint(*((AddrofInstruction *) instruction), p.funcs[argv[2]]->name));
                     break;
                 }
                 case AllocInstrType: {

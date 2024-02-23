@@ -8,6 +8,8 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "rtype.hpp"
+#include <queue>
+#include "mod_ref_utils.hpp"
 
 /*
  * Join is a union of the two abstract stores where each abstract store is a map of variable name to a set of pp where they are defined.
@@ -47,6 +49,61 @@ bool joinSets(std::set<std::string> &s1, std::set<std::string> &s2) {
     changed = (result_set.size() != s1.size());
     s1 = result_set;
     return changed;
+}
+
+std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_map<std::string, std::set<std::string>> pointsTo) {
+    // TODO - Need to handle globals and pointsTo of globals
+    // TODO - Need to handle name of pointsTo - for locals - funcname.argname
+    std::set<std::string> reachable;
+    std::queue<std::string> q;
+    for(const auto& op: args) {
+        if(!op->IsConstInt()) {
+            std::string var = op->var->name;
+            if(pointsTo.count(var)) {
+                for(const auto& v: pointsTo[var]) {
+                    reachable.insert(v);
+                    q.push(v);
+                }
+                while(!q.empty()) {
+                    std::string tmp = q.front();
+                    q.pop();
+                    if(pointsTo.count(tmp)) {
+                        for(const auto& v: pointsTo[tmp]) {
+                            reachable.insert(v);
+                            q.push(v);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return reachable;
+}
+
+std::set<std::string> GetRefs(std::set<std::string> callees, std::set<std::string> reachable) {
+    std::set<std::string> refs, union_refs;
+    for(const auto& callee: callees) {
+        if(modRefInfo_.count(callee)) {
+            ModRefInfo tmp = modRefInfo_[callee];
+            union_refs.insert(tmp.ref.begin(), tmp.ref.end());
+        }
+    }
+    std::set_intersection(union_refs.begin(), union_refs.end(), reachable.begin(), reachable.end(),
+                                                std::inserter(refs, refs.begin()));
+    return refs;
+}
+
+std::set<std::string> GetDefs(std::set<std::string> callees, std::set<std::string> reachable) {
+    std::set<std::string> defs, union_defs;
+    for(const auto& callee: callees) {
+        if(modRefInfo_.count(callee)) {
+            ModRefInfo tmp = modRefInfo_[callee];
+            union_defs.insert(tmp.mod.begin(), tmp.mod.end());
+        }
+    }
+    std::set_intersection(union_defs.begin(), union_defs.end(), reachable.begin(), reachable.end(),
+                                                std::inserter(defs, defs.begin()));
+    return defs;
 }
 
 void execute(
@@ -283,16 +340,16 @@ void execute(
 
             /*
              * DEF = {x}
-             * USE = {y} U { v in addr_taken | type(v) = type(x) }
+             * USE = {y} U pointsTo[y]
              * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
              * sigma_prime[x] = { pp }
             */
             DEF.insert(load_inst->lhs);
             USE.insert(load_inst->src);
 
-            for (auto v : addr_taken) {
-                if (Type::isEqualType(v->type, load_inst->lhs->type)) {
-                    USE.insert(v);
+            if (pointsTo.count(load_inst->src->name)) {
+                for (auto pts_to : pointsTo[load_inst->src->name]) {
+                    USE.insert(pts_to);
                 }
             }
 
@@ -313,21 +370,15 @@ void execute(
 
             /*
              * $store x op
-             * DEF = { v in addr_taken | type(v) = type(op) }
+             * DEF = pointsTo[x]
              * USE = {x} U { op | op is a variable }
              * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
              * for all v in DEF: sigma_prime[v] = sigma_prime[v] U { pp }
             */
-            for (auto v : addr_taken) {
-                // To handle the case when op is a constant int vs variable
-                if (store_inst->op->IsConstInt())
-                {
-                    if (v->isIntType())
-                        DEF.insert(v);
+            if (pointsTo.count(store_inst->dst->name)) {
+                for (auto pts_to : pointsTo[store_inst->dst->name]) {
+                    DEF.insert(pts_to);
                 }
-
-                else if (Type::isEqualType(v->type, store_inst->op->var->type))
-                    DEF.insert(v);
             }
 
             USE.insert(store_inst->dst);
@@ -511,58 +562,29 @@ void execute(
         CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal_instruction;
 
         std::set<Variable*> USE;
+        std::set<std::string> CALLEES, REFS, WDEF, REACHABLE;
+
         /*
-            * SDEF = {x} - Strong defs - definitely updating the variable
-            * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
-            * USE = { fp } U { arg | arg is a variable } U WDEF // add fp only in case of call_idr
-            * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
-            * for all v in WDEF: sigma_prime[v] = sigma_prime[v] U { pp }
-            * sigma_prime[x] = { pp }
+        * CALLEES = {id} 
+        * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)
+        * WDEF = (U mod(c) for all mods of c in CALLEES) ^ REACHABLE
+        * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
-        std::set<Variable*> SDEF;
-        std::set<Variable*> WDEF;
+       // TODO - Check logic for each function and need to add logic for globals and pointsTo globals
+        CALLEES.insert(calldir_inst->callee);
 
-        if (calldir_inst->lhs)
-            SDEF.insert(calldir_inst->lhs);
-        
-        // Add all globals to WDEF
-        for (auto it = program->globals.begin(); it != program->globals.end(); it++) {
-            WDEF.insert((*it)->globalVar);
-        }
+        REACHABLE = GetReachable(calldir_inst->args, pointsTo);
 
-        // Get reachable types for all globals
-            std::unordered_set<ReachableType*> global_reachable_types;
-            for (auto gl : program->globals) {
-                ReachableType *var_type = new ReachableType(gl->globalVar->type);
-                ReachableType::GetReachableType(program, var_type, global_reachable_types);
-            }
+        REFS = GetRefs(CALLEES, REACHABLE);
+		
+        USE.insert(REFS.begin(), REFS.end());
 
-            // Get reachable types for all args
-            std::unordered_set<ReachableType*> args_reachable_types;
-            for (auto arg : calldir_inst->args) {
-                if (arg->IsConstInt())
-                    continue;
-                ReachableType *var_type = new ReachableType(arg->var->type);
-                ReachableType::GetReachableType(program, var_type, args_reachable_types);
-            }
-
-            for (auto v : addr_taken) {
-                if (ReachableType::isPresentInSet(global_reachable_types, new ReachableType(v->type)))
-                    WDEF.insert(v);
-            }
-
-            for (auto v : addr_taken) {
-                if (ReachableType::isPresentInSet(args_reachable_types, new ReachableType(v->type)))
-                    WDEF.insert(v);
-            }
-
-        // Add WDEF to USE
-        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
-        
-        for(auto arg : calldir_inst->args) {
-            if (!arg->IsConstInt())
+        for(const auto& arg: calldir_inst->args) {
+            if(!arg->IsConstInt()) {
                 USE.insert(arg->var);
+            }
         }
+        WDEF = GetDefs(CALLEES, REACHABLE);
 
         if (execute_final) {
             for (Variable *v : USE) {
@@ -571,9 +593,9 @@ void execute(
             }
         }
 
-        for (Variable *v : WDEF) {
+        for (std::string v : WDEF) {
             // sigma_prime[v] = sigma_prime[v] U { pp }
-            sigma_prime[v->name].insert(pp);
+            sigma_prime[v].insert(pp);
         }
 
         if (calldir_inst->lhs)
@@ -592,57 +614,31 @@ void execute(
         CallIdrInstruction *callidir_inst = (CallIdrInstruction *) terminal_instruction;
 
         std::set<Variable*> USE;
+        std::set<std::string> CALLEES, REFS, WDEF, REACHABLE;
+
         /*
-            * SDEF = {x} - Strong defs - definitely updating the variable
-            * WDEF = { globals } U { v in addr_taken | type(v) in reachable_types(globals) } U { v in addr_taken | type(v) in reachable_types(args) } - Weak defs - may be updating the variable
-            * USE = { fp } U { arg | arg is a variable } U WDEF // add fp only in case of call_idr
-            * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
-            * for all v in WDEF: sigma_prime[v] = sigma_prime[v] U { pp }
-            * sigma_prime[x] = { pp }
+        * CALLEES = pointsTo[fp]
+        * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)
+        * WDEF = (U mod(c) for all mods of c in CALLEES) ^ REACHABLE
+        * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
-        std::set<Variable*> SDEF;
-        std::set<Variable*> WDEF;
 
-        if (callidir_inst->lhs)
-            SDEF.insert(callidir_inst->lhs);
-        
-        // Add all globals to WDEF
-        for (auto it = program->globals.begin(); it != program->globals.end(); it++) {
-            WDEF.insert((*it)->globalVar);
-        }
-        // Get reachable types for all globals
-        std::unordered_set<ReachableType*> global_reachable_types;
-        for (auto gl : program->globals) {
-            ReachableType *var_type = new ReachableType(gl->globalVar->type);
-            ReachableType::GetReachableType(program, var_type, global_reachable_types);
+        for(const auto& pts_to: pointsTo[callidir_inst->fp->name]) {
+            CALLEES.insert(pts_to);
         }
 
-        // Get reachable types for all args
-        std::unordered_set<ReachableType*> args_reachable_types;
-        for (auto arg : callidir_inst->args) {
-            if (arg->IsConstInt())
-                continue;
-            ReachableType *var_type = new ReachableType(arg->var->type);
-            ReachableType::GetReachableType(program, var_type, args_reachable_types);
-        }
+        REACHABLE = GetReachable(callidir_inst->args, pointsTo);
 
-        for (auto v : addr_taken) {
-            if (ReachableType::isPresentInSet(global_reachable_types, new ReachableType(v->type)))
-                WDEF.insert(v);
-        }
+        REFS = GetRefs(CALLEES, REACHABLE);
+		
+        USE.insert(REFS.begin(), REFS.end());
 
-        for (auto v : addr_taken) {
-            if (ReachableType::isPresentInSet(args_reachable_types, new ReachableType(v->type)))
-                WDEF.insert(v);
-        }
-
-        std::copy(WDEF.begin(), WDEF.end(), std::inserter(USE, USE.end()));
-
-        for(auto arg : callidir_inst->args) {
-            if (!arg->IsConstInt())
+        for(const auto& arg: callidir_inst->args) {
+            if(!arg->IsConstInt()) {
                 USE.insert(arg->var);
+            }
         }
-        USE.insert(callidir_inst->fp);
+        WDEF = GetDefs(CALLEES, REACHABLE);
 
         if (execute_final) {
             for (Variable *v : USE) {
@@ -651,9 +647,9 @@ void execute(
             }
         }
 
-        for (Variable *v : WDEF) {
+        for (std::string v : WDEF) {
             // sigma_prime[v] = sigma_prime[v] U { pp }
-            sigma_prime[v->name].insert(pp);
+            sigma_prime[v].insert(pp);
         }
 
         if (callidir_inst->lhs)

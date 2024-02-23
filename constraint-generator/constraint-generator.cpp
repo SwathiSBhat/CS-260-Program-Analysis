@@ -174,6 +174,19 @@ Statement get_store_constraint(StoreInstruction store, std::string func_name) {
     return s;
 }
 
+Statement get_call_dir_constraint(CallDirInstruction call_dir,
+                                  std::string func_name) {
+
+    /*
+     * [retval(<func>) <= [x]
+     */
+
+    /*
+     * For each argument, if it's a pointer, [arg] <= [param] such that param is
+     * the corresponding function parameter.
+     */
+}
+
 /*
  * Return a nice string representation of a given SetVariable.
  */
@@ -314,6 +327,27 @@ int main(int argc, char *argv[]) {
                     }
                 } // End of switch-case
             }
+
+            /*
+             * Let's not forget about the terminal instruction.
+             */
+            Instruction *terminal = bb.second->terminal;
+            switch (terminal->instrType) {
+                case CallDirInstrType: {
+                    CallDirInstruction *call_dir = (CallDirInstruction *) terminal;
+
+                    /*
+                     * We only care about functions that return pointers.
+                     */
+                    if (call_dir->lhs && call_dir->lhs->type->indirection != 0) {
+                        constraints.push_back(get_call_dir_constraint(*call_dir, func_name));
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
+            } // End of switch-case
         }
     }
 

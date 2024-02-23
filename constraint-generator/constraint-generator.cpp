@@ -175,7 +175,55 @@ Statement get_store_constraint(StoreInstruction store, std::string func_name) {
 }
 
 /*
- * TODO I should refactor this. And add comments.
+ * Return a nice string representation of a given SetVariable.
+ */
+std::string build_set_var_str(SetVariable s) {
+    std::string ret_str = "";
+    if (s.is_local) {
+        ret_str += s.func_name + "." + s.var_name;
+    } else {
+        ret_str += s.var_name;
+    }
+    return ret_str;
+}
+
+/*
+ * Return a string representation of an Expression.
+ */
+std::string build_expr_str(Expression e) {
+    std::string e_str = "";
+    if (std::holds_alternative<Term>(e)) {
+        Term e_term = std::get<Term>(e);
+        if (std::holds_alternative<SetVariable>(e_term)) {
+            SetVariable e_set_var = std::get<SetVariable>(e_term);
+            e_str = build_set_var_str(e_set_var);
+        } else if (std::holds_alternative<Constructor>(e_term)) {
+            Constructor e_constructor = std::get<Constructor>(e_term);
+            e_str = e_constructor.name + "(";
+            for (int i = 0; i < e_constructor.args.size(); i++) {
+                SetVariable e_set_var = std::get<SetVariable>(e_constructor.args[i]);
+                e_str += build_set_var_str(e_set_var);
+                if (i != e_constructor.args.size() - 1) {
+                    e_str += ",";
+                }
+            }
+            e_str += ")";
+        }
+    } else if (std::holds_alternative<Projection>(e)) {
+        Projection e_proj = std::get<Projection>(e);
+        e_str = "proj(";
+        e_str += e_proj.c.name;
+        e_str += ",";
+        e_str += std::to_string(e_proj.arg);
+        e_str += ",";
+        e_str += build_set_var_str(e_proj.v);
+        e_str += ")";
+    }
+    return e_str;
+}
+
+/*
+ * Return a string representation of a given Statement.
  */
 std::string build_constraint(Statement c) {
 
@@ -183,90 +231,9 @@ std::string build_constraint(Statement c) {
      * This is the constraint string we're eventually going to be returning.
      */
     std::string constraint = "";
-
-    /*
-     * First, let's look at e1.
-     */
-    std::string e1_str = "";
-    if (std::holds_alternative<Term>(c.e1)) {
-        Term e1_term = std::get<Term>(c.e1);
-        if (std::holds_alternative<SetVariable>(e1_term)) {
-            SetVariable e1_set_var = std::get<SetVariable>(e1_term);
-            if (e1_set_var.is_local) {
-                e1_str += e1_set_var.func_name + "." + e1_set_var.var_name;
-            } else {
-                e1_str += e1_set_var.var_name;
-            }
-        } else if (std::holds_alternative<Constructor>(e1_term)) {
-            Constructor e1_constructor = std::get<Constructor>(e1_term);
-            e1_str = e1_constructor.name + "(";
-            for (int i = 0; i < e1_constructor.args.size(); i++) {
-                Term term = e1_constructor.args[i];
-                SetVariable e1_set_var = std::get<SetVariable>(term);
-                if (e1_set_var.is_local) {
-                    e1_str += e1_set_var.func_name + "." + e1_set_var.var_name;
-                } else {
-                    e1_str += e1_set_var.var_name;
-                }
-                if (i != e1_constructor.args.size() - 1) {
-                    e1_str += ",";
-                }
-            }
-            e1_str += ")";
-        }
-    } else if (std::holds_alternative<Projection>(c.e1)) {
-        Projection e1_proj = std::get<Projection>(c.e1);
-        e1_str = "proj(";
-        e1_str += e1_proj.c.name;
-        e1_str += ",";
-        e1_str += std::to_string(e1_proj.arg);
-        e1_str += ",";
-        e1_str += e1_proj.v.func_name;
-        e1_str += ".";
-        e1_str += e1_proj.v.var_name;
-        e1_str += ")";
-    }
-
-    /*
-     * Now let's look at e2.
-     */
-    std::string e2_str = "";
-    if (std::holds_alternative<Term>(c.e2)) {
-        Term e2_term = std::get<Term>(c.e2);
-        if (std::holds_alternative<SetVariable>(e2_term)) {
-            SetVariable e2_set_var = std::get<SetVariable>(e2_term);
-            e2_str = e2_set_var.func_name + "." + e2_set_var.var_name;
-        } else if (std::holds_alternative<Constructor>(e2_term)) {
-            Constructor e2_constructor = std::get<Constructor>(e2_term);
-            e2_str = e2_constructor.name + "(";
-            for (int i = 0; i < e2_constructor.args.size(); i++) {
-                Term term = e2_constructor.args[i];
-                e2_str += std::get<SetVariable>(term).func_name + "." + std::get<SetVariable>(term).var_name;
-                if (i != e2_constructor.args.size() - 1) {
-                    e2_str += ",";
-                }
-            }
-            e2_str += ")";
-        }
-    } else if (std::holds_alternative<Projection>(c.e2)) {
-        Projection e2_proj = std::get<Projection>(c.e2);
-        e2_str = "proj(";
-        e2_str += e2_proj.c.name;
-        e2_str += ",";
-        e2_str += std::to_string(e2_proj.arg);
-        e2_str += ",";
-        e2_str += e2_proj.v.func_name;
-        e2_str += ".";
-        e2_str += e2_proj.v.var_name;
-        e2_str += ")";
-    }
-
-    /*
-     * Now let's actually build our constraint string.
-     */
-    constraint += e1_str;
+    constraint += build_expr_str(c.e1);
     constraint += " <= ";
-    constraint += e2_str;
+    constraint += build_expr_str(c.e2);
     constraint += "\n";
     return constraint;
 }
@@ -284,7 +251,7 @@ int main(int argc, char *argv[]) {
     std::vector<Statement> constraints;
 
     /*
-     * TODO We also want to loop over each function in the program as well.
+     * We also want to loop over each function in the program.
      */
     for (const auto &func : p.funcs) {
         std::string func_name = func.first;

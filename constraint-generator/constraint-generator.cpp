@@ -9,7 +9,7 @@
 /*
  * For debugging.
  */
-//#define DEBUG(x) std::cout << "(" << __FILE_NAME__ << ":" << __LINE__ << ") " << x << std::endl
+#define DEBUG(x) std::cout << "(" << __FILE_NAME__ << ":" << __LINE__ << ") " << x << std::endl
 
 /*
  * For globals and $alloc identifiers, func_name will be the empty string.
@@ -57,6 +57,27 @@ struct Statement {
     Expression e1;
     Expression e2;
 };
+
+/*
+ * Get a pointer to the variable that a particular function returns (if any).
+ * Return a nullptr otherwise.
+ */
+Variable* get_ret_val(Function *f) {
+
+    /*
+     * Loop through each basic block and find the one that actually returns
+     * a value.
+     */
+    for (const auto &bb : f->bbs) {
+        if (bb.second->terminal->instrType == RetInstrType) {
+            RetInstruction *ret = (RetInstruction *) bb.second->terminal;
+            if (ret->op && !ret->op->IsConstInt()) {
+                return ret->op->var;
+            }
+        }
+    }
+    return nullptr;
+}
 
 Statement get_copy_constraint(CopyInstruction copy, std::string func_name) {
     SetVariable x;
@@ -175,15 +196,41 @@ Statement get_store_constraint(StoreInstruction store, std::string func_name) {
 }
 
 Statement get_call_dir_constraint(CallDirInstruction call_dir,
-                                  std::string func_name) {
+                                  Function *func,
+                                  Function *callee) {
 
     /*
-     * [retval(<func>) <= [x]
+     * [retval(<func>)] <= [x]
      */
+    Variable *ret_var = get_ret_val(callee);
+    if (!ret_var) {
+
+        /*
+         * If we're here, something has gone very wrong.
+         */
+        DEBUG("What the fuck");
+
+    }
+
+    /*
+     * Not sure if my logic here is correct.
+     */
+    SetVariable x;
+    x.func_name = func->name;
+    x.var_name = call_dir.lhs->name;
+    SetVariable ret_val;
+    ret_val.func_name = callee->name;
+    ret_val.var_name = ret_var->name;
+    Statement s;
+    s.e1 = ret_val;
+    s.e2 = x;
+    return s;
 
     /*
      * For each argument, if it's a pointer, [arg] <= [param] such that param is
      * the corresponding function parameter.
+     *
+     * TODO
      */
 }
 
@@ -340,7 +387,7 @@ int main(int argc, char *argv[]) {
                      * We only care about functions that return pointers.
                      */
                     if (call_dir->lhs && call_dir->lhs->type->indirection != 0) {
-                        constraints.push_back(get_call_dir_constraint(*call_dir, func_name));
+                        constraints.push_back(get_call_dir_constraint(*call_dir, func.second, p.funcs[call_dir->callee]));
                     }
                     break;
                 }

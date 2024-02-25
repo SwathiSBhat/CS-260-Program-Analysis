@@ -51,11 +51,11 @@ bool joinSets(std::set<std::string> &s1, std::set<std::string> &s2) {
     return changed;
 }
 
-std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_map<std::string, std::set<std::string>> pointsTo) {
-    // TODO - Need to handle globals and pointsTo of globals
+std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_map<std::string, std::set<std::string>> pointsTo, Program *program) {
     // TODO - Need to handle name of pointsTo - for locals - funcname.argname
     std::set<std::string> reachable;
     std::queue<std::string> q;
+
     for(const auto& op: args) {
         if(!op->IsConstInt()) {
             std::string var = op->var->name;
@@ -77,10 +77,30 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
             }
         }
     }
+    // Globals + All objects reachable from globals
+    for (auto gl : program->globals) {
+        
+        reachable.insert(gl->globalVar->name);
+
+        for (auto v : pointsTo[gl->globalVar->name]) {
+            reachable.insert(v);
+            q.push(v);
+        }
+        while (!q.empty()) {
+            std::string tmp = q.front();
+            q.pop();
+            if (pointsTo.count(tmp)) {
+                for (const auto &v : pointsTo[tmp]) {
+                    reachable.insert(v);
+                    q.push(v);
+                }
+            }
+        }
+    }
     return reachable;
 }
 
-std::set<std::string> GetRefs(std::set<std::string> callees, std::set<std::string> reachable) {
+std::set<std::string> GetRefs(std::set<std::string> callees, std::set<std::string> reachable, std::map<std::string, ModRefInfo> modRefInfo_) {
     std::set<std::string> refs, union_refs;
     for(const auto& callee: callees) {
         if(modRefInfo_.count(callee)) {
@@ -93,7 +113,7 @@ std::set<std::string> GetRefs(std::set<std::string> callees, std::set<std::strin
     return refs;
 }
 
-std::set<std::string> GetDefs(std::set<std::string> callees, std::set<std::string> reachable) {
+std::set<std::string> GetDefs(std::set<std::string> callees, std::set<std::string> reachable, std::map<std::string, ModRefInfo> modRefInfo_) {
     std::set<std::string> defs, union_defs;
     for(const auto& callee: callees) {
         if(modRefInfo_.count(callee)) {
@@ -108,6 +128,8 @@ std::set<std::string> GetDefs(std::set<std::string> callees, std::set<std::strin
 
 void execute(
     Program *program,
+    std::unordered_map<std::string, std::set<std::string>> &pointsTo,
+    std::map<std::string, ModRefInfo> &modRefInfo,
     BasicBlock *bb,
     std::map<std::string, std::map<std::string, std::set<std::string>>> &bb2store,
     std::deque<std::string> &worklist,
@@ -335,8 +357,8 @@ void execute(
              * Cast it.
              */
             LoadInstruction *load_inst = (LoadInstruction *) inst;
-            std::set<Variable*> DEF;
-            std::set<Variable*> USE;
+            std::set<std::string> DEF;
+            std::set<std::string> USE;
 
             /*
              * DEF = {x}
@@ -344,8 +366,8 @@ void execute(
              * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
              * sigma_prime[x] = { pp }
             */
-            DEF.insert(load_inst->lhs);
-            USE.insert(load_inst->src);
+            DEF.insert(load_inst->lhs->name);
+            USE.insert(load_inst->src->name);
 
             if (pointsTo.count(load_inst->src->name)) {
                 for (auto pts_to : pointsTo[load_inst->src->name]) {
@@ -354,9 +376,9 @@ void execute(
             }
 
             if (execute_final) {
-                for (Variable *v : USE) {
+                for (std::string v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
-                    joinSets(soln[pp], sigma_prime[v->name]);
+                    joinSets(soln[pp], sigma_prime[v]);
                 }
             }
 
@@ -365,8 +387,8 @@ void execute(
         else if ((*inst).instrType == InstructionType::StoreInstrType)
         {
             StoreInstruction *store_inst = (StoreInstruction *) inst;
-            std::set<Variable*> DEF;
-            std::set<Variable*> USE;
+            std::set<std::string> DEF;
+            std::set<std::string> USE;
 
             /*
              * $store x op
@@ -381,19 +403,19 @@ void execute(
                 }
             }
 
-            USE.insert(store_inst->dst);
+            USE.insert(store_inst->dst->name);
             if (!store_inst->op->IsConstInt())
-                USE.insert(store_inst->op->var);
+                USE.insert(store_inst->op->var->name);
 
             if (execute_final) {
-                for (Variable *v : USE) {
+                for (std::string v : USE) {
                     // soln[pp] = soln[pp] U sigma_prime[v]
-                    joinSets(soln[pp], sigma_prime[v->name]);
+                    joinSets(soln[pp], sigma_prime[v]);
                 }
             }
 
-            for (Variable *v : DEF) {
-                sigma_prime[v->name].insert(pp);
+            for (std::string v : DEF) {
+                sigma_prime[v].insert(pp);
             }
         }
         else if ((*inst).instrType == InstructionType::CallExtInstrType)
@@ -561,8 +583,7 @@ void execute(
     {
         CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal_instruction;
 
-        std::set<Variable*> USE;
-        std::set<std::string> CALLEES, REFS, WDEF, REACHABLE;
+        std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
 
         /*
         * CALLEES = {id} 
@@ -573,23 +594,23 @@ void execute(
        // TODO - Check logic for each function and need to add logic for globals and pointsTo globals
         CALLEES.insert(calldir_inst->callee);
 
-        REACHABLE = GetReachable(calldir_inst->args, pointsTo);
+        REACHABLE = GetReachable(calldir_inst->args, pointsTo, program);
 
-        REFS = GetRefs(CALLEES, REACHABLE);
+        REFS = GetRefs(CALLEES, REACHABLE, modRefInfo);
 		
         USE.insert(REFS.begin(), REFS.end());
 
         for(const auto& arg: calldir_inst->args) {
             if(!arg->IsConstInt()) {
-                USE.insert(arg->var);
+                USE.insert(arg->var->name);
             }
         }
-        WDEF = GetDefs(CALLEES, REACHABLE);
+        WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
         if (execute_final) {
-            for (Variable *v : USE) {
+            for (std::string v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
-                joinSets(soln[pp], sigma_prime[v->name]);
+                joinSets(soln[pp], sigma_prime[v]);
             }
         }
 
@@ -613,8 +634,7 @@ void execute(
     {
         CallIdrInstruction *callidir_inst = (CallIdrInstruction *) terminal_instruction;
 
-        std::set<Variable*> USE;
-        std::set<std::string> CALLEES, REFS, WDEF, REACHABLE;
+        std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
 
         /*
         * CALLEES = pointsTo[fp]
@@ -627,23 +647,23 @@ void execute(
             CALLEES.insert(pts_to);
         }
 
-        REACHABLE = GetReachable(callidir_inst->args, pointsTo);
+        REACHABLE = GetReachable(callidir_inst->args, pointsTo, program);
 
-        REFS = GetRefs(CALLEES, REACHABLE);
+        REFS = GetRefs(CALLEES, REACHABLE, modRefInfo);
 		
         USE.insert(REFS.begin(), REFS.end());
 
         for(const auto& arg: callidir_inst->args) {
             if(!arg->IsConstInt()) {
-                USE.insert(arg->var);
+                USE.insert(arg->var->name);
             }
         }
-        WDEF = GetDefs(CALLEES, REACHABLE);
+        WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
         if (execute_final) {
-            for (Variable *v : USE) {
+            for (std::string v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
-                joinSets(soln[pp], sigma_prime[v->name]);
+                joinSets(soln[pp], sigma_prime[v]);
             }
         }
 

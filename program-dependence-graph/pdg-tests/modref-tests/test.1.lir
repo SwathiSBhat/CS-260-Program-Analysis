@@ -1,0 +1,37 @@
+func1:&() -> _
+
+fn main() -> int {
+    let a:int
+    entry:
+    $call_dir func1() then bb1
+
+    bb1:
+    $ret 0
+}
+
+fn func1() -> _ {
+    let a:int
+    entry:
+    $call_dir func2() then bb1
+
+    bb1:
+    $ret 
+}
+
+fn func2() -> _ {
+    let a:int
+    entry:
+    $call_dir func3() then bb1 
+
+    bb1:
+    $call_dir func1() then exit 
+
+    exit:
+    $ret 
+}
+
+fn func3() -> _ {
+    let a:int 
+    entry:
+    $ret
+}

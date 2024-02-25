@@ -1,4 +1,3 @@
-#include <fstream>
 #include <vector>
 #include <unordered_set>
 #include <set>
@@ -27,7 +26,7 @@ public:
      */
     std::set<std::string> bbs_to_output;
 
-    ReachingDef(Program program) : program(program) {};
+    ReachingDef(Program program, std::unordered_map<std::string, std::set<std::string>> pointsTo, std::map<std::string, ModRefInfo> modRefInfo_) : program(program), pointsTo(pointsTo), modRefInfo_(modRefInfo_)  {};
 
     /*
     Method to get all pointer typed globals, parameters, locals of the function
@@ -149,12 +148,12 @@ public:
     /*
         Uber level method to run the analysis on a function
     */
-    void AnalyzeFunc(const std::string &func_name) {
+    std::map<std::string, std::set<std::string>> AnalyzeFunc(const std::string &func_name) {
 
         Function *func = program.funcs[func_name];
         if (!func) {
             std::cout << "Function not found" << std::endl;
-            return;
+            return std::map<std::string, std::set<std::string>>();
         }
 
         funcname = func_name;
@@ -208,6 +207,8 @@ public:
             // Perform the transfer function on the current basic block
             
             execute(&program,
+                    pointsTo,
+                    modRefInfo_,
                     func->bbs[current_bb],
                     bb2store,
                     worklist,
@@ -229,6 +230,8 @@ public:
 
         for (const auto &it : bbs_to_output) {
             execute(&program,
+                    pointsTo,
+                    modRefInfo_,
                     func->bbs[it],
                     bb2store,
                     worklist,
@@ -272,6 +275,8 @@ public:
                 }
             }
         }
+
+        return soln;
     }
 
     Program program;
@@ -289,25 +294,9 @@ public:
     */
     std::map<std::string, std::set<std::string>> soln;
 
+    std::unordered_map<std::string, std::set<std::string>> pointsTo;
+    std::map<std::string, ModRefInfo> modRefInfo_;
+
 private:
     std::string funcname;
 };
-
-int main(int argc, char* argv[]) 
-{
-    if (argc != 4) {
-        std::cerr << "Usage: reachingdef <lir file path> <lir json filepath> <funcname>" << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    std::ifstream f(argv[2]);
-    json lir_json = json::parse(f);
-
-    std::string func_name = argv[3];
-
-    Program program = Program(lir_json);
-    ReachingDef reaching_def = ReachingDef(program);
-    reaching_def.AnalyzeFunc(func_name);
-
-    return 0;
-}

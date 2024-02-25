@@ -26,12 +26,12 @@ public:
     /*
         Uber level method to run the analysis on a function
     */
-    void AnalyzeFunc(const std::string &func_name) {
+    std::map<std::string, std::set<std::string>> AnalyzeFunc(const std::string &func_name) {
 
         Function *func = program.funcs[func_name];
         if (!func) {
             std::cout << "Func not found" << std::endl;
-            return;
+            return std::map<std::string, std::set<std::string>>();
         }
 
         funcname = func_name;
@@ -147,6 +147,8 @@ public:
             std::cout << "}" << std::endl;
         }
         std::cout << std::endl;
+
+        return post_dominance_frontier;
     }
 
     Program program;

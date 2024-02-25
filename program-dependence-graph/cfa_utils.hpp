@@ -87,11 +87,11 @@ std::map<std::string, std::set<std::string>> reversed_cfg_get_predecessors(Funct
         }
         else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType)
         {
-            CallDirInstruction *call_dir_inst = (CallDirInstruction *)terminal_instruction;
-            preds[curr_bb].insert(call_dir_inst->next_bb);
-            if (visited.find(call_dir_inst->next_bb) == visited.end())
+            CallIdrInstruction *call_idr_inst = (CallIdrInstruction *)terminal_instruction;
+            preds[curr_bb].insert(call_idr_inst->next_bb);
+            if (visited.find(call_idr_inst->next_bb) == visited.end())
             {
-                q.push(call_dir_inst->next_bb);
+                q.push(call_idr_inst->next_bb);
             }
         }
     }
@@ -155,11 +155,11 @@ std::map<std::string, std::set<std::string>> get_successors(Function *func)
         }
         else if (terminal_instruction->instrType == InstructionType::CallIdrInstrType)
         {
-            CallDirInstruction *call_dir_inst = (CallDirInstruction *)terminal_instruction;
-            succ[call_dir_inst->next_bb].insert(curr_bb);
-            if (visited.find(call_dir_inst->next_bb) == visited.end())
+            CallIdrInstruction *call_idr_inst = (CallIdrInstruction *)terminal_instruction;
+            succ[call_idr_inst->next_bb].insert(curr_bb);
+            if (visited.find(call_idr_inst->next_bb) == visited.end())
             {
-                q.push(call_dir_inst->next_bb);
+                q.push(call_idr_inst->next_bb);
             }
         }
     }

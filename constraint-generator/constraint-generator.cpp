@@ -143,6 +143,9 @@ std::string build_func_type_str(Type::FunctionType func_type) {
     return type_str;
 }
 
+/*
+ * TODO We need to account for global vars.
+ */
 Statement get_copy_constraint(CopyInstruction copy, std::string func_name) {
     SetVariable x;
     x.var_name = copy.lhs->name;
@@ -314,19 +317,62 @@ std::vector<Statement> get_call_dir_constraint(CallDirInstruction call_dir,
     return statements;
 }
 
-Statement get_call_idr_constraint(CallIdrInstruction *call_idr) {
+Statement get_call_idr_constraint(CallIdrInstruction *call_idr, std::string func_name) {
     Type::FunctionType *func_type = (Type::FunctionType *) call_idr->fp->type->ptr_type;
+    std::vector<Term> lam_args;
+
+    /*
+     * Create a dummy set variable and push it back.
+     */
+    SetVariable dummy;
+    dummy.var_name = "_DUMMY";
+    dummy.is_local = false;
+    lam_args.push_back(dummy);
+
+    /*
+     * If the return type is a pointer, create a set variable for it. Else, use
+     * a dummy.
+     */
     if (func_type->ret && func_type->ret->indirection != 0) {
         if (call_idr->lhs && call_idr->lhs->type->indirection != 0) {
+            SetVariable x;
+            x.func_name = func_name;
+            x.var_name = call_idr->lhs->name;
+            lam_args.push_back(x);
+        } else {
 
+            /*
+             * We already created a dummy set variable above, so we can just
+             * reuse that.
+             */
+            lam_args.push_back(dummy);
         }
     }
 
+    /*
+     * Loop through each argument, filtering out the non-pointers.
+     */
     for (const auto& arg : call_idr->args) {
-
+        if (arg->var && arg->var->type->indirection != 0) {
+            SetVariable s;
+            s.func_name = func_name;
+            s.var_name = arg->var->name;
+            lam_args.push_back(s);
+        }
     }
 
     std::string type_str = build_func_type_str(*func_type);
+
+    SetVariable e1;
+    e1.func_name = func_name;
+    e1.var_name = call_idr->fp->name;
+    Constructor e2;
+    e2.name = "lam_[" + type_str + "]";
+    e2.args = lam_args;
+    Statement s;
+    s.e1 = e1;
+    s.e2 = e2;
+    return s;
 }
 
 /*
@@ -579,7 +625,7 @@ int main(int argc, char *argv[]) {
                 }
                 case CallIdrInstrType: {
                     CallIdrInstruction *call_idr = (CallIdrInstruction *) terminal;
-                    //constraints.push_back(get_call_idr_constraint(call_idr));
+                    constraints.push_back(get_call_idr_constraint(call_idr, func_name));
                     break;
                 }
                 default: {

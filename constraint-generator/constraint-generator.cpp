@@ -79,6 +79,70 @@ Variable* get_ret_val(Function *f) {
     return nullptr;
 }
 
+/*
+ * Build a type string for a given function signature. We will use this when
+ * generating the constraints for $call_idr instructions.
+ */
+std::string build_func_type_str(Type::FunctionType func_type) {
+
+    /*
+     * This is the string we'll eventually return.
+     */
+    std::string type_str = "(";
+
+    /*
+     * Loop through each parameter.
+     */
+    for (int i = 0; i < func_type.params.size(); i++) {
+
+        /*
+         * Add ampersands if our current parameter is a pointer.
+         */
+        if (func_type.params[i]->indirection > 0) {
+            for (int j = 0; j < func_type.params[i]->indirection; j++) {
+                type_str += "&";
+            }
+        }
+
+        if (func_type.params[i]->type == IntType) {
+            type_str += "int";
+        } else if (func_type.params[i]->type == StructType) {
+            type_str += ((Type::StructType *) func_type.params[i]->ptr_type)->name;
+        }
+
+        /*
+         * Handle those pesky commas between parameters.
+         */
+        if (i != func_type.params.size() - 1) {
+            type_str += ",";
+        }
+    }
+
+    /*
+     * We're done with parameters, so let's look at the return type now.
+     */
+    type_str += ")->";
+    if (func_type.ret) {
+        if (func_type.ret->indirection > 0) {
+            for (int i = 0; i < func_type.ret->indirection; i++) {
+                type_str += "&";
+            }
+            if (func_type.ret->type == IntType) {
+                type_str += "int";
+            } else if (func_type.ret->type == StructType) {
+                type_str += ((Type::StructType *) func_type.ret->ptr_type)->name;
+            }
+        }
+    } else {
+        type_str += "_";
+    }
+
+    /*
+     * Return our complete type string.
+     */
+    return type_str;
+}
+
 Statement get_copy_constraint(CopyInstruction copy, std::string func_name) {
     SetVariable x;
     x.var_name = copy.lhs->name;

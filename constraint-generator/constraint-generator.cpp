@@ -176,6 +176,10 @@ Statement get_copy_constraint(CopyInstruction copy,
                               std::string func_name,
                               Program &p) {
     SetVariable x;
+
+    /*
+     * TODO I can factor out this logic.
+     */
     x.var_name = copy.lhs->name;
     if (is_global(func_name, *(copy.lhs), p)) {
         x.is_local = false;
@@ -195,15 +199,24 @@ Statement get_copy_constraint(CopyInstruction copy,
     return s;
 }
 
-Statement get_addrof_constraint(AddrofInstruction addrof, std::string func_name) {
+Statement get_addrof_constraint(AddrofInstruction addrof, std::string func_name, Program p) {
     SetVariable x;
     x.var_name = addrof.lhs->name;
-    x.func_name = func_name;
+    if (is_global(func_name, *(addrof.lhs), p)) {
+        x.is_local = false;
+    } else {
+        x.func_name = func_name;
+    }
     Constructor y;
     y.name = "ref";
     SetVariable y_arg;
     y_arg.var_name = addrof.rhs->name;
     y_arg.func_name = func_name;
+    if (is_global(func_name, *(addrof.rhs), p)) {
+        y_arg.is_local = false;
+    } else {
+        y_arg.func_name = func_name;
+    }
     y.args.push_back(y_arg);
     y.args.push_back(y_arg);
     Statement s;
@@ -597,7 +610,7 @@ int main(int argc, char *argv[]) {
                         break;
                     }
                     case AddrofInstrType: {
-                        constraints.push_back(get_addrof_constraint(*((AddrofInstruction *) instruction), func_name));
+                        constraints.push_back(get_addrof_constraint(*((AddrofInstruction *) instruction), func_name, p));
                         break;
                     }
                     case AllocInstrType: {

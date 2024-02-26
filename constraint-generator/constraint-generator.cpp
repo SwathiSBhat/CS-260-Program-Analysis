@@ -144,15 +144,51 @@ std::string build_func_type_str(Type::FunctionType func_type) {
 }
 
 /*
- * TODO We need to account for global vars.
+ * Helper function that determines whether a variable is a local or a global.
  */
-Statement get_copy_constraint(CopyInstruction copy, std::string func_name) {
+bool is_global(const std::string &func_name,
+               const Variable &var,
+               Program &prog) {
+
+    /*
+     * If we find a local with the same name, we know it isn't a global.
+     */
+    if (prog.funcs[func_name]->locals.find(var.name) != prog.funcs[func_name]->locals.end()) {
+        return false;
+    }
+
+    /*
+     * If we find a global with the same name, we know it's a global.
+     */
+    for (const auto &glob : prog.globals) {
+        if (glob->globalVar->name == var.name) {
+            return true;
+        }
+    }
+
+    /*
+     * Catch-all case.
+     */
+    return false;
+}
+
+Statement get_copy_constraint(CopyInstruction copy,
+                              std::string func_name,
+                              Program &p) {
     SetVariable x;
     x.var_name = copy.lhs->name;
-    x.func_name = func_name;
+    if (is_global(func_name, *(copy.lhs), p)) {
+        x.is_local = false;
+    } else {
+        x.func_name = func_name;
+    }
     SetVariable y;
     y.var_name = copy.op->var->name;
-    y.func_name = func_name;
+    if (is_global(func_name, *(copy.op->var), p)) {
+        y.is_local = false;
+    } else {
+        y.func_name = func_name;
+    }
     Statement s;
     s.e1 = y;
     s.e2 = x;
@@ -226,10 +262,6 @@ Statement get_load_constraint(LoadInstruction load, std::string func_name) {
     x.func_name = func_name;
     Projection y;
     y.arg = 1;
-
-    /*
-     * TODO What should I put in the args field?
-     */
     Constructor y_constructor;
     y_constructor.name = "ref";
     y.c = y_constructor;
@@ -560,7 +592,7 @@ int main(int argc, char *argv[]) {
                          * If the LHS isn't a pointer, ignore it.
                          */
                         if (copy->lhs->type->indirection != 0) {
-                            constraints.push_back(get_copy_constraint(*copy, func_name));
+                            constraints.push_back(get_copy_constraint(*copy, func_name, p));
                         }
                         break;
                     }

@@ -269,10 +269,14 @@ Statement get_gfp_constraint(GfpInstruction gfp, std::string func_name) {
     return s;
 }
 
-Statement get_load_constraint(LoadInstruction load, std::string func_name) {
+Statement get_load_constraint(LoadInstruction load, std::string func_name, Program &p) {
     SetVariable x;
     x.var_name = load.lhs->name;
-    x.func_name = func_name;
+    if (is_global(func_name, *(load.lhs), p)) {
+        x.is_local = false;
+    } else {
+        x.func_name = func_name;
+    }
     Projection y;
     y.arg = 1;
     Constructor y_constructor;
@@ -280,7 +284,11 @@ Statement get_load_constraint(LoadInstruction load, std::string func_name) {
     y.c = y_constructor;
     SetVariable y_set_var;
     y_set_var.var_name = load.src->name;
-    y_set_var.func_name = func_name;
+    if (is_global(func_name, *(load.src), p)) {
+        y_set_var.is_local = false;
+    } else {
+        y_set_var.func_name = func_name;
+    }
     y.v = y_set_var;
     Statement s;
     s.e1 = y;
@@ -288,10 +296,14 @@ Statement get_load_constraint(LoadInstruction load, std::string func_name) {
     return s;
 }
 
-Statement get_store_constraint(StoreInstruction store, std::string func_name) {
+Statement get_store_constraint(StoreInstruction store, std::string func_name, Program &p) {
     SetVariable y;
     y.var_name = store.op->var->name;
-    y.func_name = func_name;
+    if (is_global(func_name, *(store.op->var), p)) {
+        y.is_local = false;
+    } else {
+        y.func_name = func_name;
+    }
     Projection x;
     x.arg = 1;
     Constructor x_constructor;
@@ -299,7 +311,11 @@ Statement get_store_constraint(StoreInstruction store, std::string func_name) {
     x.c = x_constructor;
     SetVariable x_set_var;
     x_set_var.var_name = store.dst->name;
-    x_set_var.func_name = func_name;
+    if (is_global(func_name, *(store.dst), p)) {
+        x_set_var.is_local = false;
+    } else {
+        x_set_var.func_name = func_name;
+    }
     x.v = x_set_var;
     Statement s;
     s.e1 = y;
@@ -632,7 +648,7 @@ int main(int argc, char *argv[]) {
                          * Check that the lhs is a pointer.
                          */
                         if (load->lhs->type->indirection != 0) {
-                            constraints.push_back(get_load_constraint(*load, func_name));
+                            constraints.push_back(get_load_constraint(*load, func_name, p));
                         }
                         break;
                     }
@@ -644,7 +660,7 @@ int main(int argc, char *argv[]) {
                          */
                         if (!store->op->IsConstInt()) {
                             if (store->op->var->type->indirection != 0) {
-                                constraints.push_back(get_store_constraint(*store, func_name));
+                                constraints.push_back(get_store_constraint(*store, func_name, p));
                             }
                         }
                         break;

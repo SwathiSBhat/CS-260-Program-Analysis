@@ -31,18 +31,18 @@ SET(CMAKE_CXX_STANDARD 17)
 #)
 
 
-ADD_EXECUTABLE(assn2_control_flow_analysis
-	control-flow-analysis/control_flow_analysis.cpp
-	control-flow-analysis/cfa_utils.hpp
-	headers/datatypes.h
-)
+#ADD_EXECUTABLE(assn2_control_flow_analysis
+#	control-flow-analysis/control_flow_analysis.cpp
+#	control-flow-analysis/cfa_utils.hpp
+#	headers/datatypes.h
+#)
 
-ADD_EXECUTABLE(assn2_reaching_def
-	reaching-defn/reachingdef.cpp
-	reaching-defn/rtype.hpp
-	reaching-defn/execute_rdef.hpp
-	headers/datatypes.h
-)
+#ADD_EXECUTABLE(assn2_reaching_def
+#	reaching-defn/reachingdef.cpp
+#	reaching-defn/rtype.hpp
+#	reaching-defn/execute_rdef.hpp
+#	headers/datatypes.h
+#)
 
 #ADD_EXECUTABLE(test_interval_join
 #	interval-analysis/test_interval_join.cpp
@@ -54,11 +54,23 @@ ADD_EXECUTABLE(assn2_reaching_def
 #	interval-analysis/interval_analysis.hpp
 #)
 
-ADD_EXECUTABLE(assn3-constraint-generator
-		constraint-generator/constraint-generator.cpp)
+#ADD_EXECUTABLE(assn3-constraint-generator
+#		constraint-generator/constraint-generator.cpp)
 
-ADD_EXECUTABLE(assn3_constraint_solver
-	pointer-analysis/constraint_solver.cpp
-	pointer-analysis/set_constraint_util.cpp
+#ADD_EXECUTABLE(assn3_constraint_solver
+#	pointer-analysis/constraint_solver.cpp
+#	pointer-analysis/set_constraint_util.cpp
+#	headers/tokenizer.hpp
+#)
+
+ADD_EXECUTABLE(assn4_program_slicing
+	program-dependence-graph/program_slicing.cpp
+	program-dependence-graph/control_flow_analysis.hpp
+	program-dependence-graph/cfa_utils.hpp
+	program-dependence-graph/mod_ref_utils.hpp
+	program-dependence-graph/execute_rdef.hpp
+	program-dependence-graph/rtype.hpp
+	program-dependence-graph/reachingdef.hpp
+	headers/datatypes.h
 	headers/tokenizer.hpp
 )

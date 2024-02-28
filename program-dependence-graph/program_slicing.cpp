@@ -113,6 +113,72 @@ std::vector<std::string> SplitPP(std::string pp) {
     return res;
 }
 
+// Pad PP to ensure correct ordering of instructions in solution
+string PadPP(string pp) {
+  std::vector<string> cmp = SplitPP(pp);
+  while(cmp[2].size() < 4) {
+    cmp[2].insert(0, "0");
+  }
+  string new_pp = cmp[0] + ":" + cmp[1] + ":" + cmp[2];
+  return new_pp;
+}
+
+struct order {
+  bool operator() (std::string a, std::string b) const {
+    std::vector<std::string> cmp1 = SplitPP(a);
+    std::vector<std::string> cmp2 = SplitPP(b);
+    if(cmp1[0] != cmp2[0]) {
+      if(cmp1[0].compare(cmp2[0]) < 0)
+        return true;
+      return false;
+    }
+    if(cmp1[1] != cmp2[1]) {
+      if(cmp1[1].compare(cmp2[1]) < 0)
+        return true;
+      return false;
+    }
+    if(cmp1[2] != cmp2[2]) {
+      if(cmp1[2].compare(cmp2[2]) < 0)
+        return true;
+      return false;
+    }
+    return false;
+  }
+};
+
+std::set<string, order> GetSlice(string slice_pp) {
+  std::set<string, order> slice = {};
+  slice.insert(PadPP(slice_pp));
+  
+  std::queue<string> to_visit;
+  to_visit.push(slice_pp);
+
+  while(!to_visit.empty()) {
+    string pp = to_visit.front();
+    to_visit.pop();
+
+    if(pdg.find(pp) != pdg.end()) {
+      for(const auto& pred: pdg[pp]->dd_pred) {
+        std::string tmp = PadPP(pred);
+        if(!slice.count(tmp)) {
+          to_visit.push(pred);
+          slice.insert(tmp);
+        }
+      }
+
+      for(const auto& pred: pdg[pp]->cd_pred) {
+        std::string tmp = PadPP(pred);
+        if(!slice.count(tmp)) {
+          to_visit.push(pred);
+          slice.insert(tmp);
+        }
+      }
+    }
+  }
+
+  return slice;
+}
+
 int main(int argc, char const *argv[])
 {
    if (argc != 4) {
@@ -175,6 +241,16 @@ int main(int argc, char const *argv[])
     std::map<std::string, std::set<std::string>> data_dependencies = reaching_def.AnalyzeFunc(func_name);
 
     PDG::ProcessDataDependencies(program.funcs[func_name], data_dependencies);
+
+    // Get slice for given program point
+    std::set<string, order> slice = GetSlice(slice_pp);
+
+    std::cout << "Slice: {" << std::endl;
+    for(const auto& pp: slice) {
+        std::cout << pp << std::endl;
+    }
+    std::cout << "}" << std::endl;
+    std::cout << std::endl;
 
     return 0;
 }

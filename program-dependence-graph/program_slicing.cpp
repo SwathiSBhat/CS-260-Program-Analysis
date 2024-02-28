@@ -6,10 +6,12 @@
 #include <queue>
 #include<set>
 #include <fstream>
+#include <sstream>
 #include "../headers/datatypes.h"
 #include "control_flow_analysis.hpp"
 #include "mod_ref_utils.hpp"
 #include "reachingdef.hpp"
+#include "../headers/tokenizer.hpp"
 
 using json = nlohmann::json;
 
@@ -24,6 +26,7 @@ class PDGNode {
 };
 
 std::unordered_map<std::string, PDGNode*> pdg; // PDG: pp -> PDGNode
+std::unordered_map<string, std::set<string>> pointsTo; // points to info
 
 class PDG {
     public:
@@ -98,19 +101,67 @@ class PDG {
 
 };
 
+std::vector<std::string> SplitPP(std::string pp) {
+    std::vector<string> res(3);
+    util::Tokenizer tk(pp, {' '}, {"#"}, {});
+    std::vector<std::string> tokens = tk.Tokens();
+    res[0] = util::Tokenizer::Consume(tokens);
+    util::Tokenizer::ConsumeToken(tokens, "#");
+    res[1] = util::Tokenizer::Consume(tokens);
+    util::Tokenizer::ConsumeToken(tokens, "#");
+    res[2] = util::Tokenizer::Consume(tokens);
+    return res;
+}
+
 int main(int argc, char const *argv[])
 {
    if (argc != 4) {
-        std::cerr << "Usage: program_slicing <lir file path> <lir json filepath> <funcname>" << std::endl;
+        std::cerr << "Usage: program_slicing <lir json filepath> <slice pp> <points to soln file>" << std::endl;
         return EXIT_FAILURE;
     }
 
-    std::ifstream f(argv[2]);
+    std::ifstream f(argv[1]);
     json lir_json = json::parse(f);
 
-    std::string func_name = argv[3];
+    std::string slice_pp = argv[2];
+    std::vector<std::string> pp = SplitPP(slice_pp);
+    std::string func_name = pp[0];
+    std::string bb_name = pp[1];
+    std::string idx = pp[2];
+    std::cout << "Function: " << func_name << " BB: " << bb_name << " Index: " << idx << std::endl;
 
-    // TODO - Parse pointsTo information
+    std::string pointsToFile = argv[3];
+    std::ifstream in(pointsToFile);
+    std::string input_str(std::istreambuf_iterator<char>{in}, {});
+
+    util::Tokenizer tk(input_str, {' '}, {"{", "}", "->", ","}, {});
+    std::vector<std::string> tokens = tk.Tokens();
+
+    // parse the points-to information
+    while (!tokens.empty()) {
+        std::string lhs = util::Tokenizer::Consume(tokens);
+
+        std::set<std::string> points_to = {};
+        util::Tokenizer::ConsumeToken(tokens, "->");
+        util::Tokenizer::ConsumeToken(tokens, "{");
+
+        while(tokens.back() != "}") {
+            if(tokens.back() == ",") {
+                util::Tokenizer::ConsumeToken(tokens, ",");
+            }
+            else {
+                std::string ptsto_element = util::Tokenizer::Consume(tokens);
+                points_to.insert(ptsto_element);
+            }
+
+        }
+        util::Tokenizer::ConsumeToken(tokens, "}");
+        pointsTo[lhs] = points_to;
+
+        if (!tokens.empty()) {
+            util::Tokenizer::ConsumeToken(tokens, "\n");
+        }
+    }
 
     Program program = Program(lir_json);
     ControlFlowAnalysis constant_analysis = ControlFlowAnalysis(program);

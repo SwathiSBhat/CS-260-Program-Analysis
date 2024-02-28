@@ -4,10 +4,10 @@ project(CS260ProgramAnalysis)
 
 SET(CMAKE_CXX_STANDARD 17)
 
-ADD_EXECUTABLE(assn0
-	assn0.cpp
-	headers/json.hpp
-)
+#ADD_EXECUTABLE(assn0
+#	assn0.cpp
+#	headers/json.hpp
+#)
 
 #ADD_EXECUTABLE(test_abstract_store
 #	tests/test_abstract_store.cpp
@@ -29,6 +29,7 @@ ADD_EXECUTABLE(assn0
 #	interval-analysis/interval_execute.hpp
 #	headers/datatypes.h
 #)
+
 
 ADD_EXECUTABLE(assn2_control_flow_analysis
 	control-flow-analysis/control_flow_analysis.cpp
@@ -54,5 +55,10 @@ ADD_EXECUTABLE(assn2_reaching_def
 #)
 
 ADD_EXECUTABLE(assn3-constraint-generator
-		constraint-generator/constraint-generator.cpp
+		constraint-generator/constraint-generator.cpp)
+
+ADD_EXECUTABLE(assn3_constraint_solver
+	pointer-analysis/constraint_solver.cpp
+	pointer-analysis/set_constraint_util.cpp
+	headers/tokenizer.hpp
 )

@@ -1,0 +1,26 @@
+fn main() -> int {
+  let a: &&int, b: int, c: &int, d: &&int, e: &&int, f: &&int, g:&&int, h: &int, i: int
+
+  entry:
+    a = $alloc 1 [_alloc]
+    b = $copy 42
+    c = $addrof b
+    d = $gep a 42
+    $store d c
+    $branch b bb1 bb2
+
+  bb1:
+    e = $copy d
+    $jump bb3
+
+  bb2:
+    f = $addrof c
+    $jump bb3
+
+  bb3:
+    g = $copy e
+    g = $copy f
+    h = $load g
+    i = $load h
+    $ret i
+}

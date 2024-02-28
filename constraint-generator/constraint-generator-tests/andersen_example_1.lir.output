@@ -1,0 +1,9 @@
+main.a <= main.d
+main.c <= proj(ref,1,main.d)
+main.d <= main.e
+main.e <= main.g
+main.f <= main.g
+proj(ref,1,main.g) <= main.h
+ref(_alloc,_alloc) <= main.a
+ref(main.b,main.b) <= main.c
+ref(main.c,main.c) <= main.f

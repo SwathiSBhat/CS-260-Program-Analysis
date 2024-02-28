@@ -33,9 +33,9 @@ class PDG {
 
     static std::string GetPP(std::string function, BasicBlock *bb, int idx) {
         if (idx == bb->instructions.size()) {
-            return function + ":" + bb->label + ":term";
+            return function + "#" + bb->label + "#term";
         }
-        return function + ":" + bb->label + ":" + std::to_string(idx);
+        return function + "#" + bb->label + "#" + std::to_string(idx);
     }
 
     static void ProcessControlDependencies(Function *func, std::map<std::string, std::set<std::string>> control_dependencies) {
@@ -80,14 +80,16 @@ class PDG {
     static void ProcessDataDependencies(Function *func, std::map<std::string, std::set<std::string>> data_dependencies) {
         for(const auto& [use, definitions]: data_dependencies) {
             
-            std::string use_pp = func->name + ":" + use;
+            std::string use_pp = func->name + "#" + use;
+            std::replace(use_pp.begin(), use_pp.end(), '.', '#');
 
             if(!pdg.count(use_pp)) {
                 pdg[use_pp] = new PDGNode(use_pp);
             }
             
             for(const auto& definition: definitions) {
-                std::string definition_pp = func->name + ":" + definition;
+                std::string definition_pp = func->name + "#" + definition;
+                std::replace(definition_pp.begin(), definition_pp.end(), '.', '#');
 
                 if(!pdg.count(definition_pp)) {
                     pdg[definition_pp] = new PDGNode(definition_pp);
@@ -96,6 +98,38 @@ class PDG {
                 pdg[definition_pp]->dd_succ.insert(use_pp);
                 pdg[use_pp]->dd_pred.insert(definition_pp);
             }
+        }
+    }
+
+    /*
+    * Print PDG
+    */
+    static void PrintPDG() {
+        for(const auto& [pp, node]: pdg) {
+            std::cout << "PP: " << pp << std::endl;
+            std::cout << "DD Pred: ";
+            for(const auto& pred: node->dd_pred) {
+                std::cout << pred << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "DD Succ: ";
+            for(const auto& succ: node->dd_succ) {
+                std::cout << succ << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "CD Pred: ";
+            for(const auto& pred: node->cd_pred) {
+                std::cout << pred << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "CD Succ: ";
+            for(const auto& succ: node->cd_succ) {
+                std::cout << succ << " ";
+            }
+            std::cout << std::endl;
         }
     }
 
@@ -119,7 +153,7 @@ string PadPP(string pp) {
   while(cmp[2].size() < 4) {
     cmp[2].insert(0, "0");
   }
-  string new_pp = cmp[0] + ":" + cmp[1] + ":" + cmp[2];
+  string new_pp = cmp[0] + "#" + cmp[1] + "#" + cmp[2];
   return new_pp;
 }
 
@@ -147,56 +181,58 @@ struct order {
 };
 
 std::set<string, order> GetSlice(string slice_pp) {
-  std::set<string, order> slice = {};
-  slice.insert(PadPP(slice_pp));
-  
-  std::queue<string> to_visit;
-  to_visit.push(slice_pp);
+    std::cout << "Get Slice for " << slice_pp << std::endl;
+    std::set<string, order> slice = {};
+    slice.insert(PadPP(slice_pp));
+    
+    std::queue<string> to_visit;
+    to_visit.push(slice_pp);
 
-  while(!to_visit.empty()) {
-    string pp = to_visit.front();
-    to_visit.pop();
+    while(!to_visit.empty()) {
+        string pp = to_visit.front();
+        to_visit.pop();
 
-    if(pdg.find(pp) != pdg.end()) {
-      for(const auto& pred: pdg[pp]->dd_pred) {
-        std::string tmp = PadPP(pred);
-        if(!slice.count(tmp)) {
-          to_visit.push(pred);
-          slice.insert(tmp);
+        std::cout << "Finding pp in pdg: " << pp << std::endl;
+        if(pdg.find(pp) != pdg.end()) {
+        for(const auto& pred: pdg[pp]->dd_pred) {
+            std::string tmp = PadPP(pred);
+            if(!slice.count(tmp)) {
+            to_visit.push(pred);
+            slice.insert(tmp);
+            }
         }
-      }
 
-      for(const auto& pred: pdg[pp]->cd_pred) {
-        std::string tmp = PadPP(pred);
-        if(!slice.count(tmp)) {
-          to_visit.push(pred);
-          slice.insert(tmp);
+        for(const auto& pred: pdg[pp]->cd_pred) {
+            std::string tmp = PadPP(pred);
+            if(!slice.count(tmp)) {
+            to_visit.push(pred);
+            slice.insert(tmp);
+            }
         }
-      }
+        }
     }
-  }
 
-  return slice;
+    return slice;
 }
 
 int main(int argc, char const *argv[])
 {
-   if (argc != 4) {
-        std::cerr << "Usage: program_slicing <lir json filepath> <slice pp> <points to soln file>" << std::endl;
+   if (argc != 5) {
+        std::cerr << "Usage: program_slicing <lir file> <lir json filepath> <slice pp> <points to soln file>" << std::endl;
         return EXIT_FAILURE;
     }
 
-    std::ifstream f(argv[1]);
+    std::ifstream f(argv[2]);
     json lir_json = json::parse(f);
 
-    std::string slice_pp = argv[2];
+    std::string slice_pp = argv[3];
     std::vector<std::string> pp = SplitPP(slice_pp);
     std::string func_name = pp[0];
     std::string bb_name = pp[1];
     std::string idx = pp[2];
     std::cout << "Function: " << func_name << " BB: " << bb_name << " Index: " << idx << std::endl;
 
-    std::string pointsToFile = argv[3];
+    std::string pointsToFile = argv[4];
     std::ifstream in(pointsToFile);
     std::string input_str(std::istreambuf_iterator<char>{in}, {});
 
@@ -242,14 +278,30 @@ int main(int argc, char const *argv[])
 
     PDG::ProcessDataDependencies(program.funcs[func_name], data_dependencies);
 
+    PDG::PrintPDG();
+
     // Get slice for given program point
     std::set<string, order> slice = GetSlice(slice_pp);
 
-    std::cout << "Slice: {" << std::endl;
+    std::cout << "Slice for pp: " << slice_pp <<  std::endl;
+
+    string curr_bb = "";
     for(const auto& pp: slice) {
-        std::cout << pp << std::endl;
+        std::vector<string> cmp = SplitPP(pp);
+        if(cmp[1] != curr_bb) {
+        if(curr_bb != "") {
+            std::cout << std::endl;
+        }
+        curr_bb = cmp[1];
+        std::cout << curr_bb << ":" << std::endl;
+        }
+        BasicBlock *bb_ptr = program.funcs[cmp[0]]->bbs[curr_bb];
+        if (cmp[2] == "term") {
+            std::cout << bb_ptr->terminal->ToString() << std::endl;
+        } else {
+            std::cout << bb_ptr->instructions[std::stoi(cmp[2])]->ToString() << std::endl;
+        }
     }
-    std::cout << "}" << std::endl;
     std::cout << std::endl;
 
     return 0;

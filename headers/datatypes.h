@@ -343,6 +343,7 @@ class ExternalFunction {
 class Instruction{
     public:
         virtual void pretty_print() {};
+        virtual std::string ToString() { return ""; };
         InstructionType instrType;
 };
 
@@ -393,6 +394,10 @@ class AddrofInstruction : public Instruction{
             }
         }
 
+        std::string ToString() {
+            return lhs->name + " = $addrof " + rhs->name;
+        }
+
         void pretty_print() {
             std::cout << "******************* Addrof Instruction *******************" << std::endl;
             std::cout << "Instruction type: " << instrType << std::endl;
@@ -428,6 +433,11 @@ class AllocInstruction : public Instruction{
             if (inst_val["id"] != nullptr) {
                 id = new Variable(inst_val["id"]["name"], new Type(inst_val["id"]["typ"]));
             }
+        }
+
+        std::string ToString() {
+            std::string num_str = (num->var != nullptr) ? num->var->name : std::to_string(num->val);
+            return lhs->name + " = $alloc " + num_str + " " + "[" + id->name + "]";
         }
 
         void pretty_print() {
@@ -474,6 +484,21 @@ class ArithInstruction : public Instruction{
             if (inst_val["aop"] != nullptr) {
                 arith_op = inst_val["aop"];
             }
+        }
+
+        std::string ToString() {
+            std::string op1_str = (op1->var != nullptr) ? op1->var->name : std::to_string(op1->val);
+            std::string op2_str = (op2->var != nullptr) ? op2->var->name : std::to_string(op2->val);
+            std::string aop_str = "";
+            if (arith_op == "Add")
+                aop_str = "add";
+            else if (arith_op == "Subtract")
+                aop_str = "sub";
+            else if (arith_op == "Multiply")
+                aop_str = "mul";
+            else if (arith_op == "Divide")
+                aop_str = "div";
+            return lhs->name + " = $arith " + aop_str + " " + op1_str + " " + op2_str;
         }
 
         void pretty_print() {
@@ -523,6 +548,25 @@ class CmpInstruction : public Instruction{
             }
         }
 
+        std::string ToString() {
+            std::string op1_str = (op1->var != nullptr) ? op1->var->name : std::to_string(op1->val);
+            std::string op2_str = (op2->var != nullptr) ? op2->var->name : std::to_string(op2->val);
+            std::string rop_str = "";
+            if (cmp_op == "Eq")
+                rop_str = "eq";
+            else if (cmp_op == "Neq")
+                rop_str = "neq";
+            else if (cmp_op == "Less")
+                rop_str = "lt";
+            else if (cmp_op == "LessEq")
+                rop_str = "lte";
+            else if (cmp_op == "Greater")
+                rop_str = "gt";
+            else if (cmp_op == "GreaterEq")
+                rop_str = "gte";
+            return lhs->name + " = $cmp " + rop_str + " " + op1_str + " " + op2_str;
+        }
+
         void pretty_print() {
             std::cout << "******************* Cmp Instruction *******************" << std::endl;
             std::cout << "Instruction type: " << instrType << std::endl;
@@ -562,6 +606,11 @@ class CopyInstruction : public Instruction{
             }
         }
 
+        std::string ToString() {
+            std::string op_str = (op->var != nullptr) ? op->var->name : std::to_string(op->val);
+            return lhs->name + " = $copy " + op_str;
+        }
+
         void pretty_print() {
             std::cout << "******************* Copy Instruction *******************" << std::endl;
             std::cout << "Instruction type: " << instrType << std::endl;
@@ -597,6 +646,11 @@ class GepInstruction : public Instruction{
                 else if (inst_val["idx"]["CInt"] != nullptr)
                     idx = new Operand(inst_val["idx"]["CInt"]);
             }
+        }
+
+        std::string ToString() {
+            std::string idx_str = (idx->var != nullptr) ? idx->var->name : std::to_string(idx->val);
+            return lhs->name + " = $gep " + src->name + " " + idx_str;
         }
 
         void pretty_print() {
@@ -635,6 +689,11 @@ class GfpInstruction : public Instruction{
             }
         }
 
+        std::string ToString()
+        {
+            return lhs->name + " = $gfp " + src->name + " " + field->name;
+        }
+
         void pretty_print() {
             std::cout << "******************* Gfp Instruction *******************" << std::endl;
             std::cout << "Instruction type: " << instrType << std::endl;
@@ -666,6 +725,11 @@ class LoadInstruction : public Instruction{
             if (inst_val["src"] != nullptr) {
                 src = new Variable(inst_val["src"]["name"], new Type(inst_val["src"]["typ"]));
             }
+        }
+
+        std::string ToString()
+        {
+            return lhs->name + " = $load " + src->name;
         }
 
         void pretty_print() {
@@ -701,6 +765,12 @@ class StoreInstruction : public Instruction {
             }
         }
 
+        std::string ToString()
+        {
+            std::string op_str = (op->var != nullptr) ? op->var->name : std::to_string(op->val);
+            return "$store " + dst->name + " " + op_str;
+        }
+
         void pretty_print() {
             std::cout << "******************* Store Instruction *******************" << std::endl;
             std::cout << "Instruction type: " << instrType << std::endl;
@@ -731,7 +801,7 @@ class CallExtInstruction : public Instruction{
                 lhs = new Variable(inst_val["lhs"]["name"], new Type(inst_val["lhs"]["typ"]));
             }
             if (inst_val["ext_callee"] != nullptr) {
-                extFuncName = inst_val["ext_callee"].dump();
+                extFuncName = inst_val["ext_callee"];
             }
             if (inst_val["args"] != nullptr) {
                 for (auto &[arg_key, arg_val] : inst_val["args"].items()) {
@@ -741,6 +811,19 @@ class CallExtInstruction : public Instruction{
                         args.push_back(new Operand(arg_val["CInt"]));
                 }
             }
+        }
+
+        std::string ToString() {
+            std::string args_str = "";
+            int i = 0;
+            for (auto arg : args) {
+                args_str += (arg->var != nullptr) ? arg->var->name : std::to_string(arg->val);
+                if (i != args.size() - 1)
+                    args_str += ", ";
+                i += 1;
+            }
+            std::string lhs_str = (lhs != nullptr) ? lhs->name + " = " : "";
+            return lhs_str + "$call_ext " + extFuncName + "(" + args_str + ")";
         }
 
         void pretty_print() {
@@ -791,6 +874,12 @@ class BranchInstruction : public Instruction{
             }
         };
 
+        std::string ToString()
+        {
+            std::string cond_str = (condition->var != nullptr) ? condition->var->name : std::to_string(condition->val);
+            return "$branch " + cond_str + " " + tt + " " + ff;
+        }
+
         void pretty_print() {
             std::cout << "******************* Branch Instruction *******************" << std::endl;
             std::cout << "Instruction type: " << instrType << std::endl;
@@ -815,6 +904,10 @@ class JumpInstruction : public Instruction{
         // std::cout << "Jump Instruction" << std::endl;
         // std::cout << inst_val << std::endl;
     };
+
+    std::string ToString() {
+        return "$jump " + label;
+    }
 
     void pretty_print() {
         std::cout << "******************* Jump Instruction *******************" << std::endl;
@@ -846,6 +939,14 @@ class RetInstruction : public Instruction{
             }
             else if (inst_val["CInt"] != nullptr)
                 op = new Operand(inst_val["CInt"]);
+        }
+
+        std::string ToString()
+        {
+            if (op == nullptr)
+                return "$ret";
+            else
+                return "$ret " + ((op->var != nullptr) ? op->var->name : std::to_string(op->val));
         }
 
         void pretty_print() {
@@ -890,6 +991,20 @@ class CallDirInstruction : public Instruction{
             if (inst_val["next_bb"] != nullptr) {
                 next_bb = inst_val["next_bb"];
             }
+        }
+
+        std::string ToString()
+        {
+            std::string args_str = "";
+            int i = 0;
+            for (auto arg : args) {
+                args_str += (arg->var != nullptr) ? arg->var->name : std::to_string(arg->val);
+                if (i != args.size() - 1)
+                    args_str += ", ";
+                i += 1;
+            }
+            std::string lhs_str = (lhs != nullptr) ? lhs->name + " = " : "";
+            return lhs_str + "$call_dir " + callee + "(" + args_str + ") then " + next_bb;
         }
 
         void pretty_print() {
@@ -944,6 +1059,20 @@ class CallIdrInstruction : public Instruction{
             if (inst_val["next_bb"] != nullptr) {
                 next_bb = inst_val["next_bb"];
             }
+        }
+
+        std::string ToString()
+        {
+            std::string args_str = "";
+            int i = 0;
+            for (auto arg : args) {
+                args_str += (arg->var != nullptr) ? arg->var->name : std::to_string(arg->val);
+                if (i != args.size() - 1)
+                    args_str += ", ";
+                i += 1;
+            }
+            std::string lhs_str = (lhs != nullptr) ? lhs->name + " = " : "";
+            return lhs_str + "$call_idr " + fp->name + "(" + args_str + ") then " + next_bb;
         }
 
         void pretty_print() {

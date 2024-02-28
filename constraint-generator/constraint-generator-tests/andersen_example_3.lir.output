@@ -1,0 +1,6 @@
+foo <= main.f
+foo.p3 <= foo.r
+lam_[(&int,int,&int)->&int](foo,foo.r,foo.p1,foo.p3) <= foo
+main.f <= lam_[(&int,int,&int)->&int](_DUMMY,main.c,main.a,main.b)
+ref(_alloc1,_alloc1) <= main.a
+ref(_alloc2,_alloc2) <= main.b

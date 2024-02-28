@@ -167,8 +167,6 @@ int main(int argc, char const *argv[])
     ControlFlowAnalysis constant_analysis = ControlFlowAnalysis(program);
     std::map<std::string, std::set<std::string>> control_dependencies = constant_analysis.AnalyzeFunc(func_name);
     PDG::ProcessControlDependencies(program.funcs[func_name], control_dependencies);
-    
-    std::unordered_map<std::string, std::set<std::string>> pointsTo;
 
     ModRef mod_ref = ModRef(program, pointsTo);
     mod_ref.ComputeModRefInfo();

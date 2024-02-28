@@ -20,24 +20,6 @@ enum NodeType {
 };
 
 /*
-* A constructor has a name, arity, a list of arguments and a list of contravariant positions
-*/
-class Constructor {
-    public:
-    std::string name;
-    int arity;
-    std::set<int> contravariant_pos;
-
-    Constructor(const std::string& name, const int& arity, const std::set<int>& contravariant_pos) : 
-    name(name), arity(arity), contravariant_pos(contravariant_pos){}
-
-    const std::string Name() const { return name; }
-    const int Arity() const { return arity; }
-    const bool IsContraPos(int pos) const { return contravariant_pos.count(pos); }
-
-};
-
-/*
 * A node in the graph can be a set variable, a constructor or a projection
 * Each node has a name and a set of predecessor and successor nodes 
 * If the node is a set variable, it can store it's projections

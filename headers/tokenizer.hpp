@@ -135,19 +135,16 @@ class Tokenizer {
 
   static string Consume(vector<std::string> &tokens) {
     if (tokens.empty()) {
-        // std::cout << "No more tokens to consume" << std::endl;
         return "";
     }
 
     string token = tokens.back();
     tokens.pop_back();
-    // std::cout << "Consumed token: " << token << std::endl;
     return token;
   }
 
 static void ConsumeToken(vector<std::string> &tokens, std::string str) {
     if (tokens.empty()) {
-        // std::cout << "No more tokens to consume" << std::endl;
         return;
     }
     if (tokens.back() != str) {

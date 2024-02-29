@@ -55,6 +55,7 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
     // TODO - Need to handle name of pointsTo - for locals - funcname.argname
     std::set<std::string> reachable;
     std::queue<std::string> q;
+    std::set<std::string> visited;
 
     for(const auto& op: args) {
         if(!op->IsConstInt()) {
@@ -62,7 +63,10 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
             if(pointsTo.count(var)) {
                 for(const auto& v: pointsTo[var]) {
                     reachable.insert(v);
-                    q.push(v);
+                    if (visited.count(v) == 0) {
+                        visited.insert(v);
+                        q.push(v);
+                    }
                 }
                 while(!q.empty()) {
                     std::string tmp = q.front();
@@ -70,7 +74,10 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                     if(pointsTo.count(tmp)) {
                         for(const auto& v: pointsTo[tmp]) {
                             reachable.insert(v);
-                            q.push(v);
+                            if (visited.count(v) == 0) {
+                                visited.insert(v);
+                                q.push(v);
+                            }
                         }
                     }
                 }
@@ -78,13 +85,21 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
         }
     }
     // Globals + All objects reachable from globals
+
+    std::set<std::string> visited_globals;
+
     for (auto gl : program->globals) {
-        
         reachable.insert(gl->globalVar->name);
+
+        if (!pointsTo.count(gl->globalVar->name))
+            continue;
 
         for (auto v : pointsTo[gl->globalVar->name]) {
             reachable.insert(v);
-            q.push(v);
+            if (visited_globals.count(v) == 0) {
+                visited_globals.insert(v);
+                q.push(v);
+            }
         }
         while (!q.empty()) {
             std::string tmp = q.front();
@@ -92,7 +107,10 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
             if (pointsTo.count(tmp)) {
                 for (const auto &v : pointsTo[tmp]) {
                     reachable.insert(v);
-                    q.push(v);
+                    if (visited_globals.count(v) == 0) {
+                        visited_globals.insert(v);
+                        q.push(v);
+                    }
                 }
             }
         }
@@ -584,7 +602,6 @@ void execute(
         CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal_instruction;
 
         std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
-
         /*
         * CALLEES = {id} 
         * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)
@@ -635,7 +652,6 @@ void execute(
         CallIdrInstruction *callidir_inst = (CallIdrInstruction *) terminal_instruction;
 
         std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
-
         /*
         * CALLEES = pointsTo[fp]
         * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)

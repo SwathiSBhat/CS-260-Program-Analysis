@@ -135,7 +135,7 @@ public:
         /*
         * The solution is the contents of post_dominance_frontier
         */
-        for (const auto &[bb, doms] : post_dominance_frontier) {
+        /*for (const auto &[bb, doms] : post_dominance_frontier) {
             std::cout << bb << " -> {";
             for(auto it = doms.begin(); it != doms.end(); it++) {
                 if (std::next(it) == doms.end()) {
@@ -146,7 +146,7 @@ public:
             }
             std::cout << "}" << std::endl;
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
 
         return post_dominance_frontier;
     }

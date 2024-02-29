@@ -1,0 +1,59 @@
+test:&() -> int
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let _lo1:int, _t2:int, _t3:int, _t4:int, id0:int, id1:int, id2:int, id3:int, id4:int, id5:int, id6:int, id7:int
+bb1:
+  id4 = $copy _lo1
+  $branch 6 bb4 bb5
+
+bb2:
+  _lo1 = $copy id0
+  $jump bb1
+
+bb3:
+  id5 = $copy id1
+  $ret 4
+
+bb4:
+  id3 = $copy id1
+  $branch 2 bb7 bb6
+
+bb5:
+  id6 = $copy 9
+  id1 = $copy id4
+  id7 = $copy id5
+  id3 = $copy 4
+  id2 = $copy 8
+  id0 = $copy id3
+  $jump bb3
+
+bb6:
+  id6 = $copy 7
+  id5 = $copy 4
+  $jump bb3
+
+bb7:
+  _t4 = $cmp gte id5 id5
+  id1 = $copy _t4
+  id6 = $copy id5
+  $jump bb6
+
+entry:
+  id1 = $copy id1
+  _t2 = $arith sub id0 id1
+  id0 = $copy _t2
+  id3 = $copy 9
+  id5 = $copy 5
+  id7 = $copy id1
+  id6 = $copy id7
+  id0 = $copy id2
+  id3 = $copy 6
+  _lo1 = $copy id4
+  _t3 = $cmp eq _lo1 0
+  $branch _t3 bb2 bb1
+}

@@ -181,7 +181,7 @@ struct order {
 };
 
 std::set<string, order> GetSlice(string slice_pp) {
-    std::cout << "Get Slice for " << slice_pp << std::endl;
+    
     std::set<string, order> slice = {};
     slice.insert(PadPP(slice_pp));
     
@@ -192,23 +192,26 @@ std::set<string, order> GetSlice(string slice_pp) {
         string pp = to_visit.front();
         to_visit.pop();
 
-        std::cout << "Finding pp in pdg: " << pp << std::endl;
+        //std::cout << "Popped " << pp << std::endl;
         if(pdg.find(pp) != pdg.end()) {
-        for(const auto& pred: pdg[pp]->dd_pred) {
-            std::string tmp = PadPP(pred);
-            if(!slice.count(tmp)) {
-            to_visit.push(pred);
-            slice.insert(tmp);
+            //std::cout << "Found " << pp << std::endl;
+            for(const auto& pred: pdg[pp]->dd_pred) {
+                std::string tmp = PadPP(pred);
+                if(!slice.count(tmp)) {
+                    to_visit.push(pred);
+                    slice.insert(tmp);
+                    //std::cout << "Inserted dd_pred " << tmp << std::endl;
+                }
             }
-        }
 
-        for(const auto& pred: pdg[pp]->cd_pred) {
-            std::string tmp = PadPP(pred);
-            if(!slice.count(tmp)) {
-            to_visit.push(pred);
-            slice.insert(tmp);
+            for(const auto& pred: pdg[pp]->cd_pred) {
+                std::string tmp = PadPP(pred);
+                if(!slice.count(tmp)) {
+                    to_visit.push(pred);
+                    slice.insert(tmp);
+                    //std::cout << "Inserted cd_pred " << tmp << std::endl;
+                }
             }
-        }
         }
     }
 
@@ -230,7 +233,7 @@ int main(int argc, char const *argv[])
     std::string func_name = pp[0];
     std::string bb_name = pp[1];
     std::string idx = pp[2];
-    std::cout << "Function: " << func_name << " BB: " << bb_name << " Index: " << idx << std::endl;
+    // std::cout << "Function: " << func_name << " BB: " << bb_name << " Index: " << idx << std::endl;
 
     std::string pointsToFile = argv[4];
     std::ifstream in(pointsToFile);
@@ -278,12 +281,12 @@ int main(int argc, char const *argv[])
 
     PDG::ProcessDataDependencies(program.funcs[func_name], data_dependencies);
 
-    PDG::PrintPDG();
+    //PDG::PrintPDG();
 
     // Get slice for given program point
     std::set<string, order> slice = GetSlice(slice_pp);
 
-    std::cout << "Slice for pp: " << slice_pp <<  std::endl;
+    // std::cout << "Slice for pp: " << slice_pp <<  std::endl;
 
     string curr_bb = "";
     for(const auto& pp: slice) {
@@ -302,6 +305,7 @@ int main(int argc, char const *argv[])
             std::cout << bb_ptr->instructions[std::stoi(cmp[2])]->ToString() << std::endl;
         }
     }
+    std::cout << std::endl;
     std::cout << std::endl;
 
     return 0;

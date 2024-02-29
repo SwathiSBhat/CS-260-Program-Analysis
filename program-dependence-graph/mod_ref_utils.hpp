@@ -171,6 +171,7 @@ class ModRef {
                     }
                     else if (instr->instrType == InstructionType::LoadInstrType) {
                         LoadInstruction *load_instr = (LoadInstruction *)instr;
+                        
                         if (pointsTo.count(load_instr->src->name)) {
                             for (auto &pointed_to: pointsTo[load_instr->src->name]) {
                                 node->refs.insert(pointed_to);
@@ -223,10 +224,10 @@ class ModRef {
     std::map<std::string, ModRefInfo> ComputeModRefInfo() {
 
         ComputeCallGraph();
-        PrintNodes();
-        std::cout << "Transitive closure" << std::endl;
+        // PrintNodes();
+        // std::cout << "Transitive closure" << std::endl;
         ComputeTransitiveClosure();
-        PrintNodes();
+        // PrintNodes();
         InitModRefInfo();
 
         // Propagate mod/ref information backwards in the transitive closure of the call graph
@@ -242,8 +243,8 @@ class ModRef {
             mod_ref_info[func_name].ref = func_ref->refs;
         }
 
-        std::cout << "Mod Ref Info" << std::endl;
-        PrintModRefInfo();
+        // std::cout << "Mod Ref Info" << std::endl;
+        // PrintModRefInfo();
 
         return mod_ref_info;
     }

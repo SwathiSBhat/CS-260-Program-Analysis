@@ -203,7 +203,6 @@ public:
         while (!worklist.empty()) {
             std::string current_bb = worklist.front();
             worklist.pop_front();
-
             // Perform the transfer function on the current basic block
             
             execute(&program,

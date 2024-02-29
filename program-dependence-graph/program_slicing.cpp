@@ -300,9 +300,9 @@ int main(int argc, char const *argv[])
         }
         BasicBlock *bb_ptr = program.funcs[cmp[0]]->bbs[curr_bb];
         if (cmp[2] == "term") {
-            std::cout << bb_ptr->terminal->ToString() << std::endl;
+            std::cout << "  " << bb_ptr->terminal->ToString() << std::endl;
         } else {
-            std::cout << bb_ptr->instructions[std::stoi(cmp[2])]->ToString() << std::endl;
+            std::cout << "  " << bb_ptr->instructions[std::stoi(cmp[2])]->ToString() << std::endl;
         }
     }
     std::cout << std::endl;

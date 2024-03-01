@@ -246,6 +246,14 @@ int main(int argc, char const *argv[])
     while (!tokens.empty()) {
         std::string lhs = util::Tokenizer::Consume(tokens);
 
+        /*
+         * We don't want to get tripped up by random newlines at the end of the
+         * file.
+         */
+        if (lhs.compare("\n") == 0) {
+            break;
+        }
+
         std::set<std::string> points_to = {};
         util::Tokenizer::ConsumeToken(tokens, "->");
         util::Tokenizer::ConsumeToken(tokens, "{");

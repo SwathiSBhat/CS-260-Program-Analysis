@@ -396,6 +396,9 @@ void execute(
             std::string pointsToVarName = "test." + load_inst->src->name;
             if (pointsTo.count(pointsToVarName)) {
                 for (auto pts_to : pointsTo[pointsToVarName]) {
+                    // remove func_name. from pts_to
+                    if (pts_to.find(".") != std::string::npos)
+                        pts_to = pts_to.substr(pts_to.find(".") + 1);
                     USE.insert(pts_to);
                 }
             }
@@ -425,8 +428,10 @@ void execute(
            // TODO - Parameterize func name. For now, since it's always test, hardcoding it
            std::string pointsToVarName = "test." + store_inst->dst->name;
             if (pointsTo.count(pointsToVarName)) {
-                std::cout << "Points to found for " << store_inst->dst->name << std::endl;
                 for (auto pts_to : pointsTo[pointsToVarName]) {
+                    // Remove func_name. from pts_to
+                    if (pts_to.find(".") != std::string::npos)
+                        pts_to = pts_to.substr(pts_to.find(".") + 1);
                     DEF.insert(pts_to);
                 }
             }
@@ -669,7 +674,10 @@ void execute(
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
 
-        for(const auto& pts_to: pointsTo[callidir_inst->fp->name]) {
+        for(auto pts_to: pointsTo[callidir_inst->fp->name]) {
+            // Remove func_name. from pts_to
+            if (pts_to.find(".") != std::string::npos)
+                pts_to = pts_to.substr(pts_to.find(".") + 1);
             CALLEES.insert(pts_to);
         }
 

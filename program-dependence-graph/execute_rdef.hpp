@@ -51,8 +51,19 @@ bool joinSets(std::set<std::string> &s1, std::set<std::string> &s2) {
     return changed;
 }
 
+bool isGlobalVar(Variable *var, Program *program, std::string func_name) {
+    
+    if (program->funcs[func_name]->locals.count(var->name) > 0)
+        return false;
+
+    for (auto gl : program->globals) {
+        if (gl->globalVar->name == var->name)
+            return true;
+    }
+    return false;
+}
+
 std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_map<std::string, std::set<std::string>> pointsTo, Program *program) {
-    // TODO - Need to handle name of pointsTo - for locals - funcname.argname
     std::set<std::string> reachable;
     std::queue<std::string> q;
     std::set<std::string> visited;
@@ -62,28 +73,40 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
         if(!op->IsConstInt()) {
             std::string var = op->var->name;
             // TODO - Parameterize func name. For now, since it's always test, hardcoding it
-            std::string pointsToVarName = "test." + var;
+            std::string pointsToVarName = isGlobalVar(op->var, program, "test") ? var : "test." + var;
 
             if(pointsTo.count(pointsToVarName)) {
-                std::cout << "Points to found for " << var << std::endl;
-                for(const auto& v: pointsTo[pointsToVarName]) {
-                    reachable.insert(v);
+                for(auto v: pointsTo[pointsToVarName]) {
+                    
                     if (visited.count(v) == 0) {
                         visited.insert(v);
                         q.push(v);
                     }
+
+                    // Remove function name from v
+                    if (v.find(".") != std::string::npos)
+                        v = v.substr(v.find(".") + 1);
+                    reachable.insert(v);
+
                 }
+
                 while(!q.empty()) {
+
                     std::string tmp = q.front();
                     q.pop();
                     
                     if(pointsTo.count(tmp)) {
-                        for(const auto& v: pointsTo[tmp]) {
-                            reachable.insert(v);
+                        for(auto v: pointsTo[tmp]) {
+                            
                             if (visited.count(v) == 0) {
                                 visited.insert(v);
                                 q.push(v);
                             }
+
+                            // Remove function name from v
+                            if (v.find(".") != std::string::npos)
+                                v = v.substr(v.find(".") + 1);
+                            reachable.insert(v);
                         }
                     }
                 }
@@ -101,22 +124,35 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
             continue;
 
         for (auto v : pointsTo[gl->globalVar->name]) {
-            reachable.insert(v);
+            
             if (visited_globals.count(v) == 0) {
                 visited_globals.insert(v);
                 q.push(v);
             }
+
+            // Remove function name from v
+            if (v.find(".") != std::string::npos)
+                v = v.substr(v.find(".") + 1);
+            reachable.insert(v);
         }
+
         while (!q.empty()) {
+
             std::string tmp = q.front();
             q.pop();
+
             if (pointsTo.count(tmp)) {
-                for (const auto &v : pointsTo[tmp]) {
-                    reachable.insert(v);
+                for (auto v : pointsTo[tmp]) {
+                    
                     if (visited_globals.count(v) == 0) {
                         visited_globals.insert(v);
                         q.push(v);
                     }
+
+                    // Remove function name from v
+                    if (v.find(".") != std::string::npos)
+                        v = v.substr(v.find(".") + 1);
+                    reachable.insert(v);
                 }
             }
         }
@@ -393,7 +429,7 @@ void execute(
             DEF.insert(load_inst->lhs->name);
             USE.insert(load_inst->src->name);
 
-            std::string pointsToVarName = "test." + load_inst->src->name;
+            std::string pointsToVarName = isGlobalVar(load_inst->src, program, "test") ? load_inst->src->name : "test." + load_inst->src->name;
             if (pointsTo.count(pointsToVarName)) {
                 for (auto pts_to : pointsTo[pointsToVarName]) {
                     // remove func_name. from pts_to
@@ -426,7 +462,7 @@ void execute(
              * for all v in DEF: sigma_prime[v] = sigma_prime[v] U { pp }
             */
            // TODO - Parameterize func name. For now, since it's always test, hardcoding it
-           std::string pointsToVarName = "test." + store_inst->dst->name;
+           std::string pointsToVarName = isGlobalVar(store_inst->dst, program, "test") ? store_inst->dst->name : "test." + store_inst->dst->name;
             if (pointsTo.count(pointsToVarName)) {
                 for (auto pts_to : pointsTo[pointsToVarName]) {
                     // Remove func_name. from pts_to
@@ -623,7 +659,7 @@ void execute(
         * WDEF = (U mod(c) for all mods of c in CALLEES) ^ REACHABLE
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
-       // TODO - Check logic for each function and need to add logic for globals and pointsTo globals
+       
         CALLEES.insert(calldir_inst->callee);
 
         REACHABLE = GetReachable(calldir_inst->args, pointsTo, program);

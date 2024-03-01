@@ -150,6 +150,18 @@ class ModRef {
         }
     }
 
+    bool isGlobalVar(Variable *var, std::string func_name) {
+    
+        if (program_.funcs[func_name]->locals.count(var->name) > 0)
+            return false;
+
+        for (auto gl : program_.globals) {
+            if (gl->globalVar->name == var->name)
+                return true;
+        }
+        return false;
+    }
+
     /*
     * Initialize mod/ref information: For each function compute:
     *  a. The set of globals assigned in the function and pointed to objects that function F can define i.e store operations
@@ -163,9 +175,8 @@ class ModRef {
                 for (auto &instr: bb.second->instructions) {
                     if (instr->instrType == InstructionType::StoreInstrType) {
                         StoreInstruction *store_instr = (StoreInstruction *)instr;
-                        // Add func name while comparing with pts to set
-                        // TODO - Handle for globals and do not add function name in that case
-                        std::string pointsToKey = it.second->name + "." + store_instr->dst->name;
+                        // Add func name while comparing with pts to set for locals and keep it as is for globals
+                        std::string pointsToKey = isGlobalVar(store_instr->dst, it.second->name) ? store_instr->dst->name : it.second->name + "." + store_instr->dst->name;
                         if (pointsTo.count(pointsToKey)) {
                             for (auto pointed_to: pointsTo[pointsToKey]) {
                                 // Remove the function name from the pointed_to
@@ -178,9 +189,8 @@ class ModRef {
                     }
                     else if (instr->instrType == InstructionType::LoadInstrType) {
                         LoadInstruction *load_instr = (LoadInstruction *)instr;
-                        // Add func name while comparing with pts to set
-                        // TODO - Handle for globals and do not add function name in that case
-                        std::string pointsToKey = it.second->name + "." + load_instr->src->name;
+                        // Add func name while comparing with pts to set for locals and keep it as is for globals
+                        std::string pointsToKey = isGlobalVar(load_instr->src, it.second->name) ? load_instr->src->name : it.second->name + "." + load_instr->src->name;
                         if (pointsTo.count(pointsToKey)) {
                             for (auto pointed_to: pointsTo[pointsToKey]) {
                                 // Remove the function name from the pointed_to
@@ -237,10 +247,10 @@ class ModRef {
     std::map<std::string, ModRefInfo> ComputeModRefInfo() {
 
         ComputeCallGraph();
-        // PrintNodes();
-        // std::cout << "Transitive closure" << std::endl;
+        //PrintNodes();
+        //std::cout << "Transitive closure" << std::endl;
         ComputeTransitiveClosure();
-        // PrintNodes();
+        //PrintNodes();
         InitModRefInfo();
 
         // Propagate mod/ref information backwards in the transitive closure of the call graph
@@ -256,8 +266,8 @@ class ModRef {
             mod_ref_info[func_name].ref = func_ref->refs;
         }
 
-        // std::cout << "Mod Ref Info" << std::endl;
-        // PrintModRefInfo();
+        //std::cout << "Mod Ref Info" << std::endl;
+        //PrintModRefInfo();
 
         return mod_ref_info;
     }

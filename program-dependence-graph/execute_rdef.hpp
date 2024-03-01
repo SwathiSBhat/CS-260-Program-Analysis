@@ -57,11 +57,16 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
     std::queue<std::string> q;
     std::set<std::string> visited;
 
+
     for(const auto& op: args) {
         if(!op->IsConstInt()) {
             std::string var = op->var->name;
-            if(pointsTo.count(var)) {
-                for(const auto& v: pointsTo[var]) {
+            // TODO - Parameterize func name. For now, since it's always test, hardcoding it
+            std::string pointsToVarName = "test." + var;
+
+            if(pointsTo.count(pointsToVarName)) {
+                std::cout << "Points to found for " << var << std::endl;
+                for(const auto& v: pointsTo[pointsToVarName]) {
                     reachable.insert(v);
                     if (visited.count(v) == 0) {
                         visited.insert(v);
@@ -71,6 +76,7 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                 while(!q.empty()) {
                     std::string tmp = q.front();
                     q.pop();
+                    
                     if(pointsTo.count(tmp)) {
                         for(const auto& v: pointsTo[tmp]) {
                             reachable.insert(v);
@@ -387,8 +393,9 @@ void execute(
             DEF.insert(load_inst->lhs->name);
             USE.insert(load_inst->src->name);
 
-            if (pointsTo.count(load_inst->src->name)) {
-                for (auto pts_to : pointsTo[load_inst->src->name]) {
+            std::string pointsToVarName = "test." + load_inst->src->name;
+            if (pointsTo.count(pointsToVarName)) {
+                for (auto pts_to : pointsTo[pointsToVarName]) {
                     USE.insert(pts_to);
                 }
             }
@@ -415,8 +422,11 @@ void execute(
              * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
              * for all v in DEF: sigma_prime[v] = sigma_prime[v] U { pp }
             */
-            if (pointsTo.count(store_inst->dst->name)) {
-                for (auto pts_to : pointsTo[store_inst->dst->name]) {
+           // TODO - Parameterize func name. For now, since it's always test, hardcoding it
+           std::string pointsToVarName = "test." + store_inst->dst->name;
+            if (pointsTo.count(pointsToVarName)) {
+                std::cout << "Points to found for " << store_inst->dst->name << std::endl;
+                for (auto pts_to : pointsTo[pointsToVarName]) {
                     DEF.insert(pts_to);
                 }
             }

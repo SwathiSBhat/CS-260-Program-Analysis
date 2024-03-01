@@ -163,17 +163,30 @@ class ModRef {
                 for (auto &instr: bb.second->instructions) {
                     if (instr->instrType == InstructionType::StoreInstrType) {
                         StoreInstruction *store_instr = (StoreInstruction *)instr;
-                        if (pointsTo.count(store_instr->dst->name)) {
-                            for (auto &pointed_to: pointsTo[store_instr->dst->name]) {
+                        // Add func name while comparing with pts to set
+                        // TODO - Handle for globals and do not add function name in that case
+                        std::string pointsToKey = it.second->name + "." + store_instr->dst->name;
+                        if (pointsTo.count(pointsToKey)) {
+                            for (auto pointed_to: pointsTo[pointsToKey]) {
+                                // Remove the function name from the pointed_to
+                                if (pointed_to.find(".") != std::string::npos) {
+                                    pointed_to = pointed_to.substr(pointed_to.find(".") + 1);
+                                }
                                 node->mods.insert(pointed_to);
                             }
                         }
                     }
                     else if (instr->instrType == InstructionType::LoadInstrType) {
                         LoadInstruction *load_instr = (LoadInstruction *)instr;
-                        
-                        if (pointsTo.count(load_instr->src->name)) {
-                            for (auto &pointed_to: pointsTo[load_instr->src->name]) {
+                        // Add func name while comparing with pts to set
+                        // TODO - Handle for globals and do not add function name in that case
+                        std::string pointsToKey = it.second->name + "." + load_instr->src->name;
+                        if (pointsTo.count(pointsToKey)) {
+                            for (auto pointed_to: pointsTo[pointsToKey]) {
+                                // Remove the function name from the pointed_to
+                                if (pointed_to.find(".") != std::string::npos) {
+                                    pointed_to = pointed_to.substr(pointed_to.find(".") + 1);
+                                }
                                 node->refs.insert(pointed_to);
                             }
                         }

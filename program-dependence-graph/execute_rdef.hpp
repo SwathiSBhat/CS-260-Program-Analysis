@@ -626,7 +626,7 @@ void execute(
        // TODO - Check logic for each function and need to add logic for globals and pointsTo globals
         CALLEES.insert(calldir_inst->callee);
 
-        /*REACHABLE = GetReachable(calldir_inst->args, pointsTo, program);
+        REACHABLE = GetReachable(calldir_inst->args, pointsTo, program);
 
         REFS = GetRefs(CALLEES, REACHABLE, modRefInfo);
 		
@@ -637,7 +637,7 @@ void execute(
                 USE.insert(arg->var->name);
             }
         }
-        WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);*/
+        WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
         if (execute_final) {
             for (std::string v : USE) {
@@ -681,7 +681,7 @@ void execute(
             CALLEES.insert(pts_to);
         }
 
-        /*REACHABLE = GetReachable(callidir_inst->args, pointsTo, program);
+        REACHABLE = GetReachable(callidir_inst->args, pointsTo, program);
 
         REFS = GetRefs(CALLEES, REACHABLE, modRefInfo);
 		
@@ -692,7 +692,7 @@ void execute(
                 USE.insert(arg->var->name);
             }
         }
-        WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);*/
+        WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
         if (execute_final) {
             for (std::string v : USE) {

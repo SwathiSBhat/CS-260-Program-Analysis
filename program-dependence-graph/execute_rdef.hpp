@@ -710,7 +710,10 @@ void execute(
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
 
-        for(auto pts_to: pointsTo[callidir_inst->fp->name]) {
+        // Add function name to callidir_inst->fp->name
+        std::string pointsToVarName = isGlobalVar(callidir_inst->fp, program, "test") ? callidir_inst->fp->name : "test." + callidir_inst->fp->name;
+        std::cout << "pointsToVarName: " << pointsToVarName << std::endl;
+        for(auto pts_to: pointsTo[pointsToVarName]) {
             // Remove func_name. from pts_to
             if (pts_to.find(".") != std::string::npos)
                 pts_to = pts_to.substr(pts_to.find(".") + 1);
@@ -723,12 +726,34 @@ void execute(
 		
         USE.insert(REFS.begin(), REFS.end());
 
+        USE.insert(callidir_inst->fp->name);
+
         for(const auto& arg: callidir_inst->args) {
             if(!arg->IsConstInt()) {
                 USE.insert(arg->var->name);
             }
         }
         WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
+
+        // Print callee, reachable, refs, use, wdef
+        std::cout << "CALLEES: " << std::endl;
+        for(const auto& callee: CALLEES) {
+            std::cout << callee << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "REACHABLE: " << std::endl;
+        for(const auto& r: REACHABLE) {
+            std::cout << r << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "REFS: " << std::endl;
+        for(const auto& r: REFS) {
+            std::cout << r << " ";
+        }
+        std::cout << std::endl;
+
 
         if (execute_final) {
             for (std::string v : USE) {

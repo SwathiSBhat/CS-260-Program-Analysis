@@ -57,9 +57,9 @@ class ModRef {
 
         // Add edges to the call graph
         std::queue<std::string> to_visit;
-        to_visit.push("main");
+        to_visit.push("test");
         std::set<std::string> visited;
-        visited.insert("main");
+        visited.insert("test");
 
         while (!to_visit.empty()) {
             std::string func_name = to_visit.front();
@@ -114,8 +114,8 @@ class ModRef {
         std::queue<std::string> worklist;
         std::set<std::string> visited;
 
-        worklist.push("main");
-        visited.insert("main");
+        worklist.push("test");
+        visited.insert("test");
 
         while (!worklist.empty())
         {
@@ -180,11 +180,19 @@ class ModRef {
                         if (pointsTo.count(pointsToKey)) {
                             for (auto pointed_to: pointsTo[pointsToKey]) {
                                 // Remove the function name from the pointed_to
-                                if (pointed_to.find(".") != std::string::npos) {
+                                /*if (pointed_to.find(".") != std::string::npos) {
                                     pointed_to = pointed_to.substr(pointed_to.find(".") + 1);
-                                }
+                                }*/
                                 node->mods.insert(pointed_to);
                             }
+                        }
+
+                        // If rhs is global, add to set of refs
+                        if (isGlobalVar(store_instr->dst, it.second->name)) {
+                            node->refs.insert(store_instr->dst->name);
+                        }
+                        if (!store_instr->op->IsConstInt() && isGlobalVar(store_instr->op->var, it.second->name)) {
+                            node->refs.insert(store_instr->op->var->name);
                         }
                     }
                     else if (instr->instrType == InstructionType::LoadInstrType) {
@@ -194,12 +202,100 @@ class ModRef {
                         if (pointsTo.count(pointsToKey)) {
                             for (auto pointed_to: pointsTo[pointsToKey]) {
                                 // Remove the function name from the pointed_to
-                                if (pointed_to.find(".") != std::string::npos) {
+                                /*if (pointed_to.find(".") != std::string::npos) {
                                     pointed_to = pointed_to.substr(pointed_to.find(".") + 1);
-                                }
+                                }*/
                                 node->refs.insert(pointed_to);
                             }
                         }
+
+                        // If lhs is global, add to set of mods
+                        if (isGlobalVar(load_instr->lhs, it.second->name)) {
+                            node->mods.insert(load_instr->lhs->name);
+                        }
+                    }
+                    else if (instr->instrType == InstructionType::CopyInstrType) {
+                        CopyInstruction *copy_instr = (CopyInstruction *)instr;
+                        // If the lhs is a global, then add to set of mods
+                        if (isGlobalVar(copy_instr->lhs, it.second->name)) {
+                            node->mods.insert(copy_instr->lhs->name);
+                        }
+                        // If the rhs is a global, then add to set of refs
+                        if (!copy_instr->op->IsConstInt() && isGlobalVar(copy_instr->op->var, it.second->name)) {
+                            node->refs.insert(copy_instr->op->var->name);
+                        }
+                    }
+                    else if (instr->instrType == InstructionType::ArithInstrType) {
+                        ArithInstruction *arith_instr = (ArithInstruction *)instr;
+                        // If the lhs is a global, then add to set of mods
+                        if (isGlobalVar(arith_instr->lhs, it.second->name)) {
+                            node->mods.insert(arith_instr->lhs->name);
+                        }
+                        // If the rhs is a global, then add to set of refs
+                        if (!arith_instr->op1->IsConstInt() && isGlobalVar(arith_instr->op1->var, it.second->name)) {
+                            node->refs.insert(arith_instr->op1->var->name);
+                        }
+                        if (!arith_instr->op2->IsConstInt() && isGlobalVar(arith_instr->op2->var, it.second->name)) {
+                            node->refs.insert(arith_instr->op2->var->name);
+                        }
+                    }
+                    else if (instr->instrType == InstructionType::AllocInstrType)
+                    {
+                        AllocInstruction *alloc_instr = (AllocInstruction *)instr;
+                        // If the lhs is a global, then add to set of mods
+                        if (isGlobalVar(alloc_instr->lhs, it.second->name)) 
+                            node->mods.insert(alloc_instr->lhs->name);
+                        // If the rhs is a global, then add to set of refs
+                        if (!alloc_instr->num->IsConstInt() && isGlobalVar(alloc_instr->num->var, it.second->name)) 
+                            node->refs.insert(alloc_instr->num->var->name);
+                    }
+                    else if (instr->instrType == InstructionType::CmpInstrType)
+                    {
+                        CmpInstruction *cmp_instr = (CmpInstruction *)instr;
+                        // If the lhs is a global, then add to set of mods
+                        if (isGlobalVar(cmp_instr->lhs, it.second->name)) 
+                            node->mods.insert(cmp_instr->lhs->name);
+                        // If the rhs is a global, then add to set of refs
+                        if (!cmp_instr->op1->IsConstInt() && isGlobalVar(cmp_instr->op1->var, it.second->name)) 
+                            node->refs.insert(cmp_instr->op1->var->name);
+                        if (!cmp_instr->op2->IsConstInt() && isGlobalVar(cmp_instr->op2->var, it.second->name)) 
+                            node->refs.insert(cmp_instr->op2->var->name);
+                    }
+                    else if (instr->instrType == InstructionType::GepInstrType)
+                    {
+                        GepInstruction *gep_instr = (GepInstruction *)instr;
+                        // If the lhs is a global, then add to set of mods
+                        if (isGlobalVar(gep_instr->lhs, it.second->name)) 
+                            node->mods.insert(gep_instr->lhs->name);
+                        // If the rhs is a global, then add to set of refs
+                        if (isGlobalVar(gep_instr->src, it.second->name)) 
+                            node->refs.insert(gep_instr->src->name);
+                        if (!gep_instr->idx->IsConstInt() && isGlobalVar(gep_instr->idx->var, it.second->name)) 
+                            node->refs.insert(gep_instr->idx->var->name);
+                    }
+                    else if (instr->instrType == InstructionType::GfpInstrType)
+                    {
+                        GfpInstruction *gfp_instr = (GfpInstruction *)instr;
+                        // If the lhs is a global, then add to set of mods
+                        if (isGlobalVar(gfp_instr->lhs, it.second->name)) 
+                            node->mods.insert(gfp_instr->lhs->name);
+                        // If the rhs is a global, then add to set of refs
+                        if (isGlobalVar(gfp_instr->src, it.second->name)) 
+                            node->refs.insert(gfp_instr->src->name);
+                    }
+                    else if (instr->instrType == InstructionType::AddrofInstrType)
+                    {
+                        AddrofInstruction *addrof_instr = (AddrofInstruction *)instr;
+                        // If the lhs is a global, then add to set of mods
+                        if (isGlobalVar(addrof_instr->lhs, it.second->name)) 
+                            node->mods.insert(addrof_instr->lhs->name);
+                    }
+                    else if (instr->instrType == InstructionType::RetInstrType)
+                    {
+                        // IF op is a globa, add to set of refs
+                        RetInstruction *ret_instr = (RetInstruction *)instr;
+                        if (!ret_instr->op->IsConstInt() && isGlobalVar(ret_instr->op->var, it.second->name)) 
+                            node->refs.insert(ret_instr->op->var->name);
                     }
                 }
             }
@@ -247,10 +343,10 @@ class ModRef {
     std::map<std::string, ModRefInfo> ComputeModRefInfo() {
 
         ComputeCallGraph();
-        //PrintNodes();
-        //std::cout << "Transitive closure" << std::endl;
+        PrintNodes();
+        std::cout << "Transitive closure" << std::endl;
         ComputeTransitiveClosure();
-        //PrintNodes();
+        PrintNodes();
         InitModRefInfo();
 
         // Propagate mod/ref information backwards in the transitive closure of the call graph
@@ -266,8 +362,8 @@ class ModRef {
             mod_ref_info[func_name].ref = func_ref->refs;
         }
 
-        //std::cout << "Mod Ref Info" << std::endl;
-        //PrintModRefInfo();
+        std::cout << "Mod Ref Info" << std::endl;
+        PrintModRefInfo();
 
         return mod_ref_info;
     }

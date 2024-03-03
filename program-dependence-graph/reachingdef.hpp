@@ -252,7 +252,7 @@ public:
         }
         std::sort(sorted_pps.begin(), sorted_pps.end(), custom_sort()); 
 
-        /*for (auto it = sorted_pps.begin(); it != sorted_pps.end(); it++) {
+        for (auto it = sorted_pps.begin(); it != sorted_pps.end(); it++) {
             if (soln[*it].size() == 0) {
                 continue;
             }
@@ -273,7 +273,7 @@ public:
                     std::cout << *def << ", ";
                 }
             }
-        }*/
+        }
 
         return soln;
     }

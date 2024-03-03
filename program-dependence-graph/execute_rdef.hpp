@@ -84,8 +84,8 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                     }
 
                     // Remove function name from v
-                    if (v.find(".") != std::string::npos)
-                        v = v.substr(v.find(".") + 1);
+                    /*if (v.find(".") != std::string::npos)
+                        v = v.substr(v.find(".") + 1);*/
                     reachable.insert(v);
 
                 }
@@ -104,8 +104,8 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                             }
 
                             // Remove function name from v
-                            if (v.find(".") != std::string::npos)
-                                v = v.substr(v.find(".") + 1);
+                            /*if (v.find(".") != std::string::npos)
+                                v = v.substr(v.find(".") + 1);*/
                             reachable.insert(v);
                         }
                     }
@@ -131,8 +131,8 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
             }
 
             // Remove function name from v
-            if (v.find(".") != std::string::npos)
-                v = v.substr(v.find(".") + 1);
+            /*if (v.find(".") != std::string::npos)
+                v = v.substr(v.find(".") + 1);*/
             reachable.insert(v);
         }
 
@@ -150,8 +150,8 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                     }
 
                     // Remove function name from v
-                    if (v.find(".") != std::string::npos)
-                        v = v.substr(v.find(".") + 1);
+                    /*if (v.find(".") != std::string::npos)
+                        v = v.substr(v.find(".") + 1);*/
                     reachable.insert(v);
                 }
             }
@@ -653,6 +653,8 @@ void execute(
         CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal_instruction;
 
         std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
+
+        //std::cout << "Call dir instruction for bb: " << bb->label << std::endl;
         /*
         * CALLEES = {id} 
         * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)
@@ -674,6 +676,37 @@ void execute(
             }
         }
         WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
+
+        // Print callee, reachable, refs, use, wdef
+        /*std::cout << "CALLEES: " << std::endl;
+        for(const auto& callee: CALLEES) {
+            std::cout << callee << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "REACHABLE: " << std::endl;
+        for(const auto& r: REACHABLE) {
+            std::cout << r << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "REFS: " << std::endl;
+        for(const auto& r: REFS) {
+            std::cout << r << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "USE: " << std::endl;
+        for(const auto& u: USE) {
+            std::cout << u << " ";
+        }
+        std::cout << std::endl;   
+
+        std::cout << "WDEF: " << std::endl;
+        for(const auto& w: WDEF) {
+            std::cout << w << " ";
+        }
+        std::cout << std::endl;*/   
 
         if (execute_final) {
             for (std::string v : USE) {
@@ -709,10 +742,9 @@ void execute(
         * WDEF = (U mod(c) for all mods of c in CALLEES) ^ REACHABLE
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
-
+        //std::cout << "Call idr instruction for bb: " << bb->label << std::endl;
         // Add function name to callidir_inst->fp->name
         std::string pointsToVarName = isGlobalVar(callidir_inst->fp, program, "test") ? callidir_inst->fp->name : "test." + callidir_inst->fp->name;
-        std::cout << "pointsToVarName: " << pointsToVarName << std::endl;
         for(auto pts_to: pointsTo[pointsToVarName]) {
             // Remove func_name. from pts_to
             if (pts_to.find(".") != std::string::npos)
@@ -736,7 +768,7 @@ void execute(
         WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
         // Print callee, reachable, refs, use, wdef
-        std::cout << "CALLEES: " << std::endl;
+        /*std::cout << "CALLEES: " << std::endl;
         for(const auto& callee: CALLEES) {
             std::cout << callee << " ";
         }
@@ -752,7 +784,7 @@ void execute(
         for(const auto& r: REFS) {
             std::cout << r << " ";
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
 
 
         if (execute_final) {

@@ -654,7 +654,7 @@ void execute(
 
         std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
 
-        //std::cout << "Call dir instruction for bb: " << bb->label << std::endl;
+        std::cout << "Call dir instruction for bb: " << bb->label << std::endl;
         /*
         * CALLEES = {id} 
         * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)
@@ -677,8 +677,26 @@ void execute(
         }
         WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
+        // Remove test. prefix from USE, WDEF
+        std::set<std::string> USE_tmp;
+        for (auto u : USE) {
+            if (u.find("test.") != std::string::npos)
+                USE_tmp.insert(u.substr(u.find("test.") + 5));
+            else
+                USE_tmp.insert(u);
+        }
+        USE = USE_tmp;
+
+        std::set<std::string> WDEF_tmp;
+        for (auto w : WDEF) {
+            if (w.find("test.") != std::string::npos)
+                WDEF_tmp.insert(w.substr(w.find("test.") + 5));
+            else
+                WDEF_tmp.insert(w);
+        }
+
         // Print callee, reachable, refs, use, wdef
-        /*std::cout << "CALLEES: " << std::endl;
+        std::cout << "CALLEES: " << std::endl;
         for(const auto& callee: CALLEES) {
             std::cout << callee << " ";
         }
@@ -706,7 +724,7 @@ void execute(
         for(const auto& w: WDEF) {
             std::cout << w << " ";
         }
-        std::cout << std::endl;*/   
+        std::cout << std::endl;
 
         if (execute_final) {
             for (std::string v : USE) {
@@ -742,7 +760,7 @@ void execute(
         * WDEF = (U mod(c) for all mods of c in CALLEES) ^ REACHABLE
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
-        //std::cout << "Call idr instruction for bb: " << bb->label << std::endl;
+        std::cout << "Call idr instruction for bb: " << bb->label << std::endl;
         // Add function name to callidir_inst->fp->name
         std::string pointsToVarName = isGlobalVar(callidir_inst->fp, program, "test") ? callidir_inst->fp->name : "test." + callidir_inst->fp->name;
         for(auto pts_to: pointsTo[pointsToVarName]) {
@@ -767,8 +785,26 @@ void execute(
         }
         WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
+        // Remove test. prefix from USE, WDEF
+        std::set<std::string> USE_tmp;
+        for (auto u : USE) {
+            if (u.find("test.") != std::string::npos)
+                USE_tmp.insert(u.substr(u.find("test.") + 5));
+            else
+                USE_tmp.insert(u);
+        }
+        USE = USE_tmp;
+
+        std::set<std::string> WDEF_tmp;
+        for (auto w : WDEF) {
+            if (w.find("test.") != std::string::npos)
+                WDEF_tmp.insert(w.substr(w.find("test.") + 5));
+            else
+                WDEF_tmp.insert(w);
+        }
+
         // Print callee, reachable, refs, use, wdef
-        /*std::cout << "CALLEES: " << std::endl;
+        std::cout << "CALLEES: " << std::endl;
         for(const auto& callee: CALLEES) {
             std::cout << callee << " ";
         }
@@ -784,7 +820,7 @@ void execute(
         for(const auto& r: REFS) {
             std::cout << r << " ";
         }
-        std::cout << std::endl;*/
+        std::cout << std::endl;
 
 
         if (execute_final) {

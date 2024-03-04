@@ -11,23 +11,6 @@ test:&() -> int
 fn f1(p:int, q:&int) -> &int {
 let _lo1:int, _t10:&int, _t11:int, _t12:&&&&int, _t13:&&&int, _t14:&&&int, _t15:&&int, _t16:&&int, _t17:&int, _t18:int, _t19:int, _t2:&() -> int, _t20:&&&int, _t21:&&int, _t22:&int, _t23:int, _t24:&int, _t25:&&int, _t26:&int, _t27:int, _t28:&int, _t29:&int, _t3:&&&&&&int, _t30:int, _t31:&&int, _t32:&int, _t33:&int, _t34:&st, _t35:int, _t36:int, _t37:int, _t38:&int, _t4:&&&&&int, _t5:&&&&&int, _t6:&&&&int, _t7:&&&int, _t8:&&&&int, _t9:int, id42:&() -> int, id43:&() -> int, id44:&&() -> int, id45:&st, id46:int, id47:int, id48:&int, id49:&&int, id50:&&int, id51:&&int, id52:&&int, id53:int, id54:&int, id55:&&int, id56:&&&int, id57:&&&&int, id58:&&&int, id59:&&&&int, id60:&&&&&int, id61:int, id62:&int, id63:&() -> int, id64:int, id65:&&st, id66:&&st, id67:int, id68:&int, id69:&int, id70:&&int, id71:int, id72:&int, id73:&int
 bb1:
-  _t10 = $gep id62 _t9
-  _t11 = $load _t10
-  id61 = $copy _t11
-  _t12 = $gep id57 id61
-  _t13 = $load _t12
-  id56 = $copy _t13
-  _t14 = $gep id56 10
-  _t15 = $load _t14
-  id55 = $copy _t15
-  _t16 = $gep id55 1
-  _t17 = $load _t16
-  id54 = $copy _t17
-  id63 = $copy id43
-  id66 = $copy id65
-  _t18 = $cmp neq id65 id66
-  id64 = $copy _t18
-  id67 = $copy 9
   _t19 = $call_dir test() then bb2
 
 bb10:
@@ -242,26 +225,12 @@ entry:
 
 fn f3(p:&int, q:&int) -> &st {
 let _t1:int, _t2:int, _t3:&&&st, _t4:&&&st, _t5:&&st, _t6:int, _t7:&st, id94:int, id95:int, id96:&int, id97:&&st, id98:&&&st, id99:&&st
-bb1:
-  $call_dir f3(q, id96) then bb2
 
 bb2:
-  _t7 = $load id97
   $ret _t7
 
 entry:
-  _t1 = $load q
-  id94 = $copy _t1
-  _t2 = $load q
-  id95 = $copy _t2
-  _t3 = $addrof id99
-  id98 = $copy _t3
-  _t4 = $gep id98 3
-  _t5 = $load _t4
-  id97 = $copy _t5
-  _t6 = $arith add id95 id95
-  id94 = $copy _t6
-  $call_dir test() then bb1
+  $call_dir test() then bb2
 }
 
 fn main() -> int {
@@ -273,30 +242,17 @@ fn test() -> int {
 let _ret66:int, _t1:&int, _t10:&&int, _t11:&() -> int, _t12:&&() -> int, _t13:&() -> int, _t14:&st, _t15:&&(int, &int) -> &int, _t16:&&(int, &int) -> &int, _t17:&(int, &int) -> &int, _t18:&st, _t19:&&int, _t2:&int, _t20:int, _t21:&int, _t22:&int, _t23:&int, _t24:int, _t25:&&int, _t26:&int, _t27:&&int, _t28:&int, _t29:&&int, _t3:&int, _t30:&int, _t31:int, _t32:&&int, _t33:&int, _t34:int, _t35:&int, _t36:&st, _t37:&&int, _t38:&int, _t39:&int, _t4:&(&st, &int) -> &st, _t40:&int, _t41:&int, _t42:int, _t43:&int, _t44:int, _t45:&int, _t46:&int, _t47:int, _t48:int, _t49:&int, _t5:&st, _t50:&int, _t51:int, _t52:&int, _t53:int, _t54:&int, _t55:&int, _t56:&int, _t57:int, _t58:&int, _t59:&int, _t6:&int, _t60:&&(&st, &int) -> &st, _t61:int, _t62:&(&st, &int) -> &st, _t63:int, _t64:&int, _t65:int, _t7:int, _t8:int, _t9:&&&int, id0:&&&int, id1:int, id10:&int, id11:int, id12:int, id13:&st, id14:&(&st, &int) -> &st, id15:&(&st, &int) -> &st, id16:&&(&st, &int) -> &st, id17:&&(&st, &int) -> &st, id18:&st, id19:&&int, id2:&int, id20:int, id21:&() -> int, id22:&&() -> int, id23:&int, id24:int, id25:int, id26:&&int, id27:&st, id28:&st, id29:&st, id3:int, id30:&st, id31:&() -> int, id32:&st, id33:&&int, id34:&&int, id35:&(int, &int) -> &int, id36:&&(int, &int) -> &int, id37:&st, id38:&() -> int, id39:&() -> int, id4:&int, id40:&() -> int, id41:&(int, &int) -> &int, id5:&int, id6:&int, id7:int, id8:&int, id9:&int
 bb1:
   id2 = $copy _t1
-  _t2 = $call_dir f1(id3, id5) then bb24
-
-bb24:
-  $branch 2 bb37 bb40
-
-
-bb37:
-  f1 = $copy f1
-  id12 = $copy 9
-  _t55 = $addrof id25
-  _t56 = $call_idr id35(6, _t55) then exit
+  $jump bb40
 
 bb40:
   $store id2 _t57
-  _t58 = $call_dir f1(2, id5) then bb41
-
-bb41:
-  _t59 = $call_dir f1(id7, id8) then bb42
+  _t59 = $copy _t1
+  $jump bb42
 
 bb42:
   $call_dir f3(_t58, _t59) then exit
 
 entry:
-  id1 = $copy 10
   id3 = $copy id3
   _t1 = $call_dir f1(id3, id4) then bb1
 

@@ -82,10 +82,6 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                         visited.insert(v);
                         q.push(v);
                     }
-
-                    // Remove function name from v
-                    /*if (v.find(".") != std::string::npos)
-                        v = v.substr(v.find(".") + 1);*/
                     reachable.insert(v);
 
                 }
@@ -102,10 +98,6 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                                 visited.insert(v);
                                 q.push(v);
                             }
-
-                            // Remove function name from v
-                            /*if (v.find(".") != std::string::npos)
-                                v = v.substr(v.find(".") + 1);*/
                             reachable.insert(v);
                         }
                     }
@@ -129,10 +121,6 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                 visited_globals.insert(v);
                 q.push(v);
             }
-
-            // Remove function name from v
-            /*if (v.find(".") != std::string::npos)
-                v = v.substr(v.find(".") + 1);*/
             reachable.insert(v);
         }
 
@@ -148,10 +136,6 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
                         visited_globals.insert(v);
                         q.push(v);
                     }
-
-                    // Remove function name from v
-                    /*if (v.find(".") != std::string::npos)
-                        v = v.substr(v.find(".") + 1);*/
                     reachable.insert(v);
                 }
             }
@@ -432,9 +416,9 @@ void execute(
             std::string pointsToVarName = isGlobalVar(load_inst->src, program, "test") ? load_inst->src->name : "test." + load_inst->src->name;
             if (pointsTo.count(pointsToVarName)) {
                 for (auto pts_to : pointsTo[pointsToVarName]) {
-                    // remove func_name. from pts_to
-                    if (pts_to.find(".") != std::string::npos)
-                        pts_to = pts_to.substr(pts_to.find(".") + 1);
+                    // remove test. from pts_to
+                    if (pts_to.find("test.") != std::string::npos)
+                        pts_to = pts_to.substr(pts_to.find("test.") + 5);
                     USE.insert(pts_to);
                 }
             }
@@ -465,9 +449,9 @@ void execute(
            std::string pointsToVarName = isGlobalVar(store_inst->dst, program, "test") ? store_inst->dst->name : "test." + store_inst->dst->name;
             if (pointsTo.count(pointsToVarName)) {
                 for (auto pts_to : pointsTo[pointsToVarName]) {
-                    // Remove func_name. from pts_to
-                    if (pts_to.find(".") != std::string::npos)
-                        pts_to = pts_to.substr(pts_to.find(".") + 1);
+                    // Remove test. from pts_to
+                    if (pts_to.find("test.") != std::string::npos)
+                        pts_to = pts_to.substr(pts_to.find("test.") + 5);
                     DEF.insert(pts_to);
                 }
             }
@@ -654,7 +638,6 @@ void execute(
 
         std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
 
-        std::cout << "Call dir instruction for bb: " << bb->label << std::endl;
         /*
         * CALLEES = {id} 
         * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)
@@ -695,37 +678,6 @@ void execute(
                 WDEF_tmp.insert(w);
         }
 
-        // Print callee, reachable, refs, use, wdef
-        std::cout << "CALLEES: " << std::endl;
-        for(const auto& callee: CALLEES) {
-            std::cout << callee << " ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "REACHABLE: " << std::endl;
-        for(const auto& r: REACHABLE) {
-            std::cout << r << " ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "REFS: " << std::endl;
-        for(const auto& r: REFS) {
-            std::cout << r << " ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "USE: " << std::endl;
-        for(const auto& u: USE) {
-            std::cout << u << " ";
-        }
-        std::cout << std::endl;   
-
-        std::cout << "WDEF: " << std::endl;
-        for(const auto& w: WDEF) {
-            std::cout << w << " ";
-        }
-        std::cout << std::endl;
-
         if (execute_final) {
             for (std::string v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
@@ -738,8 +690,9 @@ void execute(
             sigma_prime[v].insert(pp);
         }
 
-        if (calldir_inst->lhs)
+        if (calldir_inst->lhs) {
             sigma_prime[calldir_inst->lhs->name] = {pp};
+        }
 
         if (!execute_final) {
             if (joinAbsStore(bb2store[calldir_inst->next_bb], sigma_prime) || bbs_to_output.count(calldir_inst->next_bb) == 0) {
@@ -760,7 +713,7 @@ void execute(
         * WDEF = (U mod(c) for all mods of c in CALLEES) ^ REACHABLE
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
-        std::cout << "Call idr instruction for bb: " << bb->label << std::endl;
+
         // Add function name to callidir_inst->fp->name
         std::string pointsToVarName = isGlobalVar(callidir_inst->fp, program, "test") ? callidir_inst->fp->name : "test." + callidir_inst->fp->name;
         for(auto pts_to: pointsTo[pointsToVarName]) {
@@ -803,26 +756,6 @@ void execute(
                 WDEF_tmp.insert(w);
         }
 
-        // Print callee, reachable, refs, use, wdef
-        std::cout << "CALLEES: " << std::endl;
-        for(const auto& callee: CALLEES) {
-            std::cout << callee << " ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "REACHABLE: " << std::endl;
-        for(const auto& r: REACHABLE) {
-            std::cout << r << " ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "REFS: " << std::endl;
-        for(const auto& r: REFS) {
-            std::cout << r << " ";
-        }
-        std::cout << std::endl;
-
-
         if (execute_final) {
             for (std::string v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
@@ -836,7 +769,9 @@ void execute(
         }
 
         if (callidir_inst->lhs)
+        {
             sigma_prime[callidir_inst->lhs->name] = {pp};
+        }
 
         if (!execute_final) {
             if (joinAbsStore(bb2store[callidir_inst->next_bb], sigma_prime) || bbs_to_output.count(callidir_inst->next_bb) == 0) {

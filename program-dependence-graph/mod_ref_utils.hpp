@@ -49,13 +49,9 @@ class ModRef {
     }
     
     void ComputeCallGraph() {
-        
-        // TODO - Check if a node needs to be created for each function or can the call graph just be created starting from main
-        /*for (auto &it: prog->funcs) {
-            Node *node = get_node(nodes_, it.first);
-        }*/
 
         // Add edges to the call graph
+        // Start from test function since that is always the function we need to analyze
         std::queue<std::string> to_visit;
         to_visit.push("test");
         std::set<std::string> visited;
@@ -72,7 +68,6 @@ class ModRef {
                     CallDirInstruction *call_instr = (CallDirInstruction *)bb.second->terminal;
                     Node *callee_node = get_node(call_instr->callee);
                     // Check that callee_node is not already added to the set of successors of node
-                    // TODO - Check that this works
                     if (node->succs.find(callee_node) == node->succs.end()) {
                         node->succs.insert(callee_node);
                     }
@@ -84,7 +79,7 @@ class ModRef {
                         visited.insert(call_instr->callee);
                     }
                 }
-                // TODO - Verify this instruction using pointsTo set. The key for pointTo set might require function name
+  
                 else if (bb.second->terminal->instrType == InstructionType::CallIdrInstrType) {
                     CallIdrInstruction *call_instr = (CallIdrInstruction *)bb.second->terminal;
                     std::set<std::string> callees = pointsTo[call_instr->fp->name];
@@ -121,21 +116,19 @@ class ModRef {
         {
             std::string func_name = worklist.front();
             worklist.pop();
-            //std::cout << "Visiting " << func_name << std::endl;
+
             Node *node = get_node(func_name);
             for (auto &succ: node->succs) {
                 int succ_edges = succ->preds.size() + succ->succs.size();
                 if (node->name != succ->name) {
                     for (auto &pred: node->preds) {
                         int pred_edges = pred->preds.size() + pred->succs.size();
-                        //if (pred->name != succ->name) {
                             if (pred->succs.find(succ) == pred->succs.end()) {
                                 pred->succs.insert(succ);
                             }
                             if (succ->preds.find(pred) == succ->preds.end()) {
                                 succ->preds.insert(pred);
                             }
-                        //}
                         if (visited.find(pred->name) == visited.end() || pred->preds.size() + pred->succs.size() > pred_edges) {
                             worklist.push(pred->name);
                             visited.insert(pred->name);
@@ -179,10 +172,6 @@ class ModRef {
                         std::string pointsToKey = isGlobalVar(store_instr->dst, it.second->name) ? store_instr->dst->name : it.second->name + "." + store_instr->dst->name;
                         if (pointsTo.count(pointsToKey)) {
                             for (auto pointed_to: pointsTo[pointsToKey]) {
-                                // Remove the function name from the pointed_to
-                                /*if (pointed_to.find(".") != std::string::npos) {
-                                    pointed_to = pointed_to.substr(pointed_to.find(".") + 1);
-                                }*/
                                 node->mods.insert(pointed_to);
                             }
                         }
@@ -201,10 +190,6 @@ class ModRef {
                         std::string pointsToKey = isGlobalVar(load_instr->src, it.second->name) ? load_instr->src->name : it.second->name + "." + load_instr->src->name;
                         if (pointsTo.count(pointsToKey)) {
                             for (auto pointed_to: pointsTo[pointsToKey]) {
-                                // Remove the function name from the pointed_to
-                                /*if (pointed_to.find(".") != std::string::npos) {
-                                    pointed_to = pointed_to.substr(pointed_to.find(".") + 1);
-                                }*/
                                 node->refs.insert(pointed_to);
                             }
                         }
@@ -292,14 +277,13 @@ class ModRef {
                     }
                     else if (instr->instrType == InstructionType::RetInstrType)
                     {
-                        // IF op is a globa, add to set of refs
+                        // IF op is a global, add to set of refs
                         RetInstruction *ret_instr = (RetInstruction *)instr;
                         if (!ret_instr->op->IsConstInt() && isGlobalVar(ret_instr->op->var, it.second->name)) 
                             node->refs.insert(ret_instr->op->var->name);
                     }
                 }
             }
-            // TODO - Need to handle global variables
         }
     }
 
@@ -343,14 +327,13 @@ class ModRef {
     std::map<std::string, ModRefInfo> ComputeModRefInfo() {
 
         ComputeCallGraph();
-        PrintNodes();
-        std::cout << "Transitive closure" << std::endl;
+        //PrintNodes();
+        //std::cout << "Transitive closure" << std::endl;
         ComputeTransitiveClosure();
-        PrintNodes();
+        //PrintNodes();
         InitModRefInfo();
 
         // Propagate mod/ref information backwards in the transitive closure of the call graph
-        // TODO - Verify the below function
         for(const auto& [func_name, func_ref]: nodes_) {
             for(const auto& node: func_ref->succs) {
                 func_ref->refs.insert(node->refs.begin(), node->refs.end());
@@ -362,8 +345,8 @@ class ModRef {
             mod_ref_info[func_name].ref = func_ref->refs;
         }
 
-        std::cout << "Mod Ref Info" << std::endl;
-        PrintModRefInfo();
+        //std::cout << "Mod Ref Info" << std::endl;
+        //PrintModRefInfo();
 
         return mod_ref_info;
     }

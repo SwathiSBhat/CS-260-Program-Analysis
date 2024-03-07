@@ -70,3 +70,4 @@ constraint_gen
 assn3_constraint_generator
 program_slicing
 assn4_program_slicing
+taint_analysis

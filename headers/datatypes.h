@@ -1292,7 +1292,7 @@ class Function {
  */
 class Program {
     public:
-        Program(json program_json): structs(std::unordered_map<std::string, Struct*>()), globals(std::vector<Global*>()), funcs(std::unordered_map<std::string, Function*>()), ext_funcs(std::vector<ExternalFunction*>()) {
+        Program(json program_json): structs(std::unordered_map<std::string, Struct*>()), globals(std::vector<Global*>()), funcs(std::unordered_map<std::string, Function*>()), ext_funcs(std::unordered_map<std::string, ExternalFunction*>()) {
             // std::cout << "Program" << std::endl;
             
             if (program_json["structs"] != nullptr) {
@@ -1315,7 +1315,9 @@ class Program {
             }
             if (program_json["externs"] != nullptr) {
                 for (auto &[ext_func_key, ext_func_val] : program_json["externs"].items()) {
-                    ext_funcs.push_back(new ExternalFunction(ext_func_val));
+                    ExternalFunction *ext_func = new ExternalFunction(ext_func_val);
+                    ext_funcs[ext_func_key] = ext_func;
+                    ext_func->name = ext_func_key;
                 }
             }
         };
@@ -1342,8 +1344,8 @@ class Program {
             }
             if (what_to_print["externs"] != nullptr && what_to_print["externs"] == "true") {
                 std::cout << "External Functions: " << std::endl;
-                for (auto ext_func : ext_funcs) {
-                    ext_func->pretty_print();
+                for (auto it = ext_funcs.begin(); it != ext_funcs.end(); ++it) {
+                    it->second->pretty_print();
                 }
             }
             std::cout << "******************* End of Program *******************" << std::endl;
@@ -1352,5 +1354,5 @@ class Program {
         std::unordered_map<std::string, Struct*> structs;
         std::vector<Global*> globals;
         std::unordered_map<std::string, Function*> funcs;
-        std::vector<ExternalFunction*> ext_funcs;
+        std::unordered_map<std::string, ExternalFunction*> ext_funcs;
 };

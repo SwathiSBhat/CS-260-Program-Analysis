@@ -88,7 +88,7 @@ class TaintAnalysis {
             }
             std::cout << "}" << std::endl;
         }
-        
+        std::cout << std::endl;
     }
 
     private:

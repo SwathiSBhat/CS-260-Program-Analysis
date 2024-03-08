@@ -486,7 +486,7 @@ void execute(
             }
             else if (program->ext_funcs.find(callext_inst->extFuncName) != program->ext_funcs.end() && 
                 isSink(program, program->ext_funcs[callext_inst->extFuncName])) {
-                //std::cout << "Sink " << callext_inst->extFuncName << std::endl;
+                // std::cout << "Sink " << callext_inst->extFuncName << std::endl;
                 std::set<std::string> reachable = GetReachable(callext_inst->args, pointsTo, program, func);
                 
                 for (std::string v : reachable) {
@@ -525,8 +525,8 @@ void execute(
     {
         JumpInstruction *jump_inst = (JumpInstruction *) terminal_instruction;
         // Propagate store to jump label
-        if (bbs_to_output.count(func->name + "." + jump_inst->label) == 0 || 
-        joinAbsStore(bb2store[func->name][jump_inst->label], sigma_prime[func->name][bb->label]))
+        if (joinAbsStore(bb2store[func->name][jump_inst->label], sigma_prime[func->name][bb->label]) || 
+            bbs_to_output.count(func->name + "." + jump_inst->label) == 0)
         {
             bbs_to_output.insert(func->name + "." + jump_inst->label);
             worklist.push_back({func->name, jump_inst->label});
@@ -536,15 +536,15 @@ void execute(
     {
         BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
 
-        if (bbs_to_output.count(func->name + "." + branch_inst->tt) == 0 || 
-        joinAbsStore(bb2store[func->name][branch_inst->tt], sigma_prime[func->name][bb->label]))
+        if (joinAbsStore(bb2store[func->name][branch_inst->tt], sigma_prime[func->name][bb->label]) ||
+            bbs_to_output.count(func->name + "." + branch_inst->tt) == 0)
         {
             bbs_to_output.insert(func->name + "." + branch_inst->tt);
             worklist.push_back({func->name, branch_inst->tt});
         }
 
-        if (bbs_to_output.count(func->name + "." + branch_inst->ff) == 0 || 
-        joinAbsStore(bb2store[func->name][branch_inst->ff], sigma_prime[func->name][bb->label]))
+        if (joinAbsStore(bb2store[func->name][branch_inst->ff], sigma_prime[func->name][bb->label]) ||
+            bbs_to_output.count(func->name + "." + branch_inst->ff) == 0)
         {
             bbs_to_output.insert(func->name + "." + branch_inst->ff);
             worklist.push_back({func->name, branch_inst->ff});
@@ -605,8 +605,8 @@ void execute(
                 //PrintAbsStore(caller_store);
 
                 // Propagate caller store to (func, next_bb)
-                if (bbs_to_output.count(caller_func + "." + next_bb) == 0 ||
-                joinAbsStore(bb2store[caller_func][next_bb], caller_store))
+                if (joinAbsStore(bb2store[caller_func][next_bb], caller_store) ||
+                    bbs_to_output.count(caller_func + "." + next_bb) == 0)
                 {
                     bbs_to_output.insert(caller_func + "." + next_bb);
                     worklist.push_back({caller_func, next_bb});
@@ -662,8 +662,8 @@ void execute(
         }
 
         // Propagate store to next bb
-        if (bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0 ||
-        joinAbsStore(bb2store[func->name][calldir_inst->next_bb], sigma_prime[func->name][bb->label]))
+        if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
+            bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0)
         {
             bbs_to_output.insert(func->name + "." + calldir_inst->next_bb);
             worklist.push_back({func->name, calldir_inst->next_bb});
@@ -692,8 +692,8 @@ void execute(
         // TODO - Check if this equality check works as expected
         if (returned_store == ret_store) {
             AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], func, calldir_inst->lhs);
-            if (bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0 ||
-            joinAbsStore(bb2store[func->name][calldir_inst->next_bb], caller_store))
+            if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], caller_store) ||
+                bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0)
             {
                 bbs_to_output.insert(func->name + "." + calldir_inst->next_bb);
                 worklist.push_back({func->name, calldir_inst->next_bb});
@@ -755,8 +755,8 @@ void execute(
             }
 
             // Propagate store to next bb
-            if (bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0 ||
-            joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]))
+            if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
+                bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
             {
                 bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
                 worklist.push_back({func->name, callidir_inst->next_bb});
@@ -785,8 +785,8 @@ void execute(
             // TODO - Check if this equality check works as expected
             if (returned_store == ret_store) {
                 AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], func, callidir_inst->lhs);
-                if (bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0 ||
-                joinAbsStore(bb2store[func->name][callidir_inst->next_bb], caller_store))
+                if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], caller_store) ||
+                    bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
                 {
                     bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
                     worklist.push_back({func->name, callidir_inst->next_bb});

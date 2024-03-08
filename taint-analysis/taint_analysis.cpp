@@ -167,8 +167,8 @@ class TaintAnalysis {
 
 int main(int argc, char const *argv[])
 {
-    if (argc != 4) {
-        std::cerr << "Usage: taint_analysis <lir file> <lir json filepath> <points to soln file>" << std::endl;
+    if (argc != 5) {
+        std::cerr << "Usage: taint_analysis <lir file> <lir json filepath> <points to soln file> <sensitivity>" << std::endl;
         return EXIT_FAILURE;
     }
 

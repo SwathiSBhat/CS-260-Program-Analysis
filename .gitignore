@@ -71,3 +71,4 @@ assn3_constraint_generator
 program_slicing
 assn4_program_slicing
 taint_analysis
+assn5_taint_analysis

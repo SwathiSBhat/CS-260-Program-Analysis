@@ -723,16 +723,28 @@ void execute(
         for(auto points_to: pointsTo[pointoToKey])
         {
             std::string curr_context = func->name + "." + bb->label;
+            // For context insentive, func_name = context_id
             call_edges[{points_to, points_to}].insert(curr_context);
-            
+
+            std::cout << "Inside callidir for context: " << curr_context << std::endl;
+
             AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime[func->name][bb->label], points_to, callidir_inst->args, func);
-            
+        
+            std::cout << "Callee store for " << points_to << " is: " << std::endl;
+            PrintAbsStore(callee_store);
+
+            bool callee_store_changed = joinAbsStore(bb2store[points_to]["entry"], callee_store);
+
+            // Print bb2store
+            std::cout << "bb2store[" << points_to << ".entry]" << std::endl;
+            PrintAbsStore(bb2store[points_to]["entry"]);
+
             // Propagate callee store to (<func>, entry), if changed add to worklist
-            if (bbs_to_output.count(points_to + ".entry") == 0 || 
-            joinAbsStore(bb2store[points_to]["entry"], callee_store))
+            if (bbs_to_output.count(points_to + ".entry") == 0 || callee_store_changed)
             {
                 bbs_to_output.insert(points_to + ".entry");
                 worklist.push_back({points_to, "entry"});
+                std::cout << "Pushed to worklist: " << points_to + ".entry" << std::endl;
             }
 
             // store[x] = bottom
@@ -748,6 +760,7 @@ void execute(
             {
                 bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
                 worklist.push_back({func->name, callidir_inst->next_bb});
+                std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
             }
 
             // if call_returned[<func>] = ret_store then
@@ -757,6 +770,18 @@ void execute(
             AbsStore returned_store = call_returned[{points_to, points_to}];
             Operand *callee_ret_op = func_ret_op[points_to]->op; 
             AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, callee_ret_op);
+
+            std::cout << "Returned store for " << points_to << " is: " << std::endl;
+            PrintAbsStore(returned_store);
+            std::cout << "Ret store for " << points_to << " is: " << std::endl;
+            PrintAbsStore(ret_store);
+
+            // Print bbs_to_output
+            std::cout << "bbs_to_output: " << std::endl;
+            for (auto it = bbs_to_output.begin(); it != bbs_to_output.end(); it++) {
+                std::cout << *it << std::endl;
+            }
+
             // TODO - Check if this equality check works as expected
             if (returned_store == ret_store) {
                 AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], func, callidir_inst->lhs);
@@ -765,8 +790,10 @@ void execute(
                 {
                     bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
                     worklist.push_back({func->name, callidir_inst->next_bb});
+                    std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
                 }
             }
+
         }
     }
     else

@@ -63,14 +63,21 @@ SET(CMAKE_CXX_STANDARD 17)
 #	headers/tokenizer.hpp
 #)
 
-ADD_EXECUTABLE(assn4_program_slicing
-	program-dependence-graph/program_slicing.cpp
-	program-dependence-graph/control_flow_analysis.hpp
-	program-dependence-graph/cfa_utils.hpp
-	program-dependence-graph/mod_ref_utils.hpp
-	program-dependence-graph/execute_rdef.hpp
-	program-dependence-graph/rtype.hpp
-	program-dependence-graph/reachingdef.hpp
+#ADD_EXECUTABLE(assn4_program_slicing
+#	program-dependence-graph/program_slicing.cpp
+#	program-dependence-graph/control_flow_analysis.hpp
+#	program-dependence-graph/cfa_utils.hpp
+#	program-dependence-graph/mod_ref_utils.hpp
+#	program-dependence-graph/execute_rdef.hpp
+#	program-dependence-graph/rtype.hpp
+#	program-dependence-graph/reachingdef.hpp
+#	headers/datatypes.h
+#	headers/tokenizer.hpp
+#)
+
+ADD_EXECUTABLE(assn5_taint_analysis
+	taint-analysis/taint_analysis.cpp
+	taint-analysis/execute_taint.hpp
 	headers/datatypes.h
 	headers/tokenizer.hpp
 )

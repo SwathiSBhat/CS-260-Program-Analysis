@@ -117,41 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named assn4_program_slicing
+# Target rules for targets named assn5_taint_analysis
 
 # Build rule for target.
-assn4_program_slicing: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn4_program_slicing
-.PHONY : assn4_program_slicing
+assn5_taint_analysis: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn5_taint_analysis
+.PHONY : assn5_taint_analysis
 
 # fast build rule for target.
-assn4_program_slicing/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/build
-.PHONY : assn4_program_slicing/fast
+assn5_taint_analysis/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn5_taint_analysis.dir/build.make CMakeFiles/assn5_taint_analysis.dir/build
+.PHONY : assn5_taint_analysis/fast
 
-program-dependence-graph/program_slicing.o: program-dependence-graph/program_slicing.cpp.o
-.PHONY : program-dependence-graph/program_slicing.o
+taint-analysis/taint_analysis.o: taint-analysis/taint_analysis.cpp.o
+.PHONY : taint-analysis/taint_analysis.o
 
 # target to build an object file
-program-dependence-graph/program_slicing.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/program-dependence-graph/program_slicing.cpp.o
-.PHONY : program-dependence-graph/program_slicing.cpp.o
+taint-analysis/taint_analysis.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn5_taint_analysis.dir/build.make CMakeFiles/assn5_taint_analysis.dir/taint-analysis/taint_analysis.cpp.o
+.PHONY : taint-analysis/taint_analysis.cpp.o
 
-program-dependence-graph/program_slicing.i: program-dependence-graph/program_slicing.cpp.i
-.PHONY : program-dependence-graph/program_slicing.i
+taint-analysis/taint_analysis.i: taint-analysis/taint_analysis.cpp.i
+.PHONY : taint-analysis/taint_analysis.i
 
 # target to preprocess a source file
-program-dependence-graph/program_slicing.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/program-dependence-graph/program_slicing.cpp.i
-.PHONY : program-dependence-graph/program_slicing.cpp.i
+taint-analysis/taint_analysis.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn5_taint_analysis.dir/build.make CMakeFiles/assn5_taint_analysis.dir/taint-analysis/taint_analysis.cpp.i
+.PHONY : taint-analysis/taint_analysis.cpp.i
 
-program-dependence-graph/program_slicing.s: program-dependence-graph/program_slicing.cpp.s
-.PHONY : program-dependence-graph/program_slicing.s
+taint-analysis/taint_analysis.s: taint-analysis/taint_analysis.cpp.s
+.PHONY : taint-analysis/taint_analysis.s
 
 # target to generate assembly for a file
-program-dependence-graph/program_slicing.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/program-dependence-graph/program_slicing.cpp.s
-.PHONY : program-dependence-graph/program_slicing.cpp.s
+taint-analysis/taint_analysis.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn5_taint_analysis.dir/build.make CMakeFiles/assn5_taint_analysis.dir/taint-analysis/taint_analysis.cpp.s
+.PHONY : taint-analysis/taint_analysis.cpp.s
 
 # Help Target
 help:
@@ -161,10 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... assn4_program_slicing"
-	@echo "... program-dependence-graph/program_slicing.o"
-	@echo "... program-dependence-graph/program_slicing.i"
-	@echo "... program-dependence-graph/program_slicing.s"
+	@echo "... assn5_taint_analysis"
+	@echo "... taint-analysis/taint_analysis.o"
+	@echo "... taint-analysis/taint_analysis.i"
+	@echo "... taint-analysis/taint_analysis.s"
 .PHONY : help
 
 

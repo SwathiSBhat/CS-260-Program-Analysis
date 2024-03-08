@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include <queue>
-#include<set>
+#include <set>
 #include <fstream>
 #include <sstream>
 #include <deque>
@@ -64,7 +64,7 @@ class TaintAnalysis {
                 func_ret_op);
 
             // Print call_edges after every bb
-            printCallEdges();
+            // printCallEdges();
 
             for (const auto &i: worklist) {
                 bbs_to_output.insert(i.first + "." + i.second);
@@ -74,11 +74,17 @@ class TaintAnalysis {
         /*
         * Print soln which will be the sinks to sources that can taint them
         */
-        std::cout << "Sinks to sources: " << std::endl;
+        // std::cout << "Sinks to sources: " << std::endl;
         for (auto it = soln.begin(); it != soln.end(); it++) {
-            std::cout << it->first << "-> {";
+            if (it->second.size() == 0) {
+                continue;
+            }
+            std::cout << it->first << " -> {";
             for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-                std::cout << *it2 << ",";
+                if (it2 == --it->second.end())
+                    std::cout << *it2;
+                else
+                    std::cout << *it2 << ", ";
             }
             std::cout << "}" << std::endl;
         }
@@ -145,7 +151,7 @@ class TaintAnalysis {
     void printCallEdges() {
         std::cout << "Call edges: " << std::endl;
         for (auto it = call_edges.begin(); it != call_edges.end(); it++) {
-            std::cout << it->first.first << " : " << it->first.second << "-> {";
+            std::cout << it->first.first << " : " << it->first.second << " -> {";
             for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
                 std::cout << *it2 << ",";
             }

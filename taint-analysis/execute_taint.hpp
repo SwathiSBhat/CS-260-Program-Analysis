@@ -141,6 +141,47 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
     return reachable;
 }
 
+std::set<std::string> GetReachable(std::vector<Variable*> params, std::unordered_map<std::string, std::set<std::string>> pointsTo, Program *program, Function* curr_func) {
+    std::set<std::string> reachable;
+    std::queue<std::string> q;
+    std::set<std::string> visited;
+
+    for(const auto& param: params) {
+        std::string var = param->name;
+        std::string pointsToVarName = isGlobalVar(param, program, curr_func->name) ? var : curr_func->name + "." + var;
+
+        if(pointsTo.count(pointsToVarName)) {
+            for(auto v: pointsTo[pointsToVarName]) {
+                
+                if (visited.count(v) == 0) {
+                    visited.insert(v);
+                    q.push(v);
+                }
+                reachable.insert(v);
+
+            }
+
+            while(!q.empty()) {
+
+                std::string tmp = q.front();
+                q.pop();
+                
+                if(pointsTo.count(tmp)) {
+                    for(auto v: pointsTo[tmp]) {
+                        
+                        if (visited.count(v) == 0) {
+                            visited.insert(v);
+                            q.push(v);
+                        }
+                        reachable.insert(v);
+                    }
+                }
+            }
+        }
+    }
+    return reachable;
+}
+
 /*
 * Helper functions for intraprocedural taint analysis
 */
@@ -159,6 +200,95 @@ std::set<std::string> taint(Operand *op, AbsStore &store, std::string key) {
     }
 }
 
+/*
+* Helper functions:
+* GetCalleeStore : (pointoTo, curr abs store, callee, args) -> abs store
+*       func = func where the call to GetCalleeStore is made
+* GetReturnedStore : (pointoTo, curr abs store, curr func, ret op? if present) -> abs store
+* GetCallerStore : (store, call lhs if present) -> abs store
+*/
+AbsStore GetCalleeStore(Program *program, std::unordered_map<std::string, std::set<std::string>> pointsTo, AbsStore curr_store, std::string callee, std::vector<Operand*> args, Function* func) {
+    // TODO - Verify whole function
+
+    // 1. Map each callee parameter to abstract store of the corresponding argument
+    // TODO - Ensure argument is of form func_name.argument_name to ensure proper retrieval from store
+    AbsStore callee_store = {};
+    Function *callee_func = program->funcs[callee];
+    for (int i = 0; i < args.size(); i++) {
+        // TODO - How to handle constant arguments?
+        if (!args[i]->IsConstInt() && curr_store[args[i]->var->name].size() > 0)
+            callee_store[callee + "." + callee_func->params[i]->name] = curr_store[args[i]->var->name];
+    }
+    // 2. Copy each element reachable from args
+    std::set<std::string> reachable = GetReachable(args, pointsTo, program, func);
+    for (auto it = reachable.begin(); it != reachable.end(); it++) {
+        // TODO - Ensure that the weak update here is correct
+        joinSets(callee_store[*it], curr_store[*it]);
+    }
+
+    return callee_store;
+}
+
+AbsStore GetReturnedStore(Program *program, std::unordered_map<std::string, std::set<std::string>> pointsTo, AbsStore curr_store, Function *curr_func, Operand* ret_op) {
+    // TODO - Verify whole function
+    AbsStore returned_store = {};
+
+    // 1. Add all elements of current store reachable from a parameter
+    std::set<std::string> reachable = GetReachable(curr_func->params, pointsTo, program, curr_func);
+    for (auto it = reachable.begin(); it != reachable.end(); it++) {
+        if (curr_store.find(*it) != curr_store.end()) {
+            returned_store[*it] = curr_store[*it];
+        }
+    }
+
+    // 2. Add all elements of current store reachable from the return operand
+    if (ret_op != nullptr && !ret_op->IsConstInt()) {
+        std::string ret_op_key = GetKey(program, curr_func, ret_op->var);
+        for (auto points_to: pointsTo[ret_op_key]) {
+            returned_store[points_to] = curr_store[points_to];
+        }
+        
+        // TODO - Check if anything needs to be done if constant is returned
+        // 3. Placeholde FAKE for lhs of return instruction
+        if (curr_store.find(ret_op_key) != curr_store.end()) {
+            returned_store["FAKE"] = curr_store[ret_op_key];
+        }
+    }
+
+    return returned_store;
+}
+
+AbsStore GetCallerStore(Program *program, AbsStore curr_store, Function *curr_func, Variable* call_lhs) {
+    // TODO - Verify whole function
+    AbsStore caller_store = curr_store;
+    if (call_lhs != nullptr) {
+        std::string call_lhs_key = GetKey(program, curr_func, call_lhs);
+        if (curr_store.find("FAKE") != curr_store.end()) {
+            caller_store[call_lhs_key] = curr_store["FAKE"];
+            caller_store.erase("FAKE");
+        }
+    }
+    else {
+        if (caller_store.find("FAKE") != caller_store.end())
+            caller_store.erase("FAKE");
+    }
+    return caller_store;
+}
+
+
+void PrintAbsStore(AbsStore store)
+{
+    for (auto it = store.begin(); it != store.end(); it++)
+    {
+        std::cout << it->first << " : ";
+        for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++)
+        {
+            std::cout << *it2 << ",";
+        }
+        std::cout << std::endl;
+    }
+}
+
 void execute(
     Program *program,
     Function* func,
@@ -168,7 +298,9 @@ void execute(
     std::set<std::string> &bbs_to_output,
     std::map<std::string, std::set<std::string>> &soln,
     std::unordered_map<std::string, std::set<std::string>> pointsTo,
-    bool execute_final = false
+    std::map<std::pair<std::string, std::string>, std::set<std::string>> &call_edges,
+    std::map<std::pair<std::string, std::string>, AbsStore> &call_returned,
+    std::map<std::string, RetInstruction*> func_ret_op
 )
 {
     std::map<std::string, std::map<std::string, AbsStore>> sigma_prime = bb2store;  
@@ -357,17 +489,15 @@ void execute(
                 std::cout << "Sink " << callext_inst->extFuncName << std::endl;
                 std::set<std::string> reachable = GetReachable(callext_inst->args, pointsTo, program, func);
                 
-                if (execute_final) {
-                    for (std::string v : reachable) {
-                        joinSets(soln[callext_inst->extFuncName], sigma_prime[func->name][bb->label][v]);
-                    }
+                for (std::string v : reachable) {
+                    joinSets(soln[callext_inst->extFuncName], sigma_prime[func->name][bb->label][v]);
+                }
 
-                    for (auto v: callext_inst->args) {
-                        if (v->IsConstInt())
-                            continue;
-                        std::string v_key = GetKey(program, func, v->var);
-                        joinSets(soln[callext_inst->extFuncName], sigma_prime[func->name][bb->label][v_key]);
-                    }
+                for (auto v: callext_inst->args) {
+                    if (v->IsConstInt())
+                        continue;
+                    std::string v_key = GetKey(program, func, v->var);
+                    joinSets(soln[callext_inst->extFuncName], sigma_prime[func->name][bb->label][v_key]);
                 }
 
                 if (callext_inst->lhs) {
@@ -391,27 +521,253 @@ void execute(
 
     std::string pp = bb->label + "." + "term";
     
-    if ((*terminal_instruction).instrType == InstructionType::JumpInstrType || 
-        (*terminal_instruction).instrType == InstructionType::BranchInstrType)
+    if ((*terminal_instruction).instrType == InstructionType::JumpInstrType)
     {
-        // no-op
+        JumpInstruction *jump_inst = (JumpInstruction *) terminal_instruction;
+        // Propagate store to jump label
+        if (bbs_to_output.count(func->name + "." + jump_inst->label) == 0 || 
+        joinAbsStore(bb2store[func->name][jump_inst->label], sigma_prime[func->name][bb->label]))
+        {
+            bbs_to_output.insert(func->name + "." + jump_inst->label);
+            worklist.push_back({func->name, jump_inst->label});
+        }
+    }
+    else if ((*terminal_instruction).instrType == InstructionType::BranchInstrType)
+    {
+        BranchInstruction *branch_inst = (BranchInstruction *) terminal_instruction;
+
+        if (bbs_to_output.count(func->name + "." + branch_inst->tt) == 0 || 
+        joinAbsStore(bb2store[func->name][branch_inst->tt], sigma_prime[func->name][bb->label]))
+        {
+            bbs_to_output.insert(func->name + "." + branch_inst->tt);
+            worklist.push_back({func->name, branch_inst->tt});
+        }
+
+        if (bbs_to_output.count(func->name + "." + branch_inst->ff) == 0 || 
+        joinAbsStore(bb2store[func->name][branch_inst->ff], sigma_prime[func->name][bb->label]))
+        {
+            bbs_to_output.insert(func->name + "." + branch_inst->ff);
+            worklist.push_back({func->name, branch_inst->ff});
+        }
     }
     else if ((*terminal_instruction).instrType == InstructionType::RetInstrType)
     {
         RetInstruction *ret_inst = (RetInstruction *) terminal_instruction;
+        /*
+        * If we are in main, then no-op
+        * Let ret_store = GetReturnedStore(...)
+        * call_returned[<curr func>] = ret_store
+        * for all (func,bb) in call_edges[<curr func>], where terminal of bb is a call_(dir/idr) instruction:
+        *    let caller_store = get_caller_store(ret_store, x)
+        *    propagate caller_store to (func, next_bb)
+        */
 
+        if (func->name != "main") {
+            
+            AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, ret_inst->op);
+
+            call_returned[{func->name, func->name}] = ret_store;
+
+            // Print ret store
+            std::cout << "Ret store for " << func->name << " is: " << std::endl;
+            PrintAbsStore(ret_store);
+
+            for (auto it = call_edges[{func->name, func->name}].begin(); it != call_edges[{func->name, func->name}].end(); it++) {
+                // TODO - Handle different contexts differently based on sensitivity
+                std::string caller_bb = it->substr(it->find(".") + 1);
+                std::string caller_func = it->substr(0, it->find("."));
+                
+                Variable *caller_lhs = nullptr;
+                Instruction *instr = program->funcs[caller_func]->bbs[caller_bb]->terminal;
+                std::string next_bb;
+                
+                if (instr->instrType == InstructionType::CallDirInstrType)
+                {
+                    CallDirInstruction *calldir_inst = (CallDirInstruction*) instr;
+                    caller_lhs = calldir_inst->lhs;
+                    next_bb = calldir_inst->next_bb;
+                }
+                else if (instr->instrType == InstructionType::CallIdrInstrType)
+                {
+                    CallIdrInstruction *callidr_inst = (CallIdrInstruction*) instr;
+                    caller_lhs = callidr_inst->lhs;
+                    next_bb = callidr_inst->next_bb;
+                }
+                else
+                {
+                    std::cout << "Unknown call_edges terminal instruction type" << std::endl;
+                }
+
+                AbsStore caller_store = GetCallerStore(program, ret_store, func, caller_lhs);
+
+                // Print caller store
+                std::cout << "Caller store for " << caller_func << " is: " << std::endl;
+                PrintAbsStore(caller_store);
+
+                // Propagate caller store to (func, next_bb)
+                if (bbs_to_output.count(caller_func + "." + next_bb) == 0 ||
+                joinAbsStore(bb2store[caller_func][next_bb], caller_store))
+                {
+                    bbs_to_output.insert(caller_func + "." + next_bb);
+                    worklist.push_back({caller_func, next_bb});
+                }
+            }
+        }
     }
     else if ((*terminal_instruction).instrType == InstructionType::CallDirInstrType)
     {
         CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal_instruction;
+        /*
+        * 1. Update call_edges to include new call site. Populate it with correct context id based on sensitivity
+        * 2. Get callee store
+        * 3. Propagate callee store to (<func>, entry), if changed add to worklist
+        * 4. store[x] = bottom
+        * 5. Propagate store to next bb
+        * 6. if call_returned[<func>] = ret_store then
+                let caller_store = get_caller_store(ret_store, x)
+                propagate caller_store to bb
+        */
 
-        
+        // TODO - Add check for sensitivity here and modify context accordingly
+        std::string curr_context = func->name + "." + bb->label;
+        // For context insentive, func_name = context_id
+        call_edges[{calldir_inst->callee, calldir_inst->callee}].insert(curr_context);
+
+        std::cout << "Inside calldir for context: " << curr_context << std::endl;
+
+        AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime[func->name][bb->label], calldir_inst->callee, calldir_inst->args, func);
+    
+        std::cout << "Callee store for " << calldir_inst->callee << " is: " << std::endl;
+        PrintAbsStore(callee_store);
+
+        bool callee_store_changed = joinAbsStore(bb2store[calldir_inst->callee]["entry"], callee_store);
+
+        // Print bb2store
+        std::cout << "bb2store[" << calldir_inst->callee << ".entry]" << std::endl;
+        PrintAbsStore(bb2store[calldir_inst->callee]["entry"]);
+
+        // Propagate callee store to (<func>, entry), if changed add to worklist
+        if (bbs_to_output.count(calldir_inst->callee + ".entry") == 0 || callee_store_changed)
+        {
+            bbs_to_output.insert(calldir_inst->callee + ".entry");
+            worklist.push_back({calldir_inst->callee, "entry"});
+            std::cout << "Pushed to worklist: " << calldir_inst->callee + ".entry" << std::endl;
+        }
+
+        // store[x] = bottom
+        // TODO - Check if this has to be removed or made an empty set
+        if (calldir_inst->lhs) {
+            std::string lhsKey = GetKey(program, func, calldir_inst->lhs);
+            sigma_prime[func->name][bb->label][lhsKey] = {};
+        }
+
+        // Propagate store to next bb
+        if (bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0 ||
+        joinAbsStore(bb2store[func->name][calldir_inst->next_bb], sigma_prime[func->name][bb->label]))
+        {
+            bbs_to_output.insert(func->name + "." + calldir_inst->next_bb);
+            worklist.push_back({func->name, calldir_inst->next_bb});
+            std::cout << "Pushed to worklist: " << func->name + "." + calldir_inst->next_bb << std::endl;
+        }
+
+        // if call_returned[<func>] = ret_store then
+        // let caller_store = get_caller_store(ret_store, x)
+        // propagate caller_store to bb
+
+        AbsStore returned_store = call_returned[{calldir_inst->callee, calldir_inst->callee}];
+        Operand *callee_ret_op = func_ret_op[calldir_inst->callee]->op; 
+        AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, callee_ret_op);
+
+        std::cout << "Returned store for " << calldir_inst->callee << " is: " << std::endl;
+        PrintAbsStore(returned_store);
+        std::cout << "Ret store for " << calldir_inst->callee << " is: " << std::endl;
+        PrintAbsStore(ret_store);
+
+        // Print bbs_to_output
+        std::cout << "bbs_to_output: " << std::endl;
+        for (auto it = bbs_to_output.begin(); it != bbs_to_output.end(); it++) {
+            std::cout << *it << std::endl;
+        }
+
+        // TODO - Check if this equality check works as expected
+        if (returned_store == ret_store) {
+            AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], func, calldir_inst->lhs);
+            if (bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0 ||
+            joinAbsStore(bb2store[func->name][calldir_inst->next_bb], caller_store))
+            {
+                bbs_to_output.insert(func->name + "." + calldir_inst->next_bb);
+                worklist.push_back({func->name, calldir_inst->next_bb});
+                std::cout << "Pushed to worklist: " << func->name + "." + calldir_inst->next_bb << std::endl;
+            }
+        }
 
     }
     else if ((*terminal_instruction).instrType == InstructionType::CallIdrInstrType)
     {
         CallIdrInstruction *callidir_inst = (CallIdrInstruction *) terminal_instruction;
 
+        /*
+        * Run the below logic for each pointsTo of fp
+        * 1. Update call_edges to include new call site. Populate it with correct context id based on sensitivity
+        * 2. Get callee store
+        * 3. Propagate callee store to (<func>, entry), if changed add to worklist
+        * 4. store[x] = bottom
+        * 5. Propagate store to next bb
+        * 6. if call_returned[<func>] = ret_store then
+                let caller_store = get_caller_store(ret_store, x)
+                propagate caller_store to bb
+        */
+
+        std::string pointoToKey = isGlobalVar(callidir_inst->fp, program, func->name) ? callidir_inst->fp->name : func->name + "." + callidir_inst->fp->name;
+
+        for(auto points_to: pointsTo[pointoToKey])
+        {
+            std::string curr_context = func->name + "." + bb->label;
+            call_edges[{points_to, points_to}].insert(curr_context);
+            
+            AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime[func->name][bb->label], points_to, callidir_inst->args, func);
+            
+            // Propagate callee store to (<func>, entry), if changed add to worklist
+            if (bbs_to_output.count(points_to + ".entry") == 0 || 
+            joinAbsStore(bb2store[points_to]["entry"], callee_store))
+            {
+                bbs_to_output.insert(points_to + ".entry");
+                worklist.push_back({points_to, "entry"});
+            }
+
+            // store[x] = bottom
+            // TODO - Check if this has to be removed or made an empty set
+            if (callidir_inst->lhs) {
+                std::string lhsKey = GetKey(program, func, callidir_inst->lhs);
+                sigma_prime[func->name][bb->label][lhsKey] = {};
+            }
+
+            // Propagate store to next bb
+            if (bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0 ||
+            joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]))
+            {
+                bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
+                worklist.push_back({func->name, callidir_inst->next_bb});
+            }
+
+            // if call_returned[<func>] = ret_store then
+            // let caller_store = get_caller_store(ret_store, x)
+            // propagate caller_store to bb
+
+            AbsStore returned_store = call_returned[{points_to, points_to}];
+            Operand *callee_ret_op = func_ret_op[points_to]->op; 
+            AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, callee_ret_op);
+            // TODO - Check if this equality check works as expected
+            if (returned_store == ret_store) {
+                AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], func, callidir_inst->lhs);
+                if (bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0 ||
+                joinAbsStore(bb2store[func->name][callidir_inst->next_bb], caller_store))
+                {
+                    bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
+                    worklist.push_back({func->name, callidir_inst->next_bb});
+                }
+            }
+        }
     }
     else
     {

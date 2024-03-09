@@ -210,14 +210,14 @@ std::set<std::string> taint(Operand *op, AbsStore &store, std::string key) {
 AbsStore GetCalleeStore(Program *program, std::unordered_map<std::string, std::set<std::string>> pointsTo, AbsStore curr_store, std::string callee, std::vector<Operand*> args, Function* func) {
     // TODO - Verify whole function
 
-    // 1. Map each callee parameter to abstract store of the corresponding argument
-    // TODO - Ensure argument is of form func_name.argument_name to ensure proper retrieval from store
+    // 1. Map each callee parameter to abstract store of the corresponding argumentg
     AbsStore callee_store = {};
     Function *callee_func = program->funcs[callee];
     for (int i = 0; i < args.size(); i++) {
         // TODO - How to handle constant arguments?
-        if (!args[i]->IsConstInt() && curr_store[args[i]->var->name].size() > 0)
-            callee_store[callee + "." + callee_func->params[i]->name] = curr_store[args[i]->var->name];
+        std::string key = GetKey(program, func, args[i]);
+        if (!args[i]->IsConstInt() && curr_store[key].size() > 0)
+            callee_store[callee + "." + callee_func->params[i]->name] = curr_store[key];
     }
     // 2. Copy each element reachable from args
     std::set<std::string> reachable = GetReachable(args, pointsTo, program, func);
@@ -569,8 +569,8 @@ void execute(
             call_returned[{func->name, func->name}] = ret_store;
 
             // Print ret store
-            //std::cout << "Ret store for " << func->name << " is: " << std::endl;
-            //PrintAbsStore(ret_store);
+            std::cout << "Ret store for " << func->name << " is: " << std::endl;
+            PrintAbsStore(ret_store);
 
             for (auto it = call_edges[{func->name, func->name}].begin(); it != call_edges[{func->name, func->name}].end(); it++) {
                 // TODO - Handle different contexts differently based on sensitivity
@@ -601,8 +601,8 @@ void execute(
                 AbsStore caller_store = GetCallerStore(program, ret_store, caller_lhs, program->funcs[caller_func]);
 
                 // Print caller store
-                //std::cout << "Caller store for " << caller_func << " is: " << std::endl;
-                //PrintAbsStore(caller_store);
+                std::cout << "Caller store for " << caller_func << " is: " << std::endl;
+                PrintAbsStore(caller_store);
 
                 // Propagate caller store to (func, next_bb)
                 if (joinAbsStore(bb2store[caller_func][next_bb], caller_store) ||
@@ -633,12 +633,12 @@ void execute(
         // For context insentive, func_name = context_id
         call_edges[{calldir_inst->callee, calldir_inst->callee}].insert(curr_context);
 
-        //std::cout << "Inside calldir for context: " << curr_context << std::endl;
+        std::cout << "Inside calldir for context: " << curr_context << std::endl;
 
         AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime[func->name][bb->label], calldir_inst->callee, calldir_inst->args, func);
     
-        //std::cout << "Callee store for " << calldir_inst->callee << " is: " << std::endl;
-        //PrintAbsStore(callee_store);
+        std::cout << "Callee store for " << calldir_inst->callee << " is: " << std::endl;
+        PrintAbsStore(callee_store);
 
         bool callee_store_changed = joinAbsStore(bb2store[calldir_inst->callee]["entry"], callee_store);
 
@@ -678,10 +678,10 @@ void execute(
         Operand *callee_ret_op = func_ret_op[calldir_inst->callee]->op; 
         AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, callee_ret_op);
 
-        /*std::cout << "Returned store for " << calldir_inst->callee << " is: " << std::endl;
+        std::cout << "Returned store for " << calldir_inst->callee << " is: " << std::endl;
         PrintAbsStore(returned_store);
         std::cout << "Ret store for " << calldir_inst->callee << " is: " << std::endl;
-        PrintAbsStore(ret_store);*/
+        PrintAbsStore(ret_store);
 
         // TODO - Check if this equality check works as expected
         if (returned_store == ret_store) {
@@ -798,7 +798,7 @@ void execute(
     /*
     * Print sigma prime
     */
-    /*std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
+    std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
     for (auto it = sigma_prime[func->name][bb->label].begin(); it != sigma_prime[func->name][bb->label].end(); it++) {
         std::cout << it->first << " -> {";
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
@@ -806,7 +806,7 @@ void execute(
         }
         std::cout << "}" << std::endl;
     }
-    std::cout << std::endl;*/
+    std::cout << std::endl;
     
     return;
 }

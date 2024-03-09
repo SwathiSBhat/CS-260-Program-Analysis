@@ -1,0 +1,87 @@
+fn1:&(int) -> int
+fn2:&(int, int) -> int
+fn3:&(int, int, int) -> int
+fn4:&(int) -> int
+
+extern snk1:(int) -> _
+extern snk2:(int) -> _
+extern snk3:(int, int) -> _
+extern snk4:(int, int) -> _
+extern snk5:(int) -> _
+extern snk6:(int) -> _
+extern snk7:(int, int) -> _
+extern snk8:(int, int) -> _
+extern src1:() -> int
+extern src2:() -> int
+extern src3:() -> int
+extern src4:() -> int
+extern src5:() -> int
+extern src6:() -> int
+extern src7:() -> int
+extern src8:() -> int
+
+fn fn1(p:int) -> int {
+entry:
+  $ret p
+}
+
+fn fn2(p:int, q:int) -> int {
+let _t1:int
+entry:
+  _t1 = $arith add p q
+  $ret _t1
+}
+
+fn fn3(p:int, q:int, r:int) -> int {
+let _ret1:int
+bb2:
+  _ret1 = $copy q
+  $jump exit
+
+bb3:
+  _ret1 = $copy r
+  $jump exit
+
+entry:
+  $branch p bb2 bb3
+
+exit:
+  $ret _ret1
+}
+
+fn fn4(p:int) -> int {
+let _t1:int
+entry:
+  _t1 = $call_ext src8()
+  $ret _t1
+}
+
+fn main() -> int {
+let _lo1:int, _t10:int, _t11:int, _t12:int, _t13:int, _t14:int, _t15:int, _t16:int, _t17:int, _t18:int, _t19:int, _t2:int, _t20:int, _t21:int, _t22:int, _t3:int, _t4:int, _t5:int, _t6:int, _t7:int, _t8:int, _t9:int, id0:int, id1:int, id2:int, id3:int, id4:int, id5:int, id6:int, id7:int
+bb30:
+  _t13 = $call_ext src1()
+  $call_ext snk6(_t13)
+  _t14 = $call_ext src2()
+  id4 = $copy _t14
+  _t15 = $call_dir fn1(id3) then bb35
+
+bb33:
+  $ret 1
+
+bb35:
+  $call_dir fn1(id0) then bb38
+
+bb38:
+  _t17 = $cmp lte id4 0
+  _t18 = $call_dir fn3(4, 9, _t17) then bb40
+
+bb40:
+  $call_ext snk1(_t18)
+  _t19 = $call_ext src5()
+  id6 = $copy _t19
+  _t20 = $cmp eq id1 8
+  _t21 = $call_dir fn3(3, _t20, id3) then bb33
+
+entry:
+  $jump bb30
+}

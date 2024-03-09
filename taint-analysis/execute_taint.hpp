@@ -258,11 +258,11 @@ AbsStore GetReturnedStore(Program *program, std::unordered_map<std::string, std:
     return returned_store;
 }
 
-AbsStore GetCallerStore(Program *program, AbsStore curr_store, Function *curr_func, Variable* call_lhs) {
+AbsStore GetCallerStore(Program *program, AbsStore curr_store, Variable* call_lhs, Function *caller_func) {
     // TODO - Verify whole function
     AbsStore caller_store = curr_store;
     if (call_lhs != nullptr) {
-        std::string call_lhs_key = GetKey(program, curr_func, call_lhs);
+        std::string call_lhs_key = GetKey(program, caller_func, call_lhs);
         if (curr_store.find("FAKE") != curr_store.end()) {
             caller_store[call_lhs_key] = curr_store["FAKE"];
             caller_store.erase("FAKE");
@@ -597,8 +597,8 @@ void execute(
                 {
                     std::cout << "Unknown call_edges terminal instruction type" << std::endl;
                 }
-
-                AbsStore caller_store = GetCallerStore(program, ret_store, func, caller_lhs);
+                
+                AbsStore caller_store = GetCallerStore(program, ret_store, caller_lhs, program->funcs[caller_func]);
 
                 // Print caller store
                 //std::cout << "Caller store for " << caller_func << " is: " << std::endl;
@@ -681,17 +681,11 @@ void execute(
         /*std::cout << "Returned store for " << calldir_inst->callee << " is: " << std::endl;
         PrintAbsStore(returned_store);
         std::cout << "Ret store for " << calldir_inst->callee << " is: " << std::endl;
-        PrintAbsStore(ret_store);
-
-        // Print bbs_to_output
-        std::cout << "bbs_to_output: " << std::endl;
-        for (auto it = bbs_to_output.begin(); it != bbs_to_output.end(); it++) {
-            std::cout << *it << std::endl;
-        }*/
+        PrintAbsStore(ret_store);*/
 
         // TODO - Check if this equality check works as expected
         if (returned_store == ret_store) {
-            AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], func, calldir_inst->lhs);
+            AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], calldir_inst->lhs, func);
             if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], caller_store) ||
                 bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0)
             {
@@ -784,7 +778,7 @@ void execute(
 
             // TODO - Check if this equality check works as expected
             if (returned_store == ret_store) {
-                AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], func, callidir_inst->lhs);
+                AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], callidir_inst->lhs, func);
                 if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], caller_store) ||
                     bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
                 {

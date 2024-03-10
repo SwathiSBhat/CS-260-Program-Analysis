@@ -75,7 +75,7 @@ class TaintAnalysis {
         * Execute one last time for all functions, bbs and context
         * TODO - Change this to consult context for context sensitive analysis
         */
-        /*std::cout << "Final execution " << std::endl;
+        //std::cout << "Final execution " << std::endl;
         for (auto func: program->funcs) {
             for (auto bb: func.second->bbs) {
                 std::string curr_context = func.first + "." + bb.first;
@@ -94,7 +94,7 @@ class TaintAnalysis {
                         func_ret_op);
                 //}
             }
-        }*/
+        }
 
         /*
         * Print soln which will be the sinks to sources that can taint them

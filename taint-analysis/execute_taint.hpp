@@ -486,7 +486,7 @@ void execute(
             }
             else if (program->ext_funcs.find(callext_inst->extFuncName) != program->ext_funcs.end() && 
                 isSink(program, program->ext_funcs[callext_inst->extFuncName])) {
-                // std::cout << "Sink " << callext_inst->extFuncName << std::endl;
+                //std::cout << "Sink " << callext_inst->extFuncName << std::endl;
                 std::set<std::string> reachable = GetReachable(callext_inst->args, pointsTo, program, func);
                 
                 for (std::string v : reachable) {
@@ -685,6 +685,7 @@ void execute(
 
         // TODO - Check if this equality check works as expected
         if (returned_store == ret_store) {
+            //std::cout << "Returned store = ret store" << curr_context << std::endl;
             AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], calldir_inst->lhs, func);
             if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], caller_store) ||
                 bbs_to_output.count(func->name + "." + calldir_inst->next_bb) == 0)
@@ -741,21 +742,6 @@ void execute(
                 //std::cout << "Pushed to worklist: " << points_to + ".entry" << std::endl;
             }
 
-            // store[x] = bottom
-            // TODO - Check if this has to be removed or made an empty set
-            if (callidir_inst->lhs) {
-                std::string lhsKey = GetKey(program, func, callidir_inst->lhs);
-                sigma_prime[func->name][bb->label][lhsKey] = {};
-            }
-
-            // Propagate store to next bb
-            if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
-                bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
-            {
-                bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
-                worklist.push_back({func->name, callidir_inst->next_bb});
-                //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
-            }
 
             // if call_returned[<func>] = ret_store then
             // let caller_store = get_caller_store(ret_store, x)
@@ -768,16 +754,11 @@ void execute(
             /*std::cout << "Returned store for " << points_to << " is: " << std::endl;
             PrintAbsStore(returned_store);
             std::cout << "Ret store for " << points_to << " is: " << std::endl;
-            PrintAbsStore(ret_store);
-
-            // Print bbs_to_output
-            std::cout << "bbs_to_output: " << std::endl;
-            for (auto it = bbs_to_output.begin(); it != bbs_to_output.end(); it++) {
-                std::cout << *it << std::endl;
-            }*/
+            PrintAbsStore(ret_store);*/
 
             // TODO - Check if this equality check works as expected
             if (returned_store == ret_store) {
+                //std::cout << "Returned store = ret store" << curr_context << std::endl;
                 AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], callidir_inst->lhs, func);
                 if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], caller_store) ||
                     bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
@@ -787,7 +768,22 @@ void execute(
                     //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
                 }
             }
+        }
 
+        // store[x] = bottom
+        // TODO - Check if this has to be removed or made an empty set
+        if (callidir_inst->lhs) {
+            std::string lhsKey = GetKey(program, func, callidir_inst->lhs);
+            sigma_prime[func->name][bb->label][lhsKey] = {};
+        }
+
+        // Propagate store to next bb
+        if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
+            bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
+        {
+            bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
+            worklist.push_back({func->name, callidir_inst->next_bb});
+            //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
         }
     }
     else
@@ -800,6 +796,8 @@ void execute(
     */
     /*std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
     for (auto it = sigma_prime[func->name][bb->label].begin(); it != sigma_prime[func->name][bb->label].end(); it++) {
+        if (it->second.size() == 0)
+            continue;
         std::cout << it->first << " -> {";
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
             std::cout << *it2 << ",";

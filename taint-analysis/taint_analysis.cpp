@@ -72,31 +72,6 @@ class TaintAnalysis {
         }
 
         /*
-        * Execute one last time for all functions, bbs and context
-        * TODO - Change this to consult context for context sensitive analysis
-        */
-        //std::cout << "Final execution " << std::endl;
-        for (auto func: program->funcs) {
-            for (auto bb: func.second->bbs) {
-                std::string curr_context = func.first + "." + bb.first;
-                //if (bbs_to_output.find(curr_context) == bbs_to_output.end()) {
-                    execute(
-                        program, 
-                        program->funcs[func.first], 
-                        program->funcs[func.first]->bbs[bb.first], 
-                        bb2store, 
-                        worklist, 
-                        bbs_to_output, 
-                        soln, 
-                        pointsTo,
-                        call_edges,
-                        call_returned,
-                        func_ret_op);
-                //}
-            }
-        }
-
-        /*
         * Print soln which will be the sinks to sources that can taint them
         */
         // std::cout << "Sinks to sources: " << std::endl;
@@ -124,7 +99,7 @@ class TaintAnalysis {
         * 1) call_edges data structure = map from callee function to the set of call instructions that call it
         */
        // TODO - This can be done ahead of time only for context insensitive analysis
-        /*for (auto func: program->funcs) {
+        for (auto func: program->funcs) {
             for (auto bb: func.second->bbs) {
                 Instruction* terminal = bb.second->terminal;
                 if ((*terminal).instrType == InstructionType::CallDirInstrType)
@@ -147,7 +122,7 @@ class TaintAnalysis {
                     }
                 }
             }
-        }*/
+        }
 
         /*
         * 2) call_returned data structure = map from function to returned abstract store. This data structure stores the latest return store for each function

@@ -771,23 +771,22 @@ void execute(
                     //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
                 }
             }
+        }
 
-            // store[x] = bottom
-            // TODO - Check if this has to be removed or made an empty set
-            if (callidir_inst->lhs) {
-                std::string lhsKey = GetKey(program, func, callidir_inst->lhs);
-                sigma_prime[func->name][bb->label][lhsKey] = {};
-            }
+        // store[x] = bottom
+        // TODO - Check if this has to be removed or made an empty set
+        if (callidir_inst->lhs) {
+            std::string lhsKey = GetKey(program, func, callidir_inst->lhs);
+            sigma_prime[func->name][bb->label][lhsKey] = {};
+        }
 
-            // Propagate store to next bb
-            if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
-                bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
-            {
-                bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
-                worklist.push_back({func->name, callidir_inst->next_bb});
-                //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
-            }
-
+        // Propagate store to next bb
+        if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
+            bbs_to_output.count(func->name + "." + callidir_inst->next_bb) == 0)
+        {
+            bbs_to_output.insert(func->name + "." + callidir_inst->next_bb);
+            worklist.push_back({func->name, callidir_inst->next_bb});
+            //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
         }
     }
     else

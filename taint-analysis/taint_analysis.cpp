@@ -99,7 +99,7 @@ class TaintAnalysis {
         * 1) call_edges data structure = map from callee function to the set of call instructions that call it
         */
        // TODO - This can be done ahead of time only for context insensitive analysis
-        for (auto func: program->funcs) {
+        /*for (auto func: program->funcs) {
             for (auto bb: func.second->bbs) {
                 Instruction* terminal = bb.second->terminal;
                 if ((*terminal).instrType == InstructionType::CallDirInstrType)
@@ -122,7 +122,7 @@ class TaintAnalysis {
                     }
                 }
             }
-        }
+        }*/
 
         /*
         * 2) call_returned data structure = map from function to returned abstract store. This data structure stores the latest return store for each function

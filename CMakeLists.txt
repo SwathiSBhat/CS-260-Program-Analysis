@@ -76,8 +76,8 @@ SET(CMAKE_CXX_STANDARD 17)
 #)
 
 ADD_EXECUTABLE(assn5_taint_analysis
-	taint-analysis/taint_analysis.cpp
-	taint-analysis/execute_taint.hpp
+	taint-analysis/taint_analysis2.cpp
+	taint-analysis/execute_taint2.hpp
 	headers/datatypes.h
 	headers/tokenizer.hpp
 )

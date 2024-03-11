@@ -380,7 +380,7 @@ void execute(
     int sensitivity
 )
 {
-    std::map<std::string, std::map<std::string, AbsStore>> sigma_prime = bb2store;  
+    AbsStore sigma_prime = bb2store[func->name][bb->label];  
     
     int index = 0; // To help build program point name
 
@@ -399,10 +399,10 @@ void execute(
              * x = $arith add y z
              * sigma_prime[x] = taint(op1) U taint(op2)
             */
-            std::set<std::string> taint_op1 = taint(arith_inst->op1, sigma_prime[func->name][bb->label], GetKey(program, func, arith_inst->op1)); // TODO - Verify that is sigma_prime and not bb2store 
-            std::set<std::string> taint_op2 = taint(arith_inst->op2, sigma_prime[func->name][bb->label], GetKey(program, func, arith_inst->op2));
+            std::set<std::string> taint_op1 = taint(arith_inst->op1, sigma_prime, GetKey(program, func, arith_inst->op1)); // TODO - Verify that is sigma_prime and not bb2store 
+            std::set<std::string> taint_op2 = taint(arith_inst->op2, sigma_prime, GetKey(program, func, arith_inst->op2));
             joinSets(taint_op1, taint_op2);
-            sigma_prime[func->name][bb->label][GetKey(program, func, arith_inst->lhs)] = taint_op1;
+            sigma_prime[GetKey(program, func, arith_inst->lhs)] = taint_op1;
 
         }
         else if ((*inst).instrType == InstructionType::CmpInstrType)
@@ -413,12 +413,12 @@ void execute(
              * x = $cmp gt y z
              * sigma_prime[x] = taint(op1) U taint(op2)
             */
-            std::set<std::string> taint_op1 = taint(cmp_inst->op1, sigma_prime[func->name][bb->label], GetKey(program, func, cmp_inst->op1));
-            std::set<std::string> taint_op2 = taint(cmp_inst->op2, sigma_prime[func->name][bb->label], GetKey(program, func, cmp_inst->op2));
+            std::set<std::string> taint_op1 = taint(cmp_inst->op1, sigma_prime, GetKey(program, func, cmp_inst->op1));
+            std::set<std::string> taint_op2 = taint(cmp_inst->op2, sigma_prime, GetKey(program, func, cmp_inst->op2));
             
             joinSets(taint_op1, taint_op2);
             
-            sigma_prime[func->name][bb->label][GetKey(program, func, cmp_inst->lhs)] = taint_op1;
+            sigma_prime[GetKey(program, func, cmp_inst->lhs)] = taint_op1;
         }
         else if ((*inst).instrType == InstructionType::CopyInstrType)
         {
@@ -429,7 +429,7 @@ void execute(
              * x = $copy y
              * sigma_prime[x] = taint(y)
             */
-            sigma_prime[func->name][bb->label][GetKey(program, func, copy_inst->lhs)] = taint(copy_inst->op, sigma_prime[func->name][bb->label], GetKey(program, func, copy_inst->op));
+            sigma_prime[GetKey(program, func, copy_inst->lhs)] = taint(copy_inst->op, sigma_prime, GetKey(program, func, copy_inst->op));
 
         }
         else if ((*inst).instrType == InstructionType::AllocInstrType)
@@ -440,7 +440,7 @@ void execute(
              * x = $alloc y [id]
              * sigma_prime[x] = {}
             */
-            sigma_prime[func->name][bb->label][GetKey(program, func, alloc_inst->lhs)] = {};
+            sigma_prime[GetKey(program, func, alloc_inst->lhs)] = {};
 
         }
         else if ((*inst).instrType == InstructionType::GepInstrType)
@@ -451,12 +451,12 @@ void execute(
              * x = $gep y op
              * sigma_prime[x] = taint(op) U taint(y)
             */
-            std::set<std::string> taint_y = sigma_prime[func->name][bb->label][GetKey(program, func, gep_inst->src)];
-            std::set<std::string> taint_op = taint(gep_inst->idx, sigma_prime[func->name][bb->label], GetKey(program, func, gep_inst->idx));
+            std::set<std::string> taint_y = sigma_prime[GetKey(program, func, gep_inst->src)];
+            std::set<std::string> taint_op = taint(gep_inst->idx, sigma_prime, GetKey(program, func, gep_inst->idx));
             
             joinSets(taint_op, taint_y);
             
-            sigma_prime[func->name][bb->label][GetKey(program, func, gep_inst->lhs)] = taint_op;
+            sigma_prime[GetKey(program, func, gep_inst->lhs)] = taint_op;
 
         }
         else if ((*inst).instrType == InstructionType::GfpInstrType)
@@ -467,7 +467,7 @@ void execute(
              * x = $gfp y id
              * sigma_prime[x] = taint(y)
             */
-            sigma_prime[func->name][bb->label][GetKey(program, func, gfp_inst->lhs)] = sigma_prime[func->name][bb->label][GetKey(program, func, gfp_inst->src)];
+            sigma_prime[GetKey(program, func, gfp_inst->lhs)] = sigma_prime[GetKey(program, func, gfp_inst->src)];
 
         }
         else if ((*inst).instrType == InstructionType::AddrofInstrType)
@@ -477,7 +477,7 @@ void execute(
              * x = $addrof y
              * sigma_prime[x] = {}
             */
-            sigma_prime[func->name][bb->label][GetKey(program, func, addrof_inst->lhs)] = {};
+            sigma_prime[GetKey(program, func, addrof_inst->lhs)] = {};
 
         }
         else if ((*inst).instrType == InstructionType::LoadInstrType)
@@ -488,13 +488,13 @@ void execute(
              * sigma_prime[x] = taint(y) U (for all v in ptsto(y): taint(v))
             */
             std::string pointsToKey = GetKey(program, func, load_inst->src);
-            std::set<std::string> taint_y = sigma_prime[func->name][bb->label][pointsToKey];
+            std::set<std::string> taint_y = sigma_prime[pointsToKey];
             
             for (auto pointed_to: pointsTo[pointsToKey]) {
-                joinSets(taint_y, sigma_prime[func->name][bb->label][pointed_to]);
+                joinSets(taint_y, sigma_prime[pointed_to]);
             }
             
-            sigma_prime[func->name][bb->label][GetKey(program, func, load_inst->lhs)] = taint_y;
+            sigma_prime[GetKey(program, func, load_inst->lhs)] = taint_y;
         }
         else if ((*inst).instrType == InstructionType::StoreInstrType)
         {
@@ -504,13 +504,13 @@ void execute(
              * for all v in ptsto(x): sigma_prime[v] = sigma_prime[v] U (taint(op) U taint(x))
             */
             std::string pointsToKey = GetKey(program, func, store_inst->dst);
-            std::set<std::string> taint_op = taint(store_inst->op, sigma_prime[func->name][bb->label], GetKey(program, func, store_inst->op));
-            std::set<std::string> taint_x = sigma_prime[func->name][bb->label][pointsToKey];
+            std::set<std::string> taint_op = taint(store_inst->op, sigma_prime, GetKey(program, func, store_inst->op));
+            std::set<std::string> taint_x = sigma_prime[pointsToKey];
             
             joinSets(taint_op, taint_x);
 
             for (auto pointed_to: pointsTo[pointsToKey]) {
-                joinSets(sigma_prime[func->name][bb->label][pointed_to], taint_op);
+                joinSets(sigma_prime[pointed_to], taint_op);
             }
         }
         else if ((*inst).instrType == InstructionType::CallExtInstrType)
@@ -535,7 +535,7 @@ void execute(
                 if (callext_inst->lhs) {
                     //std::cout << "Setting lhs to " << callext_inst->extFuncName << std::endl;
                     std::string lhsKey = GetKey(program, func, callext_inst->lhs);
-                    sigma_prime[func->name][bb->label][lhsKey] = {callext_inst->extFuncName};
+                    sigma_prime[lhsKey] = {callext_inst->extFuncName};
                 }
 
                 std::set<std::string> reachable = GetReachable(callext_inst->args, pointsTo, program, func);
@@ -545,20 +545,20 @@ void execute(
                     
                     std::set<std::string> sources_set = {callext_inst->extFuncName};
 
-                    joinSets(sigma_prime[func->name][bb->label][v], sources_set);
+                    joinSets(sigma_prime[v], sources_set);
 
                     /*
                     std::string func_name = v.find(".") == std::string::npos ? "" : v.substr(0, v.find("."));
                     std::cout << "Func name: " << func_name << std::endl;
                     if (func_name == "")
-                        joinSets(sigma_prime[func->name][bb->label][v], sources_set);
+                        joinSets(sigma_prime[v], sources_set);
                     else if (func_name == func->name)
-                        joinSets(sigma_prime[func->name][bb->label][v.substr(func_name.size() + 1)], sources_set);
+                        joinSets(sigma_prime[v.substr(func_name.size() + 1)], sources_set);
                     */
                     // TODO - How to know bb label when it is from a different function?
                     // TODO - Or every local variable should be prefixed by the corresponding func name when adding to store
                     /*else
-                        joinSets(sigma_prime[func->name][bb->label][v.substr(func_name.size() + 1)], sources_set);*/
+                        joinSets(sigma_prime[v.substr(func_name.size() + 1)], sources_set);*/
                 }
             }
             else if (program->ext_funcs.find(callext_inst->extFuncName) != program->ext_funcs.end() && 
@@ -567,26 +567,26 @@ void execute(
                 std::set<std::string> reachable = GetReachable(callext_inst->args, pointsTo, program, func);
                 
                 for (std::string v : reachable) {
-                    joinSets(soln[callext_inst->extFuncName], sigma_prime[func->name][bb->label][v]);
+                    joinSets(soln[callext_inst->extFuncName], sigma_prime[v]);
                 }
 
                 for (auto v: callext_inst->args) {
                     if (v->IsConstInt())
                         continue;
                     std::string v_key = GetKey(program, func, v->var);
-                    joinSets(soln[callext_inst->extFuncName], sigma_prime[func->name][bb->label][v_key]);
+                    joinSets(soln[callext_inst->extFuncName], sigma_prime[v_key]);
                 }
 
                 if (callext_inst->lhs) {
                     std::string lhsKey = GetKey(program, func, callext_inst->lhs);
-                    sigma_prime[func->name][bb->label][lhsKey] = {};
+                    sigma_prime[lhsKey] = {};
                 }
             }
             else {
                 std::cout << "Neither source nor sink " << callext_inst->extFuncName << std::endl;
                 if (callext_inst->lhs) {
                     std::string lhsKey = GetKey(program, func, callext_inst->lhs);
-                    sigma_prime[func->name][bb->label][lhsKey] = {};
+                    sigma_prime[lhsKey] = {};
                 }
             }
         }
@@ -607,7 +607,7 @@ void execute(
             bbs_to_output_key = func->name + "." + cid + "." + jump_inst->label;
 
         // Propagate store to jump label
-        if (joinAbsStore(bb2store[func->name][jump_inst->label], sigma_prime[func->name][bb->label]) || 
+        if (joinAbsStore(bb2store[func->name][jump_inst->label], sigma_prime) || 
             bbs_to_output.count(bbs_to_output_key) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key);
@@ -629,7 +629,7 @@ void execute(
             bbs_to_output_key_ff = func->name + "." + cid + "." + branch_inst->ff;
         }
 
-        if (joinAbsStore(bb2store[func->name][branch_inst->tt], sigma_prime[func->name][bb->label]) ||
+        if (joinAbsStore(bb2store[func->name][branch_inst->tt], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_tt) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_tt);
@@ -639,7 +639,7 @@ void execute(
                 worklist.push_back({func->name, branch_inst->tt});
         }
 
-        if (joinAbsStore(bb2store[func->name][branch_inst->ff], sigma_prime[func->name][bb->label]) ||
+        if (joinAbsStore(bb2store[func->name][branch_inst->ff], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_ff) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_ff);
@@ -663,7 +663,7 @@ void execute(
 
         if (func->name != "main") {
             
-            AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, ret_inst->op);
+            AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, ret_inst->op);
 
             // For callstring sensitivity, pop off from stack
             PopFromCurrentContext(sensitivity);
@@ -757,7 +757,7 @@ void execute(
 
         //std::cout << "Inside calldir for context: " << curr_context << std::endl;
 
-        AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime[func->name][bb->label], calldir_inst->callee, calldir_inst->args, func);
+        AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime, calldir_inst->callee, calldir_inst->args, func);
     
         //std::cout << "Callee store for " << calldir_inst->callee << " is: " << std::endl;
         //PrintAbsStore(callee_store);
@@ -787,14 +787,14 @@ void execute(
         // TODO - Check if this has to be removed or made an empty set
         if (calldir_inst->lhs) {
             std::string lhsKey = GetKey(program, func, calldir_inst->lhs);
-            sigma_prime[func->name][bb->label][lhsKey] = {};
+            sigma_prime[lhsKey] = {};
         }
 
         std::string bbs_to_output_key_next = func->name + "." + calldir_inst->next_bb;
         if (sensitivity > 0)
             bbs_to_output_key_next = func->name + "." + callstring_stack + "." + calldir_inst->next_bb;
         // Propagate store to next bb
-        if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
+        if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_next) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_next);
@@ -815,7 +815,7 @@ void execute(
 
         AbsStore returned_store = call_returned[{calldir_inst->callee, context}];
         Operand *callee_ret_op = func_ret_op[calldir_inst->callee]->op; 
-        AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, callee_ret_op);
+        AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, callee_ret_op);
 
         /*std::cout << "Returned store for " << calldir_inst->callee << " is: " << std::endl;
         PrintAbsStore(returned_store);
@@ -824,7 +824,7 @@ void execute(
 
         // TODO - Check if this equality check works as expected
         if (isAbsStoreEqual(returned_store, ret_store)) {
-            AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], calldir_inst->lhs, func);
+            AbsStore caller_store = GetCallerStore(program, sigma_prime, calldir_inst->lhs, func);
             if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], caller_store) ||
                 bbs_to_output.count(bbs_to_output_key_next) == 0)
             {
@@ -870,7 +870,7 @@ void execute(
 
             //std::cout << "Inside callidir for context: " << curr_context << std::endl;
 
-            AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime[func->name][bb->label], points_to, callidir_inst->args, func);
+            AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime, points_to, callidir_inst->args, func);
         
             //std::cout << "Callee store for " << points_to << " is: " << std::endl;
             //PrintAbsStore(callee_store);
@@ -905,7 +905,7 @@ void execute(
 
             AbsStore returned_store = call_returned[{points_to, context}];
             Operand *callee_ret_op = func_ret_op[points_to]->op; 
-            AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime[func->name][bb->label], func, callee_ret_op);
+            AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, callee_ret_op);
 
             /*std::cout << "Returned store for " << points_to << " is: " << std::endl;
             PrintAbsStore(returned_store);
@@ -923,7 +923,7 @@ void execute(
             if (sensitivity > 0)
                 bbs_to_output_key_next = func->name + "." + callstring_stack + "." + callidir_inst->next_bb;
             if (isAbsStoreEqual(returned_store, ret_store)) {
-                AbsStore caller_store = GetCallerStore(program, sigma_prime[func->name][bb->label], callidir_inst->lhs, func);
+                AbsStore caller_store = GetCallerStore(program, sigma_prime, callidir_inst->lhs, func);
                 if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], caller_store) ||
                     bbs_to_output.count(bbs_to_output_key_next) == 0)
                 {
@@ -941,14 +941,14 @@ void execute(
         // TODO - Check if this has to be removed or made an empty set
         if (callidir_inst->lhs) {
             std::string lhsKey = GetKey(program, func, callidir_inst->lhs);
-            sigma_prime[func->name][bb->label][lhsKey] = {};
+            sigma_prime[lhsKey] = {};
         }
 
         // Propagate store to next bb
         std::string bbs_to_output_key_next = func->name + "." + callidir_inst->next_bb;
         if (sensitivity > 0)
             bbs_to_output_key_next = func->name + "." + callstring_stack + "." + callidir_inst->next_bb;
-        if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime[func->name][bb->label]) ||
+        if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_next) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_next);
@@ -968,7 +968,7 @@ void execute(
     * Print sigma prime
     */
     /*std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
-    for (auto it = sigma_prime[func->name][bb->label].begin(); it != sigma_prime[func->name][bb->label].end(); it++) {
+    for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
         std::cout << it->first << " -> {";
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
             std::cout << *it2 << ",";

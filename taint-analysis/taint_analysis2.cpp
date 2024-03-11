@@ -221,7 +221,7 @@ int main(int argc, char const *argv[])
 
     std::string sensitivity = argv[4];
     int sens = GetSensitivity(sensitivity);
-    std::cout << "Sensitivity: " << sens << std::endl;
+    //std::cout << "Sensitivity: " << sens << std::endl;
 
     util::Tokenizer tk(input_str, {' '}, {"{", "}", "->", ","}, {});
     std::vector<std::string> tokens = tk.Tokens();

@@ -46,19 +46,21 @@ class TaintAnalysis {
             worklist.push_back(std::make_pair("main", "entry"));
             bbs_to_output.insert("main.entry");
         }
-        else
+        else if (sensitivity == 1 || sensitivity == 2)
         {
-            worklist.push_back(std::make_pair("main.", "entry"));
-            bbs_to_output.insert("main..entry");
+            worklist.push_back(std::make_pair("main|", "entry"));
+            std::cout << "Pushed main|, entry to worklist" << std::endl;
+            bbs_to_output.insert("main|.entry");
         }
 
         while(!worklist.empty()) {
             std::pair<string,string> current = worklist.front();
             worklist.pop_front();
-            std::string current_context = current.first;
-            std::string current_func = current.first.substr(0, current.first.find("."));
-            std::string cid = current.first.substr(current.first.find(".") + 1);
+            std::string current_func = current.first.substr(0, current.first.find("|"));
+            std::string cid = current.first.substr(current.first.find("|") + 1);
             std::string current_bb = current.second;
+
+            std::cout << "Current func: " << current_func << " context: " << cid << " bb: " << current_bb << std::endl;
 
             // Perform the transfer function on the current basic block
             execute(
@@ -78,11 +80,20 @@ class TaintAnalysis {
 
             // Print call_edges after every bb
             // printCallEdges();
-
+            std::cout << std::endl;
             for (const auto &i: worklist) {
-                bbs_to_output.insert(i.first + "." + i.second);
+                if (sensitivity == 0)
+                    bbs_to_output.insert(i.first + "." + i.second);
+                else if (sensitivity == 1 || sensitivity == 2)
+                {
+                    std::string current_func = current.first.substr(0, current.first.find("|"));
+                    std::string cid = current.first.substr(current.first.find("|") + 1);
+                    std::string current_bb = current.second;
+                    bbs_to_output.insert(current_func + "." + cid + "." + i.second);
+                }
             }
         }
+
 
         /*
         * Print soln which will be the sinks to sources that can taint them
@@ -177,6 +188,7 @@ class TaintAnalysis {
 
     // call_edges is a map from (function,cid) -> set of call instructions that call it
     // For context insensitive analysis, we can ignore the cid part of the key which will be equal to the function name
+    // Maps <func, cid> -> { < set of callsite, cid pairs > }
     std::map<std::pair<std::string, std::string>, std::set<std::pair<std::string,std::string>>> call_edges;
     // call_returned is a map from (function,cid) -> returned abstract store
     // For context insensitive analysis, we can ignore the cid part of the key which will be equal to the function name
@@ -221,7 +233,7 @@ int main(int argc, char const *argv[])
 
     std::string sensitivity = argv[4];
     int sens = GetSensitivity(sensitivity);
-    //std::cout << "Sensitivity: " << sens << std::endl;
+    std::cout << "Sensitivity: " << sens << std::endl;
 
     util::Tokenizer tk(input_str, {' '}, {"{", "}", "->", ","}, {});
     std::vector<std::string> tokens = tk.Tokens();

@@ -316,58 +316,64 @@ void PrintAbsStore(AbsStore store)
 
 // The callstring stack is a string of the form "func1.bbx#func2.bby#func3.bbz#func1.bba...."
 // The first function is top of the stack and the last function is the bottom of the stack
-static std::string callstring_stack = "";
 
 // Pop off callsite from the callstring stack
-void PopFromCurrentContext(int sensitivity) {
+std::string PopFromCurrentContext(int sensitivity, std::string curr_context) {
+    std::string callstring;
+
     if (sensitivity == 1)
     {
-        callstring_stack = "";
+        callstring = "";
     }
     else if (sensitivity == 2)
     {
-        int index = callstring_stack.find("#");
+        int index = curr_context.find("#");
         if (index != std::string::npos)
         {
-            callstring_stack = callstring_stack.substr(index + 1);
+            callstring = curr_context.substr(index + 1);
         }
         else
         {
-            callstring_stack = "";
+            callstring = "";
         }
     }
+    return callstring;
 }
 
-void AddToCurrentContext(std::string callsite, int sensitivity) {
+std::string AddToCurrentContext(std::string callsite, int sensitivity, std::string curr_context) {
+    
+    std::string callstring;
+
     if (sensitivity == 1)
     {
         // For callstring-1 sensitivity, we need to maintain a callstring stack of size 1.
-        callstring_stack = callsite;
+        callstring = callsite;
     }
     else if (sensitivity == 2)
     {
         // For callstring-2 sensitity, we need to maintain a callstring stack of size 2.
         // IF the size is already 2, then we drop the bottom of the stack and add the new function to the top of the stack
-        if (callstring_stack.size() > 0)
+        if (curr_context.size() > 0)
         {
-            int index = callstring_stack.find("#");
+            int index = curr_context.find("#");
             if (index != std::string::npos)
             {
-                std::string first_callsite = callstring_stack.substr(0, index);
-                callstring_stack = callsite + "#" + first_callsite;
+                std::string first_callsite = curr_context.substr(0, index);
+                callstring = callsite + "#" + first_callsite;
             }
             else
             {
-                callstring_stack = callsite + "#" + callstring_stack;
+                callstring = callsite + "#" + curr_context;
             }
         }
     }
+    return callstring;
 }
 
 void execute(
     Program *program,
     Function* func,
-    std::string cid,
+    std::string curr_cid,
     BasicBlock *bb,
     std::map<std::string, std::map<std::string, AbsStore>> &bb2store, // function -> bb -> variable -> set of sources
     std::deque<std::pair<std::string, std::string>> &worklist,
@@ -380,7 +386,9 @@ void execute(
     int sensitivity
 )
 {
-    AbsStore sigma_prime = bb2store[func->name][bb->label];  
+    AbsStore sigma_prime = bb2store[func->name][bb->label]; 
+    if (sensitivity == 1 || sensitivity == 2)
+        sigma_prime = bb2store[func->name + "|" + curr_cid][bb->label]; // For callstring and functional sensitivity, we need to maintain a separate store for each context (cid
     
     int index = 0; // To help build program point name
 
@@ -603,16 +611,20 @@ void execute(
         JumpInstruction *jump_inst = (JumpInstruction *) terminal_instruction;
 
         std::string bbs_to_output_key = func->name + "." + jump_inst->label;
-        if (sensitivity > 0)
-            bbs_to_output_key = func->name + "." + cid + "." + jump_inst->label;
+        std::string context = func->name;
 
         // Propagate store to jump label
-        if (joinAbsStore(bb2store[func->name][jump_inst->label], sigma_prime) || 
+        if (sensitivity == 1 || sensitivity == 2) {
+            context = func->name + "|" + curr_cid;
+            bbs_to_output_key = func->name + "." + curr_cid + "." + jump_inst->label;
+        }
+        
+        if (joinAbsStore(bb2store[context][jump_inst->label], sigma_prime) || 
             bbs_to_output.count(bbs_to_output_key) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key);
             if (sensitivity > 0)
-                worklist.push_back({func->name + "." + cid, jump_inst->label});
+                worklist.push_back({func->name + "|" + curr_cid, jump_inst->label});
             else
                 worklist.push_back({func->name, jump_inst->label});
         }
@@ -624,27 +636,35 @@ void execute(
         std::string bbs_to_output_key_tt = func->name + "." + branch_inst->tt;
         std::string bbs_to_output_key_ff = func->name + "." + branch_inst->ff;
 
-        if (sensitivity > 0) {
-            bbs_to_output_key_tt = func->name + "." + cid + "." + branch_inst->tt;
-            bbs_to_output_key_ff = func->name + "." + cid + "." + branch_inst->ff;
+        if (sensitivity == 1 || sensitivity == 2) {
+            bbs_to_output_key_tt = func->name + "." + curr_cid + "." + branch_inst->tt;
+            bbs_to_output_key_ff = func->name + "." + curr_cid + "." + branch_inst->ff;
         }
 
-        if (joinAbsStore(bb2store[func->name][branch_inst->tt], sigma_prime) ||
+        std::string context = func->name;
+        if (sensitivity == 1 || sensitivity == 2)
+            context = func->name + "|" + curr_cid;
+        if (joinAbsStore(bb2store[context][branch_inst->tt], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_tt) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_tt);
-            if (sensitivity > 0)
-                worklist.push_back({func->name + "." + cid, branch_inst->tt});
+            if (sensitivity == 1 || sensitivity == 2)
+            {
+                worklist.push_back({func->name + "|" + curr_cid, branch_inst->tt});
+                std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->tt << std::endl;
+            }
             else
                 worklist.push_back({func->name, branch_inst->tt});
         }
 
-        if (joinAbsStore(bb2store[func->name][branch_inst->ff], sigma_prime) ||
+        if (joinAbsStore(bb2store[context][branch_inst->ff], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_ff) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_ff);
-            if (sensitivity > 0)
-                worklist.push_back({func->name + "." + cid, branch_inst->ff});
+            if (sensitivity == 1 || sensitivity == 2) {
+                worklist.push_back({func->name + "|" + curr_cid, branch_inst->ff});
+                std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->ff << std::endl;
+            }
             else
                 worklist.push_back({func->name, branch_inst->ff});
         }
@@ -665,24 +685,26 @@ void execute(
             
             AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, ret_inst->op);
 
-            // For callstring sensitivity, pop off from stack
-            PopFromCurrentContext(sensitivity);
-
             // for ci, curr_context = func_name
             std::string curr_context = func->name;
-            if (sensitivity == 1 || sensitivity == 2)
-                curr_context = callstring_stack;
+            if (sensitivity == 1 || sensitivity == 2) {
+                // TODO For callstring sensitivity, check if you need to pop off from stack
+                curr_context = curr_cid;
+            }
 
             call_returned[{func->name, curr_context}] = ret_store;
 
+            std::cout << "Inside ret instruction for " << func->name << std::endl;
+
             // Print ret store
-            //std::cout << "Ret store for " << func->name << " is: " << std::endl;
-            //PrintAbsStore(ret_store);
+            std::cout << "Ret store for (" << func->name << " , " << curr_context << ") is: " << std::endl;
+            PrintAbsStore(ret_store);
 
             for (auto it = call_edges[{func->name, curr_context}].begin(); it != call_edges[{func->name, curr_context}].end(); it++) {
                 // TODO - Handle different contexts differently based on sensitivity
                 std::string caller_bb = it->first.substr(it->first.find(".") + 1);
                 std::string caller_func = it->first.substr(0, it->first.find("."));
+                std::string caller_context = it->second;
                 
                 Variable *caller_lhs = nullptr;
                 Instruction *instr = program->funcs[caller_func]->bbs[caller_bb]->terminal;
@@ -708,19 +730,24 @@ void execute(
                 AbsStore caller_store = GetCallerStore(program, ret_store, caller_lhs, program->funcs[caller_func]);
 
                 // Print caller store
-                //std::cout << "Caller store for " << caller_func << " is: " << std::endl;
-                //PrintAbsStore(caller_store);
+                std::cout << "Caller store for " << caller_func << " is: " << std::endl;
+                PrintAbsStore(caller_store);
 
                 // Propagate caller store to (func, next_bb)
                 std::string bbs_to_output_key = caller_func + "." + next_bb;
-                if (sensitivity > 0)
-                    bbs_to_output_key = caller_func + "." + callstring_stack + "." + next_bb;
-                if (joinAbsStore(bb2store[caller_func][next_bb], caller_store) ||
+                std::string bb2store_key = caller_func;
+                if (sensitivity == 1 || sensitivity == 2) {
+                    bbs_to_output_key = caller_func + "." + caller_context + "." + next_bb;
+                    bb2store_key = caller_func + "|" + caller_context;
+                }
+                if (joinAbsStore(bb2store[bb2store_key][next_bb], caller_store) ||
                     bbs_to_output.count(bbs_to_output_key) == 0)
                 {
                     bbs_to_output.insert(bbs_to_output_key);
-                    if (sensitivity > 0)
-                        worklist.push_back({caller_func + "." + callstring_stack, next_bb});
+                    if (sensitivity == 1 || sensitivity == 2) {
+                        worklist.push_back({caller_func + "|" + caller_context, next_bb});
+                        std::cout << "Pushed to worklist: " << caller_func + "|" + caller_context << " , " << next_bb << std::endl;
+                    }
                     else
                         worklist.push_back({caller_func, next_bb});
                 }
@@ -740,6 +767,7 @@ void execute(
                 let caller_store = get_caller_store(ret_store, x)
                 propagate caller_store to bb
         */
+        std::cout << "Inside calldir in callsite: " << func->name + "." + bb->label << std::endl;
 
         // TODO - Add check for sensitivity here and modify context accordingly
         std::string curr_context = func->name + "." + bb->label;
@@ -750,37 +778,51 @@ void execute(
         else if (sensitivity == 1 || sensitivity == 2) {
             // Add callsite to stack of call-sites which is our context
             // callsite = func.bb
-            AddToCurrentContext(func->name + "." + bb->label, sensitivity);
-            // For callstring-1 and callstring-2 sensitivity, context_id = callstring_stack
-            call_edges[{calldir_inst->callee, callstring_stack}].insert({curr_context, callstring_stack});
+            std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+            // For callstring-1 and callstring-2 sensitivity, context_id = callee_context
+            // Map <callee func, callee context> = { set of <caller func, caller context> pairs }
+            call_edges[{calldir_inst->callee, callee_context}].insert({curr_context, curr_cid});
+            std::cout << "Added to call_edges: " << calldir_inst->callee << " : " << callee_context << " -> {" << curr_context << " , " << curr_cid <<  std::endl;
         }
-
-        //std::cout << "Inside calldir for context: " << curr_context << std::endl;
 
         AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime, calldir_inst->callee, calldir_inst->args, func);
     
-        //std::cout << "Callee store for " << calldir_inst->callee << " is: " << std::endl;
-        //PrintAbsStore(callee_store);
+        std::cout << "Callee store for (" << calldir_inst->callee << ") is: " << std::endl;
+        PrintAbsStore(callee_store);
 
-        bool callee_store_changed = joinAbsStore(bb2store[calldir_inst->callee]["entry"], callee_store);
+        std::string bbs_to_output_key = calldir_inst->callee + ".entry";
+        std::string bb2store_key = calldir_inst->callee;
+        if (sensitivity == 1 || sensitivity == 2) {
+            std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+            bbs_to_output_key = calldir_inst->callee + "." + callee_context + ".entry";
+            bb2store_key = calldir_inst->callee + "|" + callee_context;
+        }
+        bool callee_store_changed = joinAbsStore(bb2store[bb2store_key]["entry"], callee_store);
 
         // Print bb2store
-        //std::cout << "bb2store[" << calldir_inst->callee << ".entry]" << std::endl;
-        //PrintAbsStore(bb2store[calldir_inst->callee]["entry"]);
+        std::cout << "bb2store[" << bb2store_key << "][entry]" << std::endl;
+        PrintAbsStore(bb2store[bb2store_key]["entry"]);
 
         // Propagate callee store to (<func>, entry), if changed add to worklist
-        std::string bbs_to_output_key = calldir_inst->callee + ".entry";
-        if (sensitivity > 0)
-            bbs_to_output_key = calldir_inst->callee + "." + callstring_stack + ".entry";
-
         if (bbs_to_output.count(bbs_to_output_key) == 0 || callee_store_changed)
         {
             bbs_to_output.insert(bbs_to_output_key);
-            if (sensitivity > 0)
-                worklist.push_back({calldir_inst->callee + "." + callstring_stack, "entry"});
+            if (sensitivity == 1 || sensitivity == 2) {
+                std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+                worklist.push_back({calldir_inst->callee + "|" + callee_context, "entry"});
+                std::cout << "Pushed to worklist: " << calldir_inst->callee + "|" + callee_context << " , entry" << std::endl;
+            }
             else
                 worklist.push_back({calldir_inst->callee, "entry"});
-            //std::cout << "Pushed to worklist: " << calldir_inst->callee + ".entry" << std::endl;
+        }
+
+
+
+        std::string bbs_to_output_key_next = func->name + "." + calldir_inst->next_bb;
+        bb2store_key = func->name;
+        if (sensitivity == 1 || sensitivity == 2) {
+            bbs_to_output_key_next = func->name + "." + curr_cid + "." + calldir_inst->next_bb;
+            bb2store_key = func->name + "|" + curr_cid;
         }
 
         // store[x] = bottom
@@ -790,17 +832,17 @@ void execute(
             sigma_prime[lhsKey] = {};
         }
 
-        std::string bbs_to_output_key_next = func->name + "." + calldir_inst->next_bb;
-        if (sensitivity > 0)
-            bbs_to_output_key_next = func->name + "." + callstring_stack + "." + calldir_inst->next_bb;
+        
         // Propagate store to next bb
-        if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], sigma_prime) ||
+        if (joinAbsStore(bb2store[bb2store_key][calldir_inst->next_bb], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_next) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_next);
-            if (sensitivity > 0)
-                worklist.push_back({func->name + "." + callstring_stack, calldir_inst->next_bb});
-            else
+            if (sensitivity == 1 || sensitivity == 2) {
+                worklist.push_back({func->name + "|" + curr_cid, calldir_inst->next_bb});
+                std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
+            }
+            else if (sensitivity == 0)
                 worklist.push_back({func->name, calldir_inst->next_bb});
             //std::cout << "Pushed to worklist: " << func->name + "." + calldir_inst->next_bb << std::endl;
         }
@@ -811,26 +853,32 @@ void execute(
 
         std::string context = calldir_inst->callee;
         if (sensitivity == 1 || sensitivity == 2)
-            context = callstring_stack;
+            context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
 
         AbsStore returned_store = call_returned[{calldir_inst->callee, context}];
         Operand *callee_ret_op = func_ret_op[calldir_inst->callee]->op; 
         AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, callee_ret_op);
 
-        /*std::cout << "Returned store for " << calldir_inst->callee << " is: " << std::endl;
+        std::cout << "Returned store for (" << calldir_inst->callee << " , " << context << ") is: " << std::endl;
         PrintAbsStore(returned_store);
         std::cout << "Ret store for " << calldir_inst->callee << " is: " << std::endl;
-        PrintAbsStore(ret_store);*/
+        PrintAbsStore(ret_store);
 
         // TODO - Check if this equality check works as expected
         if (isAbsStoreEqual(returned_store, ret_store)) {
+            std::cout << "Returned store and ret store are equal" << std::endl;
             AbsStore caller_store = GetCallerStore(program, sigma_prime, calldir_inst->lhs, func);
-            if (joinAbsStore(bb2store[func->name][calldir_inst->next_bb], caller_store) ||
+            std::string bb2store_key = func->name;
+            if (sensitivity == 1 || sensitivity == 2)
+                bb2store_key = func->name + "|" + curr_cid;
+            if (joinAbsStore(bb2store[bb2store_key][calldir_inst->next_bb], caller_store) ||
                 bbs_to_output.count(bbs_to_output_key_next) == 0)
             {
                 bbs_to_output.insert(bbs_to_output_key_next);
-                if (sensitivity > 0)
-                    worklist.push_back({func->name + "." + callstring_stack, calldir_inst->next_bb});
+                if (sensitivity == 1 || sensitivity == 2){
+                    worklist.push_back({func->name + "|" + curr_cid, calldir_inst->next_bb});
+                    std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
+                }
                 else
                     worklist.push_back({func->name, calldir_inst->next_bb});
                 //std::cout << "Pushed to worklist: " << func->name + "." + calldir_inst->next_bb << std::endl;
@@ -854,7 +902,7 @@ void execute(
                 propagate caller_store to bb
         */
 
-        std::string pointoToKey = isGlobalVar(callidir_inst->fp, program, func->name) ? callidir_inst->fp->name : func->name + "." + callidir_inst->fp->name;
+        /*std::string pointoToKey = isGlobalVar(callidir_inst->fp, program, func->name) ? callidir_inst->fp->name : func->name + "." + callidir_inst->fp->name;
 
         for(auto points_to: pointsTo[pointoToKey])
         {
@@ -875,21 +923,27 @@ void execute(
             //std::cout << "Callee store for " << points_to << " is: " << std::endl;
             //PrintAbsStore(callee_store);
 
-            bool callee_store_changed = joinAbsStore(bb2store[points_to]["entry"], callee_store);
+            std::string bb2store_key = points_to;
+            std::string bbs_to_output_key = points_to + ".entry";
+
+            if (sensitivity == 1 || sensitivity == 2) {
+                bb2store_key = points_to + "|" + callstring_stack;
+                bbs_to_output_key = points_to + "." + callstring_stack + ".entry";
+            }
+
+            bool callee_store_changed = joinAbsStore(bb2store[bb2store_key]["entry"], callee_store);
 
             // Print bb2store
             //std::cout << "bb2store[" << points_to << ".entry]" << std::endl;
             //PrintAbsStore(bb2store[points_to]["entry"]);
 
             // Propagate callee store to (<func>, entry), if changed add to worklist
-            std::string bbs_to_output_key = points_to + ".entry";
-            if (sensitivity > 0)
-                bbs_to_output_key = points_to + "." + callstring_stack + ".entry";
+
             if (bbs_to_output.count(bbs_to_output_key) == 0 || callee_store_changed)
             {
                 bbs_to_output.insert(bbs_to_output_key);
                 if (sensitivity > 0)
-                    worklist.push_back({points_to + "." + callstring_stack, "entry"});
+                    worklist.push_back({points_to + "|" + callstring_stack, "entry"});
                 else
                     worklist.push_back({points_to, "entry"});
                 //std::cout << "Pushed to worklist: " << points_to + ".entry" << std::endl;
@@ -907,7 +961,7 @@ void execute(
             Operand *callee_ret_op = func_ret_op[points_to]->op; 
             AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, callee_ret_op);
 
-            /*std::cout << "Returned store for " << points_to << " is: " << std::endl;
+            std::cout << "Returned store for " << points_to << " is: " << std::endl;
             PrintAbsStore(returned_store);
             std::cout << "Ret store for " << points_to << " is: " << std::endl;
             PrintAbsStore(ret_store);
@@ -916,7 +970,7 @@ void execute(
             std::cout << "bbs_to_output: " << std::endl;
             for (auto it = bbs_to_output.begin(); it != bbs_to_output.end(); it++) {
                 std::cout << *it << std::endl;
-            }*/
+            }
 
             // TODO - Check if this equality check works as expected
             std::string bbs_to_output_key_next = func->name + "." + callidir_inst->next_bb;
@@ -924,12 +978,15 @@ void execute(
                 bbs_to_output_key_next = func->name + "." + callstring_stack + "." + callidir_inst->next_bb;
             if (isAbsStoreEqual(returned_store, ret_store)) {
                 AbsStore caller_store = GetCallerStore(program, sigma_prime, callidir_inst->lhs, func);
-                if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], caller_store) ||
+                std::string bb2store_key = func->name;
+                if (sensitivity == 1 || sensitivity == 2)
+                    bb2store_key = func->name + "|" + callstring_stack;
+                if (joinAbsStore(bb2store[bb2store_key][callidir_inst->next_bb], caller_store) ||
                     bbs_to_output.count(bbs_to_output_key_next) == 0)
                 {
                     bbs_to_output.insert(bbs_to_output_key_next);
                     if (sensitivity > 0)
-                        worklist.push_back({func->name + "." + callstring_stack, callidir_inst->next_bb});
+                        worklist.push_back({func->name + "|" + callstring_stack, callidir_inst->next_bb});
                     else
                         worklist.push_back({func->name, callidir_inst->next_bb});
                     //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
@@ -946,18 +1003,21 @@ void execute(
 
         // Propagate store to next bb
         std::string bbs_to_output_key_next = func->name + "." + callidir_inst->next_bb;
-        if (sensitivity > 0)
+        std::string bb2store_key = func->name;
+        if (sensitivity == 1 || sensitivity == 2) {
             bbs_to_output_key_next = func->name + "." + callstring_stack + "." + callidir_inst->next_bb;
+            bb2store_key = func->name + "|" + callstring_stack;
+        }
         if (joinAbsStore(bb2store[func->name][callidir_inst->next_bb], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_next) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_next);
             if (sensitivity > 0)
-                worklist.push_back({func->name + "." + callstring_stack, callidir_inst->next_bb});
+                worklist.push_back({func->name + "|" + callstring_stack, callidir_inst->next_bb});
             else
                 worklist.push_back({func->name, callidir_inst->next_bb});
             //std::cout << "Pushed to worklist: " << func->name + "." + callidir_inst->next_bb << std::endl;
-        }
+        }*/
     }
     else
     {
@@ -967,7 +1027,7 @@ void execute(
     /*
     * Print sigma prime
     */
-    /*std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
+    std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
     for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
         std::cout << it->first << " -> {";
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
@@ -975,7 +1035,7 @@ void execute(
         }
         std::cout << "}" << std::endl;
     }
-    std::cout << std::endl;*/
+    std::cout << std::endl;
     
     return;
 }

@@ -555,18 +555,6 @@ void execute(
 
                     joinSets(sigma_prime[v], sources_set);
 
-                    /*
-                    std::string func_name = v.find(".") == std::string::npos ? "" : v.substr(0, v.find("."));
-                    std::cout << "Func name: " << func_name << std::endl;
-                    if (func_name == "")
-                        joinSets(sigma_prime[v], sources_set);
-                    else if (func_name == func->name)
-                        joinSets(sigma_prime[v.substr(func_name.size() + 1)], sources_set);
-                    */
-                    // TODO - How to know bb label when it is from a different function?
-                    // TODO - Or every local variable should be prefixed by the corresponding func name when adding to store
-                    /*else
-                        joinSets(sigma_prime[v.substr(func_name.size() + 1)], sources_set);*/
                 }
             }
             else if (program->ext_funcs.find(callext_inst->extFuncName) != program->ext_funcs.end() && 
@@ -651,7 +639,7 @@ void execute(
             if (sensitivity == 1 || sensitivity == 2)
             {
                 worklist.push_back({func->name + "|" + curr_cid, branch_inst->tt});
-                std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->tt << std::endl;
+                //std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->tt << std::endl;
             }
             else
                 worklist.push_back({func->name, branch_inst->tt});
@@ -663,7 +651,7 @@ void execute(
             bbs_to_output.insert(bbs_to_output_key_ff);
             if (sensitivity == 1 || sensitivity == 2) {
                 worklist.push_back({func->name + "|" + curr_cid, branch_inst->ff});
-                std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->ff << std::endl;
+                //std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->ff << std::endl;
             }
             else
                 worklist.push_back({func->name, branch_inst->ff});
@@ -694,11 +682,11 @@ void execute(
 
             call_returned[{func->name, curr_context}] = ret_store;
 
-            std::cout << "Inside ret instruction for " << func->name << std::endl;
+            //std::cout << "Inside ret instruction for " << func->name << std::endl;
 
             // Print ret store
-            std::cout << "Ret store for (" << func->name << " , " << curr_context << ") is: " << std::endl;
-            PrintAbsStore(ret_store);
+            //std::cout << "Ret store for (" << func->name << " , " << curr_context << ") is: " << std::endl;
+            //PrintAbsStore(ret_store);
 
             for (auto it = call_edges[{func->name, curr_context}].begin(); it != call_edges[{func->name, curr_context}].end(); it++) {
                 // TODO - Handle different contexts differently based on sensitivity
@@ -730,8 +718,8 @@ void execute(
                 AbsStore caller_store = GetCallerStore(program, ret_store, caller_lhs, program->funcs[caller_func]);
 
                 // Print caller store
-                std::cout << "Caller store for " << caller_func << " is: " << std::endl;
-                PrintAbsStore(caller_store);
+                //std::cout << "Caller store for " << caller_func << " is: " << std::endl;
+                //PrintAbsStore(caller_store);
 
                 // Propagate caller store to (func, next_bb)
                 std::string bbs_to_output_key = caller_func + "." + next_bb;
@@ -746,7 +734,7 @@ void execute(
                     bbs_to_output.insert(bbs_to_output_key);
                     if (sensitivity == 1 || sensitivity == 2) {
                         worklist.push_back({caller_func + "|" + caller_context, next_bb});
-                        std::cout << "Pushed to worklist: " << caller_func + "|" + caller_context << " , " << next_bb << std::endl;
+                        //std::cout << "Pushed to worklist: " << caller_func + "|" + caller_context << " , " << next_bb << std::endl;
                     }
                     else
                         worklist.push_back({caller_func, next_bb});
@@ -767,9 +755,8 @@ void execute(
                 let caller_store = get_caller_store(ret_store, x)
                 propagate caller_store to bb
         */
-        std::cout << "Inside calldir in callsite: " << func->name + "." + bb->label << std::endl;
+        //std::cout << "Inside calldir in callsite: " << func->name + "." + bb->label << std::endl;
 
-        // TODO - Add check for sensitivity here and modify context accordingly
         std::string curr_context = func->name + "." + bb->label;
         if (sensitivity == 0) {
             // For context insentive, func_name = context_id
@@ -782,13 +769,13 @@ void execute(
             // For callstring-1 and callstring-2 sensitivity, context_id = callee_context
             // Map <callee func, callee context> = { set of <caller func, caller context> pairs }
             call_edges[{calldir_inst->callee, callee_context}].insert({curr_context, curr_cid});
-            std::cout << "Added to call_edges: " << calldir_inst->callee << " : " << callee_context << " -> {" << curr_context << " , " << curr_cid <<  std::endl;
+            //std::cout << "Added to call_edges: " << calldir_inst->callee << " : " << callee_context << " -> {" << curr_context << " , " << curr_cid <<  std::endl;
         }
 
         AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime, calldir_inst->callee, calldir_inst->args, func);
     
-        std::cout << "Callee store for (" << calldir_inst->callee << ") is: " << std::endl;
-        PrintAbsStore(callee_store);
+        //std::cout << "Callee store for (" << calldir_inst->callee << ") is: " << std::endl;
+        //PrintAbsStore(callee_store);
 
         std::string bbs_to_output_key = calldir_inst->callee + ".entry";
         std::string bb2store_key = calldir_inst->callee;
@@ -800,8 +787,8 @@ void execute(
         bool callee_store_changed = joinAbsStore(bb2store[bb2store_key]["entry"], callee_store);
 
         // Print bb2store
-        std::cout << "bb2store[" << bb2store_key << "][entry]" << std::endl;
-        PrintAbsStore(bb2store[bb2store_key]["entry"]);
+        //std::cout << "bb2store[" << bb2store_key << "][entry]" << std::endl;
+        //PrintAbsStore(bb2store[bb2store_key]["entry"]);
 
         // Propagate callee store to (<func>, entry), if changed add to worklist
         if (bbs_to_output.count(bbs_to_output_key) == 0 || callee_store_changed)
@@ -810,13 +797,11 @@ void execute(
             if (sensitivity == 1 || sensitivity == 2) {
                 std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
                 worklist.push_back({calldir_inst->callee + "|" + callee_context, "entry"});
-                std::cout << "Pushed to worklist: " << calldir_inst->callee + "|" + callee_context << " , entry" << std::endl;
+                //std::cout << "Pushed to worklist: " << calldir_inst->callee + "|" + callee_context << " , entry" << std::endl;
             }
             else
                 worklist.push_back({calldir_inst->callee, "entry"});
         }
-
-
 
         std::string bbs_to_output_key_next = func->name + "." + calldir_inst->next_bb;
         bb2store_key = func->name;
@@ -840,7 +825,7 @@ void execute(
             bbs_to_output.insert(bbs_to_output_key_next);
             if (sensitivity == 1 || sensitivity == 2) {
                 worklist.push_back({func->name + "|" + curr_cid, calldir_inst->next_bb});
-                std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
+                //std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
             }
             else if (sensitivity == 0)
                 worklist.push_back({func->name, calldir_inst->next_bb});
@@ -859,14 +844,14 @@ void execute(
         Operand *callee_ret_op = func_ret_op[calldir_inst->callee]->op; 
         AbsStore ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, callee_ret_op);
 
-        std::cout << "Returned store for (" << calldir_inst->callee << " , " << context << ") is: " << std::endl;
-        PrintAbsStore(returned_store);
-        std::cout << "Ret store for " << calldir_inst->callee << " is: " << std::endl;
-        PrintAbsStore(ret_store);
+        //std::cout << "Returned store for (" << calldir_inst->callee << " , " << context << ") is: " << std::endl;
+        //PrintAbsStore(returned_store);
+        //std::cout << "Ret store for " << calldir_inst->callee << " is: " << std::endl;
+        //PrintAbsStore(ret_store);
 
         // TODO - Check if this equality check works as expected
         if (isAbsStoreEqual(returned_store, ret_store)) {
-            std::cout << "Returned store and ret store are equal" << std::endl;
+            //std::cout << "Returned store and ret store are equal" << std::endl;
             AbsStore caller_store = GetCallerStore(program, sigma_prime, calldir_inst->lhs, func);
             std::string bb2store_key = func->name;
             if (sensitivity == 1 || sensitivity == 2)
@@ -877,7 +862,7 @@ void execute(
                 bbs_to_output.insert(bbs_to_output_key_next);
                 if (sensitivity == 1 || sensitivity == 2){
                     worklist.push_back({func->name + "|" + curr_cid, calldir_inst->next_bb});
-                    std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
+                    //std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
                 }
                 else
                     worklist.push_back({func->name, calldir_inst->next_bb});
@@ -1027,7 +1012,7 @@ void execute(
     /*
     * Print sigma prime
     */
-    std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
+    /*std::cout << "sigma_prime[" << func->name << "." << bb->label << "]:" << std::endl;
     for (auto it = sigma_prime.begin(); it != sigma_prime.end(); it++) {
         std::cout << it->first << " -> {";
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
@@ -1035,7 +1020,7 @@ void execute(
         }
         std::cout << "}" << std::endl;
     }
-    std::cout << std::endl;
+    std::cout << std::endl;*/
     
     return;
 }

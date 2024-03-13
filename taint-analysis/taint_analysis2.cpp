@@ -49,7 +49,7 @@ class TaintAnalysis {
         else if (sensitivity == 1 || sensitivity == 2)
         {
             worklist.push_back(std::make_pair("main|", "entry"));
-            std::cout << "Pushed main|, entry to worklist" << std::endl;
+            //std::cout << "Pushed main|, entry to worklist" << std::endl;
             bbs_to_output.insert("main|.entry");
         }
 
@@ -60,7 +60,7 @@ class TaintAnalysis {
             std::string cid = current.first.substr(current.first.find("|") + 1);
             std::string current_bb = current.second;
 
-            std::cout << "Current func: " << current_func << " context: " << cid << " bb: " << current_bb << std::endl;
+            //std::cout << "Current func: " << current_func << " context: " << cid << " bb: " << current_bb << std::endl;
 
             // Perform the transfer function on the current basic block
             execute(
@@ -80,7 +80,8 @@ class TaintAnalysis {
 
             // Print call_edges after every bb
             // printCallEdges();
-            std::cout << std::endl;
+            //std::cout << std::endl;
+
             for (const auto &i: worklist) {
                 if (sensitivity == 0)
                     bbs_to_output.insert(i.first + "." + i.second);
@@ -233,7 +234,7 @@ int main(int argc, char const *argv[])
 
     std::string sensitivity = argv[4];
     int sens = GetSensitivity(sensitivity);
-    std::cout << "Sensitivity: " << sens << std::endl;
+    //std::cout << "Sensitivity: " << sens << std::endl;
 
     util::Tokenizer tk(input_str, {' '}, {"{", "}", "->", ","}, {});
     std::vector<std::string> tokens = tk.Tokens();

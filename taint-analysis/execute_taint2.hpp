@@ -313,31 +313,10 @@ void PrintAbsStore(AbsStore store)
     }
 }
 
-// The callstring stack is a string of the form "func1.bbx#func2.bby#func3.bbz#func1.bba...."
-// The first function is top of the stack and the last function is the bottom of the stack
-
-// Pop off callsite from the callstring stack
-std::string PopFromCurrentContext(int sensitivity, std::string curr_context) {
-    std::string callstring;
-
-    if (sensitivity == 1)
-    {
-        callstring = "";
-    }
-    else if (sensitivity == 2)
-    {
-        int index = curr_context.find("#");
-        if (index != std::string::npos)
-        {
-            callstring = curr_context.substr(index + 1);
-        }
-        else
-        {
-            callstring = "";
-        }
-    }
-    return callstring;
-}
+/*
+ * The callstring stack is a string of the form "func1.bbx#func2.bby#func3.bbz#func1.bba...."
+ * The first function is top of the stack and the last function is the bottom of the stack
+*/ 
 
 std::string AddToCurrentContext(std::string callsite, int sensitivity, std::string curr_context) {
     
@@ -960,10 +939,10 @@ void execute(
                 ret_store = GetReturnedStore(program, pointsTo, bb2store[points_to + "|" + context]["entry"], program->funcs[points_to], callee_ret_op);
             }
 
-            std::cout << "Returned store for " << points_to << " is: " << std::endl;
+            /*std::cout << "Returned store for " << points_to << " is: " << std::endl;
             PrintAbsStore(returned_store);
             std::cout << "Ret store for " << points_to << " is: " << std::endl;
-            PrintAbsStore(ret_store);
+            PrintAbsStore(ret_store);*/
 
             if (returned_store.size() > 0)
             {

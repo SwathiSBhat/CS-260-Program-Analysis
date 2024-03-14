@@ -366,7 +366,6 @@ void execute(
     std::unordered_map<std::string, std::set<std::string>> pointsTo,
     std::map<std::pair<std::string, std::string>, std::set<std::pair<std::string,std::string>>> &call_edges,
     std::map<std::pair<std::string, std::string>, AbsStore> &call_returned,
-    std::map<std::string, RetInstruction*> func_ret_op,
     int sensitivity
 )
 {
@@ -929,15 +928,6 @@ void execute(
                 context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
 
             AbsStore returned_store = call_returned[{points_to, context}];
-            Operand *callee_ret_op = func_ret_op[points_to]->op; 
-            AbsStore ret_store;
-
-            if (sensitivity == 0)
-                ret_store = GetReturnedStore(program, pointsTo, sigma_prime, func, callee_ret_op);
-            else if (sensitivity == 1 || sensitivity == 2)
-            {
-                ret_store = GetReturnedStore(program, pointsTo, bb2store[points_to + "|" + context]["entry"], program->funcs[points_to], callee_ret_op);
-            }
 
             /*std::cout << "Returned store for " << points_to << " is: " << std::endl;
             PrintAbsStore(returned_store);
@@ -968,7 +958,7 @@ void execute(
                         worklist.push_back({func->name + "|" + curr_cid, callidir_inst->next_bb});
                         //std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
                     }
-                    else
+                    else if (sensitivity == 0)
                         worklist.push_back({func->name, callidir_inst->next_bb});
                     //std::cout << "Pushed to worklist: " << func->name + "." + calldir_inst->next_bb << std::endl;
                 }

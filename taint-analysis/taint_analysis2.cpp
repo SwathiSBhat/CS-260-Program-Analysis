@@ -75,7 +75,6 @@ class TaintAnalysis {
                 pointsTo,
                 call_edges,
                 call_returned,
-                func_ret_op,
                 sensitivity);
 
             // Print call_edges after every bb
@@ -149,26 +148,6 @@ class TaintAnalysis {
                 }
             }
         }
-
-        /*
-        * 2) call_returned data structure = map from function to returned abstract store. This data structure stores the latest return store for each function
-        */
-
-       /*
-       * 3) func_ret_op map = map from function to the return instruction corresponding to it
-       */
-        for (auto func: program->funcs) {
-            for (auto bb: func.second->bbs) {
-                Instruction* terminal = bb.second->terminal;
-                if ((*terminal).instrType == InstructionType::RetInstrType)
-                {
-                    RetInstruction *ret_inst = (RetInstruction *) terminal;
-                    func_ret_op[func.first] = ret_inst;
-                    break;
-                }
-            }
-        }
-        
     }
 
     /*

@@ -28,12 +28,6 @@ class TaintAnalysis {
     void AnalyzeFunction() 
     {
         /*
-        * Prep step for taint analysis
-        * 1) call_edges data structure = map from callee function to the set of call instructions that call it
-        * 2) call_returned data structure = map from function to returned abstract store. This data structure stores the latest return store for each function
-        */
-        PrepForTaintAnalysis();
-        /*
         * Worklist now stores the context i.e (func+cid, basic block) pair
         */
         std::deque<std::pair<string,string>> worklist;
@@ -116,40 +110,6 @@ class TaintAnalysis {
 
     private:
     
-    void PrepForTaintAnalysis() 
-    {
-        /*
-        * 1) call_edges data structure = map from callee function to the set of call instructions that call it
-        */
-       // This can be done ahead of time only for context insensitive analysis
-        if (sensitivity == 0) {
-            for (auto func: program->funcs) {
-                for (auto bb: func.second->bbs) {
-                    Instruction* terminal = bb.second->terminal;
-                    if ((*terminal).instrType == InstructionType::CallDirInstrType)
-                    {
-                        CallDirInstruction *calldir_inst = (CallDirInstruction *) terminal;
-                        // A call instruction can be uniquely identified by func_name and bb_name since it's always the terminal instruction 
-                        std::string curr_context = func.first + "." + bb.first;
-                        call_edges[{calldir_inst->callee, calldir_inst->callee}].insert({curr_context, curr_context});
-                    }
-                    else if ((*terminal).instrType == InstructionType::CallIdrInstrType)
-                    {
-                        CallIdrInstruction *callidr_inst = (CallIdrInstruction *) terminal;
-                        // Get pointsTo of fp in call_idr and add call_edges for each of them
-                        // TODO - Check if pointsTo can point to any other apart from function
-                        std::string pointoToKey = isGlobalVar(callidr_inst->fp, program, func.first) ? callidr_inst->fp->name : func.first + "." + callidr_inst->fp->name;
-                        std::set<std::string> points_to = pointsTo[pointoToKey];
-                        for (auto point_to: points_to) {
-                            std::string curr_context = func.first + "." + bb.first;
-                            call_edges[{point_to, point_to}].insert({curr_context, curr_context});
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /*
     * Print call edges
     */

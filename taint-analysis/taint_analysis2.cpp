@@ -44,13 +44,13 @@ class TaintAnalysis {
         if (sensitivity == 0)
         {
             worklist.push_back(std::make_pair("main", "entry"));
-            bbs_to_output.insert("main.entry");
+            bbs_to_output.insert("main|entry");
         }
         else if (sensitivity == 1 || sensitivity == 2)
         {
             worklist.push_back(std::make_pair("main|", "entry"));
             //std::cout << "Pushed main|, entry to worklist" << std::endl;
-            bbs_to_output.insert("main|.entry");
+            bbs_to_output.insert("main||entry");
         }
 
         while(!worklist.empty()) {
@@ -84,17 +84,16 @@ class TaintAnalysis {
 
             for (const auto &i: worklist) {
                 if (sensitivity == 0)
-                    bbs_to_output.insert(i.first + "." + i.second);
-                else if (sensitivity == 1 || sensitivity == 2)
+                    bbs_to_output.insert(i.first + "|" + i.second);
+                /*else if (sensitivity == 1 || sensitivity == 2)
                 {
                     std::string current_func = current.first.substr(0, current.first.find("|"));
                     std::string cid = current.first.substr(current.first.find("|") + 1);
                     std::string current_bb = current.second;
-                    bbs_to_output.insert(current_func + "." + cid + "." + i.second);
-                }
+                    bbs_to_output.insert(current_func + "|" + cid + "|" + i.second);
+                }*/
             }
         }
-
 
         /*
         * Print soln which will be the sinks to sources that can taint them

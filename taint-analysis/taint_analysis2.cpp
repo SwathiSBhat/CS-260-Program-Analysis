@@ -46,6 +46,12 @@ class TaintAnalysis {
             //std::cout << "Pushed main|, entry to worklist" << std::endl;
             bbs_to_output.insert("main||entry");
         }
+        else if (sensitivity == 3)
+        {
+            worklist.push_back(std::make_pair("main|", "entry"));
+            //std::cout << "Pushed main|, entry to worklist" << std::endl;
+            bbs_to_output.insert("main||entry");
+        }
 
         while(!worklist.empty()) {
             std::pair<string,string> current = worklist.front();
@@ -75,16 +81,10 @@ class TaintAnalysis {
             // printCallEdges();
             //std::cout << std::endl;
 
+            // TODO - Get rid of bbs_to_output
             for (const auto &i: worklist) {
                 if (sensitivity == 0)
                     bbs_to_output.insert(i.first + "|" + i.second);
-                /*else if (sensitivity == 1 || sensitivity == 2)
-                {
-                    std::string current_func = current.first.substr(0, current.first.find("|"));
-                    std::string cid = current.first.substr(current.first.find("|") + 1);
-                    std::string current_bb = current.second;
-                    bbs_to_output.insert(current_func + "|" + cid + "|" + i.second);
-                }*/
             }
         }
 
@@ -132,8 +132,6 @@ class TaintAnalysis {
     // call_returned is a map from (function,cid) -> returned abstract store
     // For context insensitive analysis, we can ignore the cid part of the key which will be equal to the function name
     std::map<std::pair<std::string, std::string>, AbsStore> call_returned;
-    // Map from function to the return instruction corresponding to it
-    std::map<std::string, RetInstruction*> func_ret_op;
     int sensitivity;
     Program *program;
 };

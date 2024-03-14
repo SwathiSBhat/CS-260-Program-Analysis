@@ -272,7 +272,6 @@ AbsStore GetReturnedStore(Program *program, std::unordered_map<std::string, std:
             returned_store[points_to] = curr_store[points_to];
         }
         
-        // TODO - Check if anything needs to be done if constant is returned
         // 3. Placeholde FAKE for lhs of return instruction
         if (curr_store.find(ret_op_key) != curr_store.end()) {
             returned_store["FAKE"] = curr_store[ret_op_key];
@@ -351,6 +350,31 @@ std::string AddToCurrentContext(std::string callsite, int sensitivity, std::stri
             callstring = callsite;
         }
     }
+    else if (sensitivity == 3)
+    {
+        // For functional sensitivity, we need to maintain a separate store for each context (cid)
+        int k = 1000;
+        // Construct callstring for stack of size k
+        // Count the number of # in context. If # == k-1 => we need to drop the last callsite
+        int count = 0;
+        for (int i = 0; i < curr_context.size(); i++)
+        {
+            if (curr_context[i] == '#')
+                count++;
+        }
+        // Get last callsite i.e string after last #
+        std::string last_callsite = "";
+        if (count == k-1)
+        {
+            int index = curr_context.find_last_of("#");
+            last_callsite = curr_context.substr(index+1);
+            callstring = callsite + "#" + curr_context.substr(0, index);
+        }
+        else
+        {
+            callstring = callsite + "#" + curr_context;
+        }
+    }
     return callstring;
 }
 
@@ -370,9 +394,8 @@ void execute(
 )
 {
     AbsStore sigma_prime = bb2store[func->name][bb->label]; 
-    if (sensitivity == 1 || sensitivity == 2)
+    if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
         sigma_prime = bb2store[func->name + "|" + curr_cid][bb->label]; // For callstring and functional sensitivity, we need to maintain a separate store for each context (cid
-    
     int index = 0; // To help build program point name
 
     /*
@@ -582,7 +605,7 @@ void execute(
         std::string context = func->name;
 
         // Propagate store to jump label
-        if (sensitivity == 1 || sensitivity == 2) {
+        if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
             context = func->name + "|" + curr_cid;
             bbs_to_output_key = func->name + "|" + curr_cid + "|" + jump_inst->label;
         }
@@ -604,19 +627,19 @@ void execute(
         std::string bbs_to_output_key_tt = func->name + "|" + branch_inst->tt;
         std::string bbs_to_output_key_ff = func->name + "|" + branch_inst->ff;
 
-        if (sensitivity == 1 || sensitivity == 2) {
+        if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
             bbs_to_output_key_tt = func->name + "|" + curr_cid + "|" + branch_inst->tt;
             bbs_to_output_key_ff = func->name + "|" + curr_cid + "|" + branch_inst->ff;
         }
 
         std::string context = func->name;
-        if (sensitivity == 1 || sensitivity == 2)
+        if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
             context = func->name + "|" + curr_cid;
         if (joinAbsStore(bb2store[context][branch_inst->tt], sigma_prime) ||
             bbs_to_output.count(bbs_to_output_key_tt) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_tt);
-            if (sensitivity == 1 || sensitivity == 2)
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
             {
                 worklist.push_back({func->name + "|" + curr_cid, branch_inst->tt});
                 //std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->tt << std::endl;
@@ -629,7 +652,7 @@ void execute(
             bbs_to_output.count(bbs_to_output_key_ff) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_ff);
-            if (sensitivity == 1 || sensitivity == 2) {
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                 worklist.push_back({func->name + "|" + curr_cid, branch_inst->ff});
                 //std::cout << "Adding to worklist: " << func->name + "|" + curr_cid << " " << branch_inst->ff << std::endl;
             }
@@ -655,7 +678,7 @@ void execute(
 
             // for ci, curr_context = func_name
             std::string curr_context = func->name;
-            if (sensitivity == 1 || sensitivity == 2) {
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                 // Popping off from callstring stack is not needed since that is handled by k-limiting the callstring
                 curr_context = curr_cid;
             }
@@ -704,7 +727,7 @@ void execute(
                 // Propagate caller store to (func, next_bb)
                 std::string bbs_to_output_key = caller_func + "|" + next_bb;
                 std::string bb2store_key = caller_func;
-                if (sensitivity == 1 || sensitivity == 2) {
+                if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                     bbs_to_output_key = caller_func + "|" + caller_context + "|" + next_bb;
                     bb2store_key = caller_func + "|" + caller_context;
                 }
@@ -712,7 +735,7 @@ void execute(
                     bbs_to_output.count(bbs_to_output_key) == 0)
                 {
                     bbs_to_output.insert(bbs_to_output_key);
-                    if (sensitivity == 1 || sensitivity == 2) {
+                    if (sensitivity == 1 || sensitivity == 2 || sensitivity ==3) {
                         worklist.push_back({caller_func + "|" + caller_context, next_bb});
                         //std::cout << "Pushed to worklist: " << caller_func + "|" + caller_context << " , " << next_bb << std::endl;
                     }
@@ -742,7 +765,7 @@ void execute(
             // For context insentive, func_name = context_id
             call_edges[{calldir_inst->callee, calldir_inst->callee}].insert({curr_context, curr_context});
         }
-        else if (sensitivity == 1 || sensitivity == 2) {
+        else if (sensitivity == 1 || sensitivity == 2 || sensitivity ==3) {
             /* Add callsite to stack of call-sites which is our context
              * callsite = func.bb
             */
@@ -762,7 +785,7 @@ void execute(
 
         std::string bbs_to_output_key = calldir_inst->callee + "|entry";
         std::string bb2store_key = calldir_inst->callee;
-        if (sensitivity == 1 || sensitivity == 2) {
+        if (sensitivity == 1 || sensitivity == 2 || sensitivity ==3) {
             std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
             bbs_to_output_key = calldir_inst->callee + "|" + callee_context + "|entry";
             bb2store_key = calldir_inst->callee + "|" + callee_context;
@@ -777,7 +800,7 @@ void execute(
         if (bbs_to_output.count(bbs_to_output_key) == 0 || callee_store_changed)
         {
             bbs_to_output.insert(bbs_to_output_key);
-            if (sensitivity == 1 || sensitivity == 2) {
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity ==3) {
                 std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
                 worklist.push_back({calldir_inst->callee + "|" + callee_context, "entry"});
                 //std::cout << "Pushed to worklist: " << calldir_inst->callee + "|" + callee_context << " , entry" << std::endl;
@@ -788,7 +811,7 @@ void execute(
 
         std::string bbs_to_output_key_next = func->name + "|" + calldir_inst->next_bb;
         bb2store_key = func->name;
-        if (sensitivity == 1 || sensitivity == 2) {
+        if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
             bbs_to_output_key_next = func->name + "|" + curr_cid + "|" + calldir_inst->next_bb;
             bb2store_key = func->name + "|" + curr_cid;
         }
@@ -804,7 +827,7 @@ void execute(
             bbs_to_output.count(bbs_to_output_key_next) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_next);
-            if (sensitivity == 1 || sensitivity == 2) {
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                 worklist.push_back({func->name + "|" + curr_cid, calldir_inst->next_bb});
                 //std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
             }
@@ -819,7 +842,7 @@ void execute(
         */
 
         std::string context = calldir_inst->callee;
-        if (sensitivity == 1 || sensitivity == 2)
+        if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
             context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
 
         AbsStore returned_store = call_returned[{calldir_inst->callee, context}];
@@ -836,13 +859,13 @@ void execute(
             //PrintAbsStore(caller_store);
             
             std::string bb2store_key = func->name;
-            if (sensitivity == 1 || sensitivity == 2)
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
                 bb2store_key = func->name + "|" + curr_cid;
             if (joinAbsStore(bb2store[bb2store_key][calldir_inst->next_bb], caller_store) ||
                 bbs_to_output.count(bbs_to_output_key_next) == 0)
             {
                 bbs_to_output.insert(bbs_to_output_key_next);
-                if (sensitivity == 1 || sensitivity == 2){
+                if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3){
                     worklist.push_back({func->name + "|" + curr_cid, calldir_inst->next_bb});
                     //std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
                 }
@@ -877,7 +900,7 @@ void execute(
                 // For context insentive, func_name = context_id
                 call_edges[{points_to, points_to}].insert({curr_context, curr_context});
             }
-            else if (sensitivity == 1 || sensitivity == 2) {
+            else if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                 std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
                 call_edges[{points_to, callee_context}].insert({curr_context, curr_cid});
             }
@@ -892,7 +915,7 @@ void execute(
             std::string bb2store_key = points_to;
             std::string bbs_to_output_key = points_to + "|entry";
 
-            if (sensitivity == 1 || sensitivity == 2) {
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                 std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
                 bb2store_key = points_to + "|" + callee_context;
                 bbs_to_output_key = points_to + "|" + callee_context + "|entry";
@@ -909,7 +932,7 @@ void execute(
             if (bbs_to_output.count(bbs_to_output_key) == 0 || callee_store_changed)
             {
                 bbs_to_output.insert(bbs_to_output_key);
-                if (sensitivity == 1 || sensitivity == 2) {
+                if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                     std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
                     worklist.push_back({points_to + "|" + callee_context, "entry"});
                 }
@@ -924,7 +947,7 @@ void execute(
             */
 
             std::string context = points_to;
-            if (sensitivity == 1 || sensitivity == 2)
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
                 context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
 
             AbsStore returned_store = call_returned[{points_to, context}];
@@ -938,7 +961,7 @@ void execute(
             {
                 std::string bbs_to_output_key_next = func->name + "|" + callidir_inst->next_bb;
                 bb2store_key = func->name;
-                if (sensitivity == 1 || sensitivity == 2) {
+                if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                     bbs_to_output_key_next = func->name + "|" + curr_cid + "|" + callidir_inst->next_bb;
                     bb2store_key = func->name + "|" + curr_cid;
                 }
@@ -948,13 +971,13 @@ void execute(
                 //std::cout << "Caller store for " << func->name << " is: " << std::endl;
                 //PrintAbsStore(caller_store);
                 std::string bb2store_key = func->name;
-                if (sensitivity == 1 || sensitivity == 2)
+                if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
                     bb2store_key = func->name + "|" + curr_cid;
                 if (joinAbsStore(bb2store[bb2store_key][callidir_inst->next_bb], caller_store) ||
                     bbs_to_output.count(bbs_to_output_key_next) == 0)
                 {
                     bbs_to_output.insert(bbs_to_output_key_next);
-                    if (sensitivity == 1 || sensitivity == 2){
+                    if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3){
                         worklist.push_back({func->name + "|" + curr_cid, callidir_inst->next_bb});
                         //std::cout << "Pushed to worklist: " << func->name + "|" + curr_cid << " , " << calldir_inst->next_bb << std::endl;
                     }
@@ -967,7 +990,7 @@ void execute(
 
         std::string bbs_to_output_key_next = func->name + "|" + callidir_inst->next_bb;
         std::string bb2store_key = func->name;
-        if (sensitivity == 1 || sensitivity == 2) {
+        if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
             bbs_to_output_key_next = func->name + "|" + curr_cid + "|" + callidir_inst->next_bb;
             bb2store_key = func->name + "|" + curr_cid;
         }
@@ -983,7 +1006,7 @@ void execute(
             bbs_to_output.count(bbs_to_output_key_next) == 0)
         {
             bbs_to_output.insert(bbs_to_output_key_next);
-            if (sensitivity == 1 || sensitivity == 2) {
+            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
                 worklist.push_back({func->name + "|" + curr_cid, callidir_inst->next_bb});
             }
             else if (sensitivity == 0)

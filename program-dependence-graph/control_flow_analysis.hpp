@@ -135,6 +135,7 @@ public:
         /*
         * The solution is the contents of post_dominance_frontier
         */
+       /*std::cout << "Control Flow Analysis for function: " << funcname << std::endl;
         for (const auto &[bb, doms] : post_dominance_frontier) {
             std::cout << bb << " -> {";
             for(auto it = doms.begin(); it != doms.end(); it++) {
@@ -146,7 +147,7 @@ public:
             }
             std::cout << "}" << std::endl;
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
 
         return post_dominance_frontier;
     }

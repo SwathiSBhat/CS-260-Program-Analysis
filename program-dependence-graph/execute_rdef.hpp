@@ -51,26 +51,54 @@ bool joinSets(std::set<std::string> &s1, std::set<std::string> &s2) {
     return changed;
 }
 
+bool isGlobalVar(Variable *var, Program *program, std::string func_name) {
+    
+    if (program->funcs[func_name]->locals.count(var->name) > 0)
+        return false;
+
+    for (auto gl : program->globals) {
+        if (gl->globalVar->name == var->name)
+            return true;
+    }
+    return false;
+}
+
 std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_map<std::string, std::set<std::string>> pointsTo, Program *program) {
-    // TODO - Need to handle name of pointsTo - for locals - funcname.argname
     std::set<std::string> reachable;
     std::queue<std::string> q;
+    std::set<std::string> visited;
+
 
     for(const auto& op: args) {
         if(!op->IsConstInt()) {
             std::string var = op->var->name;
-            if(pointsTo.count(var)) {
-                for(const auto& v: pointsTo[var]) {
+            // TODO - Parameterize func name. For now, since it's always test, hardcoding it
+            std::string pointsToVarName = isGlobalVar(op->var, program, "test") ? var : "test." + var;
+
+            if(pointsTo.count(pointsToVarName)) {
+                for(auto v: pointsTo[pointsToVarName]) {
+                    
+                    if (visited.count(v) == 0) {
+                        visited.insert(v);
+                        q.push(v);
+                    }
                     reachable.insert(v);
-                    q.push(v);
+
                 }
+
                 while(!q.empty()) {
+
                     std::string tmp = q.front();
                     q.pop();
+                    
                     if(pointsTo.count(tmp)) {
-                        for(const auto& v: pointsTo[tmp]) {
+                        for(auto v: pointsTo[tmp]) {
+                            
+                            if (visited.count(v) == 0) {
+                                visited.insert(v);
+                                q.push(v);
+                            }
                             reachable.insert(v);
-                            q.push(v);
                         }
                     }
                 }
@@ -78,21 +106,37 @@ std::set<std::string> GetReachable(std::vector<Operand*> args, std::unordered_ma
         }
     }
     // Globals + All objects reachable from globals
+
+    std::set<std::string> visited_globals;
+
     for (auto gl : program->globals) {
-        
         reachable.insert(gl->globalVar->name);
 
+        if (!pointsTo.count(gl->globalVar->name))
+            continue;
+
         for (auto v : pointsTo[gl->globalVar->name]) {
+            
+            if (visited_globals.count(v) == 0) {
+                visited_globals.insert(v);
+                q.push(v);
+            }
             reachable.insert(v);
-            q.push(v);
         }
+
         while (!q.empty()) {
+
             std::string tmp = q.front();
             q.pop();
+
             if (pointsTo.count(tmp)) {
-                for (const auto &v : pointsTo[tmp]) {
+                for (auto v : pointsTo[tmp]) {
+                    
+                    if (visited_globals.count(v) == 0) {
+                        visited_globals.insert(v);
+                        q.push(v);
+                    }
                     reachable.insert(v);
-                    q.push(v);
                 }
             }
         }
@@ -369,8 +413,12 @@ void execute(
             DEF.insert(load_inst->lhs->name);
             USE.insert(load_inst->src->name);
 
-            if (pointsTo.count(load_inst->src->name)) {
-                for (auto pts_to : pointsTo[load_inst->src->name]) {
+            std::string pointsToVarName = isGlobalVar(load_inst->src, program, "test") ? load_inst->src->name : "test." + load_inst->src->name;
+            if (pointsTo.count(pointsToVarName)) {
+                for (auto pts_to : pointsTo[pointsToVarName]) {
+                    // remove test. from pts_to
+                    if (pts_to.find("test.") != std::string::npos)
+                        pts_to = pts_to.substr(pts_to.find("test.") + 5);
                     USE.insert(pts_to);
                 }
             }
@@ -397,8 +445,13 @@ void execute(
              * for all v in USE: soln[pp] = soln[pp] U sigma_prime[v]
              * for all v in DEF: sigma_prime[v] = sigma_prime[v] U { pp }
             */
-            if (pointsTo.count(store_inst->dst->name)) {
-                for (auto pts_to : pointsTo[store_inst->dst->name]) {
+           // TODO - Parameterize func name. For now, since it's always test, hardcoding it
+           std::string pointsToVarName = isGlobalVar(store_inst->dst, program, "test") ? store_inst->dst->name : "test." + store_inst->dst->name;
+            if (pointsTo.count(pointsToVarName)) {
+                for (auto pts_to : pointsTo[pointsToVarName]) {
+                    // Remove test. from pts_to
+                    if (pts_to.find("test.") != std::string::npos)
+                        pts_to = pts_to.substr(pts_to.find("test.") + 5);
                     DEF.insert(pts_to);
                 }
             }
@@ -591,7 +644,7 @@ void execute(
         * WDEF = (U mod(c) for all mods of c in CALLEES) ^ REACHABLE
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
-       // TODO - Check logic for each function and need to add logic for globals and pointsTo globals
+       
         CALLEES.insert(calldir_inst->callee);
 
         REACHABLE = GetReachable(calldir_inst->args, pointsTo, program);
@@ -607,6 +660,24 @@ void execute(
         }
         WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
 
+        // Remove test. prefix from USE, WDEF
+        std::set<std::string> USE_tmp;
+        for (auto u : USE) {
+            if (u.find("test.") != std::string::npos)
+                USE_tmp.insert(u.substr(u.find("test.") + 5));
+            else
+                USE_tmp.insert(u);
+        }
+        USE = USE_tmp;
+
+        std::set<std::string> WDEF_tmp;
+        for (auto w : WDEF) {
+            if (w.find("test.") != std::string::npos)
+                WDEF_tmp.insert(w.substr(w.find("test.") + 5));
+            else
+                WDEF_tmp.insert(w);
+        }
+
         if (execute_final) {
             for (std::string v : USE) {
                 // soln[pp] = soln[pp] U sigma_prime[v]
@@ -619,8 +690,9 @@ void execute(
             sigma_prime[v].insert(pp);
         }
 
-        if (calldir_inst->lhs)
+        if (calldir_inst->lhs) {
             sigma_prime[calldir_inst->lhs->name] = {pp};
+        }
 
         if (!execute_final) {
             if (joinAbsStore(bb2store[calldir_inst->next_bb], sigma_prime) || bbs_to_output.count(calldir_inst->next_bb) == 0) {
@@ -635,7 +707,6 @@ void execute(
         CallIdrInstruction *callidir_inst = (CallIdrInstruction *) terminal_instruction;
 
         std::set<std::string> CALLEES, REFS, WDEF, REACHABLE, USE;
-
         /*
         * CALLEES = pointsTo[fp]
         * REACHABLE = globals U all objects reachable from globals or arguments (using points to solution)
@@ -643,7 +714,12 @@ void execute(
         * USE = {fp} U {arg | arg is a variable} U ((U ref(c) for all mods of c in CALLEES) ^ REACHABLE)
         */
 
-        for(const auto& pts_to: pointsTo[callidir_inst->fp->name]) {
+        // Add function name to callidir_inst->fp->name
+        std::string pointsToVarName = isGlobalVar(callidir_inst->fp, program, "test") ? callidir_inst->fp->name : "test." + callidir_inst->fp->name;
+        for(auto pts_to: pointsTo[pointsToVarName]) {
+            // Remove func_name. from pts_to
+            if (pts_to.find(".") != std::string::npos)
+                pts_to = pts_to.substr(pts_to.find(".") + 1);
             CALLEES.insert(pts_to);
         }
 
@@ -653,12 +729,32 @@ void execute(
 		
         USE.insert(REFS.begin(), REFS.end());
 
+        USE.insert(callidir_inst->fp->name);
+
         for(const auto& arg: callidir_inst->args) {
             if(!arg->IsConstInt()) {
                 USE.insert(arg->var->name);
             }
         }
         WDEF = GetDefs(CALLEES, REACHABLE, modRefInfo);
+
+        // Remove test. prefix from USE, WDEF
+        std::set<std::string> USE_tmp;
+        for (auto u : USE) {
+            if (u.find("test.") != std::string::npos)
+                USE_tmp.insert(u.substr(u.find("test.") + 5));
+            else
+                USE_tmp.insert(u);
+        }
+        USE = USE_tmp;
+
+        std::set<std::string> WDEF_tmp;
+        for (auto w : WDEF) {
+            if (w.find("test.") != std::string::npos)
+                WDEF_tmp.insert(w.substr(w.find("test.") + 5));
+            else
+                WDEF_tmp.insert(w);
+        }
 
         if (execute_final) {
             for (std::string v : USE) {
@@ -673,7 +769,9 @@ void execute(
         }
 
         if (callidir_inst->lhs)
+        {
             sigma_prime[callidir_inst->lhs->name] = {pp};
+        }
 
         if (!execute_final) {
             if (joinAbsStore(bb2store[callidir_inst->next_bb], sigma_prime) || bbs_to_output.count(callidir_inst->next_bb) == 0) {

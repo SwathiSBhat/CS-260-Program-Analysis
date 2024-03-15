@@ -1,0 +1,47 @@
+extern src1: () -> int
+extern src2: (&int) -> _
+extern src3: () -> int
+extern src4: () -> int
+extern snk: (int) -> _
+
+fn main() -> int {
+  let a:int, b:&int, c:&int, d:&int, e:int, f:int, g:&int, h:&int, i:int, j:int
+
+  entry:
+    a = $call_ext src1()
+    b = $addrof a
+    $branch a bb2 bb4
+
+  bb2:
+    c = $alloc 1 [_a1]
+    $call_ext src2(c)
+    d = $call_dir foo(c) then bb3
+
+  bb3:
+    e = $load d
+    $jump exit
+
+  bb4:
+    f = $call_ext src3()
+    g = $addrof f
+    h = $call_dir foo(g) then bb5
+
+  bb5:
+    j = $load h
+    $jump exit
+
+  exit:
+    $call_ext snk(j)
+    $ret 42
+}
+
+fn foo(p:&int) -> &int {
+  let q:int, r:int, s:int, t:&int
+
+  entry:
+    q = $call_ext src4()
+    r = $load p
+    s = $arith add q r
+    t = $addrof s
+    $ret t
+}

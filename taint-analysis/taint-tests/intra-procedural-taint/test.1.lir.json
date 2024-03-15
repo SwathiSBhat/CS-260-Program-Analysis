@@ -1,0 +1,357 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "main"
+                },
+                {
+                    "name": "c",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "d",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "main"
+                },
+                {
+                    "name": "e",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "main"
+                },
+                {
+                    "name": "f",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "main"
+                },
+                {
+                    "name": "g",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Alloc": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "num": {
+                                    "CInt": 1
+                                },
+                                "id": {
+                                    "name": "_a1",
+                                    "typ": "Int",
+                                    "scope": null
+                                }
+                            }
+                        },
+                        {
+                            "Alloc": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "num": {
+                                    "CInt": 1
+                                },
+                                "id": {
+                                    "name": "_a2",
+                                    "typ": "Int",
+                                    "scope": null
+                                }
+                            }
+                        },
+                        {
+                            "CallExt": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "ext_callee": "src1",
+                                "args": [
+                                    {
+                                        "Var": {
+                                            "name": "a",
+                                            "typ": {
+                                                "Pointer": "Int"
+                                            },
+                                            "scope": "main"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "CallExt": {
+                                "lhs": {
+                                    "name": "c",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "ext_callee": "src2",
+                                "args": []
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "d",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "rhs": {
+                                    "name": "c",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                }
+                            }
+                        },
+                        {
+                            "Gep": {
+                                "lhs": {
+                                    "name": "e",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "src": {
+                                    "name": "a",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "idx": {
+                                    "Var": {
+                                        "name": "c",
+                                        "typ": "Int",
+                                        "scope": "main"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Alloc": {
+                                "lhs": {
+                                    "name": "f",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "num": {
+                                    "CInt": 1
+                                },
+                                "id": {
+                                    "name": "_a3",
+                                    "typ": "Int",
+                                    "scope": null
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "f",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "c",
+                                        "typ": "Int",
+                                        "scope": "main"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "g",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "src": {
+                                    "name": "e",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "main"
+                                }
+                            }
+                        },
+                        {
+                            "CallExt": {
+                                "lhs": null,
+                                "ext_callee": "snk1",
+                                "args": [
+                                    {
+                                        "Var": {
+                                            "name": "a",
+                                            "typ": {
+                                                "Pointer": "Int"
+                                            },
+                                            "scope": "main"
+                                        }
+                                    },
+                                    {
+                                        "Var": {
+                                            "name": "d",
+                                            "typ": {
+                                                "Pointer": "Int"
+                                            },
+                                            "scope": "main"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "CallExt": {
+                                "lhs": null,
+                                "ext_callee": "snk2",
+                                "args": [
+                                    {
+                                        "Var": {
+                                            "name": "g",
+                                            "typ": "Int",
+                                            "scope": "main"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "CallExt": {
+                                "lhs": null,
+                                "ext_callee": "snk3",
+                                "args": [
+                                    {
+                                        "Var": {
+                                            "name": "b",
+                                            "typ": {
+                                                "Pointer": "Int"
+                                            },
+                                            "scope": "main"
+                                        }
+                                    },
+                                    {
+                                        "Var": {
+                                            "name": "f",
+                                            "typ": {
+                                                "Pointer": "Int"
+                                            },
+                                            "scope": "main"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {
+        "snk1": {
+            "Function": {
+                "ret_ty": null,
+                "param_ty": [
+                    {
+                        "Pointer": "Int"
+                    },
+                    {
+                        "Pointer": "Int"
+                    }
+                ]
+            }
+        },
+        "snk2": {
+            "Function": {
+                "ret_ty": null,
+                "param_ty": [
+                    "Int"
+                ]
+            }
+        },
+        "snk3": {
+            "Function": {
+                "ret_ty": null,
+                "param_ty": [
+                    {
+                        "Pointer": "Int"
+                    },
+                    {
+                        "Pointer": "Int"
+                    }
+                ]
+            }
+        },
+        "src1": {
+            "Function": {
+                "ret_ty": {
+                    "Pointer": "Int"
+                },
+                "param_ty": [
+                    {
+                        "Pointer": "Int"
+                    }
+                ]
+            }
+        },
+        "src2": {
+            "Function": {
+                "ret_ty": "Int",
+                "param_ty": []
+            }
+        }
+    }
+}

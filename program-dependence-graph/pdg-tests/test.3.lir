@@ -1,0 +1,30 @@
+extern input:(int,&int) -> int
+
+g1:int
+g2:&int
+
+fn main() -> int {
+    let i:int, j:int, x:int, y:int, z:int, tmp:int, a:&int
+
+    entry:
+    x = $call_ext input(tmp,a)
+    y = $copy 0
+    z = $copy 1
+    i = $copy 0
+    j = $copy 1
+    $jump loop_hdr
+
+    loop_hdr:
+    tmp = $cmp lt i x 
+    $branch tmp loop_body exit 
+
+    loop_body:
+    y = $arith add y 2
+    z = $arith mul z j 
+    i = $arith add i 1
+    j = $arith add j 2
+    $jump loop_hdr 
+
+    exit:
+    $ret y
+}

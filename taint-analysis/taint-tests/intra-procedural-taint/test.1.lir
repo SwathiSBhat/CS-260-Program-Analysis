@@ -1,0 +1,23 @@
+extern src1: (&int) -> &int
+extern src2: () -> int
+extern snk1: (&int, &int) -> _
+extern snk2: (int) -> _
+extern snk3: (&int, &int) -> _
+
+fn main() -> int {
+  let a:&int, b:&int, c:int, d:&int, e:&int, f:&int, g:int
+  entry:
+    a = $alloc 1 [_a1]
+    b = $alloc 1 [_a2]
+    b = $call_ext src1(a)
+    c = $call_ext src2()
+    d = $addrof c
+    e = $gep a c
+    f = $alloc 1 [_a3]
+    $store f c
+    g = $load e
+    $call_ext snk1(a, d)
+    $call_ext snk2(g)
+    $call_ext snk3(b, f)
+    $ret 0
+}

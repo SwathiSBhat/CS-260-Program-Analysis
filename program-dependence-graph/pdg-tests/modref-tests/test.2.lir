@@ -1,0 +1,28 @@
+foo:&(&int) -> _
+bar:&(&int) -> _
+
+fn main() -> int {
+    let a:&int 
+    entry:
+    a = $alloc 1 [_a1]
+    $call_dir foo(a) then exit 
+
+    exit:
+    $ret 0
+}
+
+fn foo(p:&int) -> _ {
+    entry:
+    $call_dir bar(p) then exit
+
+    exit:
+    $ret
+}
+
+fn bar(q:&int) -> _ {
+    let a:int
+    entry:
+    a = $load q 
+    $store q 42
+    $ret  
+}

@@ -1,4 +1,7 @@
-# CS260 Program Analysis
+# Description of LIR program
+
+
+## Dependencies
 
 ## Generating submission zip files
 

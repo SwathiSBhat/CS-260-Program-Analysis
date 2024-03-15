@@ -52,31 +52,6 @@ bool joinSets(std::set<std::string> &s1, std::set<std::string> &s2) {
     return changed;
 }
 
-// Check if 2 abstract stores are equal. Ignore keys that are empty and not present in either store
-// Example store1 = {a: {}, b: {1,2}, c:{3,4}} store2 = {b:{1,2}, c:{3,4},d:{}} = true
-bool isAbsStoreEqual(AbsStore store1, AbsStore store2)
-{
-    for (auto it = store1.begin(); it != store1.end(); it++)
-    {
-        if (it->second.size() == 0 && store2.count(it->first) == 0)
-            continue;
-        else if (store2.count(it->first) == 0)
-            return false;
-        else if (store2[it->first] != it->second)
-            return false;
-    }
-    for (auto it = store2.begin(); it != store2.end(); it++)
-    {
-        if (it->second.size() == 0 && store1.count(it->first) == 0)
-            continue;
-        else if (store1.count(it->first) == 0)
-            return false;
-        else if (store1[it->first] != it->second)
-            return false;
-    }
-    return true;
-}
-
 bool isGlobalVar(Variable *var, Program *program, std::string func_name) {
     
     if (program->funcs[func_name]->locals.count(var->name) > 0)
@@ -238,7 +213,6 @@ AbsStore GetCalleeStore(Program *program, std::unordered_map<std::string, std::s
     AbsStore callee_store = {};
     Function *callee_func = program->funcs[callee];
     for (int i = 0; i < args.size(); i++) {
-        // TODO - How to handle constant arguments?
         std::string key = GetKey(program, func, args[i]);
         if (!args[i]->IsConstInt() && curr_store[key].size() > 0)
             callee_store[callee + "." + callee_func->params[i]->name] = curr_store[key];
@@ -317,7 +291,7 @@ void PrintAbsStore(AbsStore store)
  * The first function is top of the stack and the last function is the bottom of the stack
 */ 
 
-std::string AddToCurrentContext(std::string callsite, int sensitivity, std::string curr_context) {
+std::string AddToCurrentContext(std::string callsite, int sensitivity, std::string curr_context, int k = 1000) {
     
     std::string callstring;
 
@@ -350,10 +324,8 @@ std::string AddToCurrentContext(std::string callsite, int sensitivity, std::stri
             callstring = callsite;
         }
     }
-    else if (sensitivity == 3)
+    else if (sensitivity > 0)
     {
-        // For functional sensitivity, we need to maintain a separate store for each context (cid)
-        int k = 1000;
         // Construct callstring for stack of size k
         // Count the number of # in context. If # == k-1 => we need to drop the last callsite
         int count = 0;
@@ -961,8 +933,13 @@ void execute(
                 // For context insentive, func_name = context_id
                 call_edges[{points_to, points_to}].insert({curr_context, curr_context});
             }
-            else if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
+            else if (sensitivity == 1 || sensitivity == 2) {
                 std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+                call_edges[{points_to, callee_context}].insert({curr_context, curr_cid});
+            }
+            else if (sensitivity == 3) {
+                AbsStore callee_store_context = GetCalleeStore(program, pointsTo, sigma_prime, points_to, callidir_inst->args, func);
+                std::string callee_context = GetFunctionalContext(callee_store_context);
                 call_edges[{points_to, callee_context}].insert({curr_context, curr_cid});
             }
 
@@ -976,8 +953,13 @@ void execute(
             std::string bb2store_key = points_to;
             std::string bbs_to_output_key = points_to + "|entry";
 
-            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3) {
+            if (sensitivity == 1 || sensitivity == 2) {
                 std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+                bb2store_key = points_to + "|" + callee_context;
+                bbs_to_output_key = points_to + "|" + callee_context + "|entry";
+            }
+            else if (sensitivity == 3) {
+                std::string callee_context = GetFunctionalContext(callee_store);
                 bb2store_key = points_to + "|" + callee_context;
                 bbs_to_output_key = points_to + "|" + callee_context + "|entry";
             }
@@ -997,6 +979,10 @@ void execute(
                     std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
                     worklist.push_back({points_to + "|" + callee_context, "entry"});
                 }
+                else if (sensitivity == 3) {
+                    std::string callee_context = GetFunctionalContext(callee_store);
+                    worklist.push_back({points_to + "|" + callee_context, "entry"});
+                }
                 else if (sensitivity == 0)
                     worklist.push_back({points_to, "entry"});
                 //std::cout << "Pushed to worklist: " << points_to + ".entry" << std::endl;
@@ -1008,8 +994,10 @@ void execute(
             */
 
             std::string context = points_to;
-            if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
+            if (sensitivity == 1 || sensitivity == 2)
                 context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+            else if (sensitivity == 3)
+                context = GetFunctionalContext(callee_store);
 
             AbsStore returned_store = call_returned[{points_to, context}];
 

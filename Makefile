@@ -117,6 +117,97 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named assn0
+
+# Build rule for target.
+assn0: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn0
+.PHONY : assn0
+
+# fast build rule for target.
+assn0/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/build
+.PHONY : assn0/fast
+
+#=============================================================================
+# Target rules for targets named assn1_constant_analysis
+
+# Build rule for target.
+assn1_constant_analysis: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn1_constant_analysis
+.PHONY : assn1_constant_analysis
+
+# fast build rule for target.
+assn1_constant_analysis/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn1_constant_analysis.dir/build.make CMakeFiles/assn1_constant_analysis.dir/build
+.PHONY : assn1_constant_analysis/fast
+
+#=============================================================================
+# Target rules for targets named assn2_control_flow_analysis
+
+# Build rule for target.
+assn2_control_flow_analysis: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn2_control_flow_analysis
+.PHONY : assn2_control_flow_analysis
+
+# fast build rule for target.
+assn2_control_flow_analysis/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_control_flow_analysis.dir/build.make CMakeFiles/assn2_control_flow_analysis.dir/build
+.PHONY : assn2_control_flow_analysis/fast
+
+#=============================================================================
+# Target rules for targets named assn2_reaching_def
+
+# Build rule for target.
+assn2_reaching_def: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn2_reaching_def
+.PHONY : assn2_reaching_def
+
+# fast build rule for target.
+assn2_reaching_def/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_reaching_def.dir/build.make CMakeFiles/assn2_reaching_def.dir/build
+.PHONY : assn2_reaching_def/fast
+
+#=============================================================================
+# Target rules for targets named assn3-constraint-generator
+
+# Build rule for target.
+assn3-constraint-generator: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn3-constraint-generator
+.PHONY : assn3-constraint-generator
+
+# fast build rule for target.
+assn3-constraint-generator/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3-constraint-generator.dir/build.make CMakeFiles/assn3-constraint-generator.dir/build
+.PHONY : assn3-constraint-generator/fast
+
+#=============================================================================
+# Target rules for targets named assn3_constraint_solver
+
+# Build rule for target.
+assn3_constraint_solver: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn3_constraint_solver
+.PHONY : assn3_constraint_solver
+
+# fast build rule for target.
+assn3_constraint_solver/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3_constraint_solver.dir/build.make CMakeFiles/assn3_constraint_solver.dir/build
+.PHONY : assn3_constraint_solver/fast
+
+#=============================================================================
+# Target rules for targets named assn4_program_slicing
+
+# Build rule for target.
+assn4_program_slicing: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assn4_program_slicing
+.PHONY : assn4_program_slicing
+
+# fast build rule for target.
+assn4_program_slicing/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/build
+.PHONY : assn4_program_slicing/fast
+
+#=============================================================================
 # Target rules for targets named assn5_taint_analysis
 
 # Build rule for target.
@@ -128,6 +219,198 @@ assn5_taint_analysis: cmake_check_build_system
 assn5_taint_analysis/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn5_taint_analysis.dir/build.make CMakeFiles/assn5_taint_analysis.dir/build
 .PHONY : assn5_taint_analysis/fast
+
+assn0.o: assn0.cpp.o
+.PHONY : assn0.o
+
+# target to build an object file
+assn0.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/assn0.cpp.o
+.PHONY : assn0.cpp.o
+
+assn0.i: assn0.cpp.i
+.PHONY : assn0.i
+
+# target to preprocess a source file
+assn0.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/assn0.cpp.i
+.PHONY : assn0.cpp.i
+
+assn0.s: assn0.cpp.s
+.PHONY : assn0.s
+
+# target to generate assembly for a file
+assn0.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/assn0.cpp.s
+.PHONY : assn0.cpp.s
+
+constant-analysis/constant_analysis.o: constant-analysis/constant_analysis.cpp.o
+.PHONY : constant-analysis/constant_analysis.o
+
+# target to build an object file
+constant-analysis/constant_analysis.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn1_constant_analysis.dir/build.make CMakeFiles/assn1_constant_analysis.dir/constant-analysis/constant_analysis.cpp.o
+.PHONY : constant-analysis/constant_analysis.cpp.o
+
+constant-analysis/constant_analysis.i: constant-analysis/constant_analysis.cpp.i
+.PHONY : constant-analysis/constant_analysis.i
+
+# target to preprocess a source file
+constant-analysis/constant_analysis.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn1_constant_analysis.dir/build.make CMakeFiles/assn1_constant_analysis.dir/constant-analysis/constant_analysis.cpp.i
+.PHONY : constant-analysis/constant_analysis.cpp.i
+
+constant-analysis/constant_analysis.s: constant-analysis/constant_analysis.cpp.s
+.PHONY : constant-analysis/constant_analysis.s
+
+# target to generate assembly for a file
+constant-analysis/constant_analysis.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn1_constant_analysis.dir/build.make CMakeFiles/assn1_constant_analysis.dir/constant-analysis/constant_analysis.cpp.s
+.PHONY : constant-analysis/constant_analysis.cpp.s
+
+constraint-generator/constraint-generator.o: constraint-generator/constraint-generator.cpp.o
+.PHONY : constraint-generator/constraint-generator.o
+
+# target to build an object file
+constraint-generator/constraint-generator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3-constraint-generator.dir/build.make CMakeFiles/assn3-constraint-generator.dir/constraint-generator/constraint-generator.cpp.o
+.PHONY : constraint-generator/constraint-generator.cpp.o
+
+constraint-generator/constraint-generator.i: constraint-generator/constraint-generator.cpp.i
+.PHONY : constraint-generator/constraint-generator.i
+
+# target to preprocess a source file
+constraint-generator/constraint-generator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3-constraint-generator.dir/build.make CMakeFiles/assn3-constraint-generator.dir/constraint-generator/constraint-generator.cpp.i
+.PHONY : constraint-generator/constraint-generator.cpp.i
+
+constraint-generator/constraint-generator.s: constraint-generator/constraint-generator.cpp.s
+.PHONY : constraint-generator/constraint-generator.s
+
+# target to generate assembly for a file
+constraint-generator/constraint-generator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3-constraint-generator.dir/build.make CMakeFiles/assn3-constraint-generator.dir/constraint-generator/constraint-generator.cpp.s
+.PHONY : constraint-generator/constraint-generator.cpp.s
+
+control-flow-analysis/control_flow_analysis.o: control-flow-analysis/control_flow_analysis.cpp.o
+.PHONY : control-flow-analysis/control_flow_analysis.o
+
+# target to build an object file
+control-flow-analysis/control_flow_analysis.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_control_flow_analysis.dir/build.make CMakeFiles/assn2_control_flow_analysis.dir/control-flow-analysis/control_flow_analysis.cpp.o
+.PHONY : control-flow-analysis/control_flow_analysis.cpp.o
+
+control-flow-analysis/control_flow_analysis.i: control-flow-analysis/control_flow_analysis.cpp.i
+.PHONY : control-flow-analysis/control_flow_analysis.i
+
+# target to preprocess a source file
+control-flow-analysis/control_flow_analysis.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_control_flow_analysis.dir/build.make CMakeFiles/assn2_control_flow_analysis.dir/control-flow-analysis/control_flow_analysis.cpp.i
+.PHONY : control-flow-analysis/control_flow_analysis.cpp.i
+
+control-flow-analysis/control_flow_analysis.s: control-flow-analysis/control_flow_analysis.cpp.s
+.PHONY : control-flow-analysis/control_flow_analysis.s
+
+# target to generate assembly for a file
+control-flow-analysis/control_flow_analysis.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_control_flow_analysis.dir/build.make CMakeFiles/assn2_control_flow_analysis.dir/control-flow-analysis/control_flow_analysis.cpp.s
+.PHONY : control-flow-analysis/control_flow_analysis.cpp.s
+
+pointer-analysis/constraint_solver.o: pointer-analysis/constraint_solver.cpp.o
+.PHONY : pointer-analysis/constraint_solver.o
+
+# target to build an object file
+pointer-analysis/constraint_solver.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3_constraint_solver.dir/build.make CMakeFiles/assn3_constraint_solver.dir/pointer-analysis/constraint_solver.cpp.o
+.PHONY : pointer-analysis/constraint_solver.cpp.o
+
+pointer-analysis/constraint_solver.i: pointer-analysis/constraint_solver.cpp.i
+.PHONY : pointer-analysis/constraint_solver.i
+
+# target to preprocess a source file
+pointer-analysis/constraint_solver.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3_constraint_solver.dir/build.make CMakeFiles/assn3_constraint_solver.dir/pointer-analysis/constraint_solver.cpp.i
+.PHONY : pointer-analysis/constraint_solver.cpp.i
+
+pointer-analysis/constraint_solver.s: pointer-analysis/constraint_solver.cpp.s
+.PHONY : pointer-analysis/constraint_solver.s
+
+# target to generate assembly for a file
+pointer-analysis/constraint_solver.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3_constraint_solver.dir/build.make CMakeFiles/assn3_constraint_solver.dir/pointer-analysis/constraint_solver.cpp.s
+.PHONY : pointer-analysis/constraint_solver.cpp.s
+
+pointer-analysis/set_constraint_util.o: pointer-analysis/set_constraint_util.cpp.o
+.PHONY : pointer-analysis/set_constraint_util.o
+
+# target to build an object file
+pointer-analysis/set_constraint_util.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3_constraint_solver.dir/build.make CMakeFiles/assn3_constraint_solver.dir/pointer-analysis/set_constraint_util.cpp.o
+.PHONY : pointer-analysis/set_constraint_util.cpp.o
+
+pointer-analysis/set_constraint_util.i: pointer-analysis/set_constraint_util.cpp.i
+.PHONY : pointer-analysis/set_constraint_util.i
+
+# target to preprocess a source file
+pointer-analysis/set_constraint_util.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3_constraint_solver.dir/build.make CMakeFiles/assn3_constraint_solver.dir/pointer-analysis/set_constraint_util.cpp.i
+.PHONY : pointer-analysis/set_constraint_util.cpp.i
+
+pointer-analysis/set_constraint_util.s: pointer-analysis/set_constraint_util.cpp.s
+.PHONY : pointer-analysis/set_constraint_util.s
+
+# target to generate assembly for a file
+pointer-analysis/set_constraint_util.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn3_constraint_solver.dir/build.make CMakeFiles/assn3_constraint_solver.dir/pointer-analysis/set_constraint_util.cpp.s
+.PHONY : pointer-analysis/set_constraint_util.cpp.s
+
+program-dependence-graph/program_slicing.o: program-dependence-graph/program_slicing.cpp.o
+.PHONY : program-dependence-graph/program_slicing.o
+
+# target to build an object file
+program-dependence-graph/program_slicing.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/program-dependence-graph/program_slicing.cpp.o
+.PHONY : program-dependence-graph/program_slicing.cpp.o
+
+program-dependence-graph/program_slicing.i: program-dependence-graph/program_slicing.cpp.i
+.PHONY : program-dependence-graph/program_slicing.i
+
+# target to preprocess a source file
+program-dependence-graph/program_slicing.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/program-dependence-graph/program_slicing.cpp.i
+.PHONY : program-dependence-graph/program_slicing.cpp.i
+
+program-dependence-graph/program_slicing.s: program-dependence-graph/program_slicing.cpp.s
+.PHONY : program-dependence-graph/program_slicing.s
+
+# target to generate assembly for a file
+program-dependence-graph/program_slicing.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn4_program_slicing.dir/build.make CMakeFiles/assn4_program_slicing.dir/program-dependence-graph/program_slicing.cpp.s
+.PHONY : program-dependence-graph/program_slicing.cpp.s
+
+reaching-defn/reachingdef.o: reaching-defn/reachingdef.cpp.o
+.PHONY : reaching-defn/reachingdef.o
+
+# target to build an object file
+reaching-defn/reachingdef.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_reaching_def.dir/build.make CMakeFiles/assn2_reaching_def.dir/reaching-defn/reachingdef.cpp.o
+.PHONY : reaching-defn/reachingdef.cpp.o
+
+reaching-defn/reachingdef.i: reaching-defn/reachingdef.cpp.i
+.PHONY : reaching-defn/reachingdef.i
+
+# target to preprocess a source file
+reaching-defn/reachingdef.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_reaching_def.dir/build.make CMakeFiles/assn2_reaching_def.dir/reaching-defn/reachingdef.cpp.i
+.PHONY : reaching-defn/reachingdef.cpp.i
+
+reaching-defn/reachingdef.s: reaching-defn/reachingdef.cpp.s
+.PHONY : reaching-defn/reachingdef.s
+
+# target to generate assembly for a file
+reaching-defn/reachingdef.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_reaching_def.dir/build.make CMakeFiles/assn2_reaching_def.dir/reaching-defn/reachingdef.cpp.s
+.PHONY : reaching-defn/reachingdef.cpp.s
 
 taint-analysis/taint_analysis.o: taint-analysis/taint_analysis.cpp.o
 .PHONY : taint-analysis/taint_analysis.o
@@ -161,7 +444,38 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... assn0"
+	@echo "... assn1_constant_analysis"
+	@echo "... assn2_control_flow_analysis"
+	@echo "... assn2_reaching_def"
+	@echo "... assn3-constraint-generator"
+	@echo "... assn3_constraint_solver"
+	@echo "... assn4_program_slicing"
 	@echo "... assn5_taint_analysis"
+	@echo "... assn0.o"
+	@echo "... assn0.i"
+	@echo "... assn0.s"
+	@echo "... constant-analysis/constant_analysis.o"
+	@echo "... constant-analysis/constant_analysis.i"
+	@echo "... constant-analysis/constant_analysis.s"
+	@echo "... constraint-generator/constraint-generator.o"
+	@echo "... constraint-generator/constraint-generator.i"
+	@echo "... constraint-generator/constraint-generator.s"
+	@echo "... control-flow-analysis/control_flow_analysis.o"
+	@echo "... control-flow-analysis/control_flow_analysis.i"
+	@echo "... control-flow-analysis/control_flow_analysis.s"
+	@echo "... pointer-analysis/constraint_solver.o"
+	@echo "... pointer-analysis/constraint_solver.i"
+	@echo "... pointer-analysis/constraint_solver.s"
+	@echo "... pointer-analysis/set_constraint_util.o"
+	@echo "... pointer-analysis/set_constraint_util.i"
+	@echo "... pointer-analysis/set_constraint_util.s"
+	@echo "... program-dependence-graph/program_slicing.o"
+	@echo "... program-dependence-graph/program_slicing.i"
+	@echo "... program-dependence-graph/program_slicing.s"
+	@echo "... reaching-defn/reachingdef.o"
+	@echo "... reaching-defn/reachingdef.i"
+	@echo "... reaching-defn/reachingdef.s"
 	@echo "... taint-analysis/taint_analysis.o"
 	@echo "... taint-analysis/taint_analysis.i"
 	@echo "... taint-analysis/taint_analysis.s"

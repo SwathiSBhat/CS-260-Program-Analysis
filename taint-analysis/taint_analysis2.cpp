@@ -81,7 +81,7 @@ class TaintAnalysis {
             // printCallEdges();
             //std::cout << std::endl;
 
-            // TODO - Get rid of bbs_to_output
+            // TODO - Get rid of below code
             for (const auto &i: worklist) {
                 if (sensitivity == 0)
                     bbs_to_output.insert(i.first + "|" + i.second);

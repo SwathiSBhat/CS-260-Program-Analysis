@@ -378,6 +378,47 @@ std::string AddToCurrentContext(std::string callsite, int sensitivity, std::stri
     return callstring;
 }
 
+/*
+* Maintain a map from abstract store string to a unique integer
+* Maintain a map from integer to abstract store string
+*/
+std::map<std::string, int> store2int;
+std::map<int, std::string> int2store;
+static int store_count = 0;
+
+std::string AbsStoreToString(AbsStore store) {
+    std::string store_str = "";
+    for (auto it = store.begin(); it != store.end(); it++) {
+        if (it->second.size() == 0)
+            continue;
+        store_str += it->first + ":{";
+        for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+            store_str += *it2 + ",";
+        }
+        store_str += "};";
+    }
+    return store_str;
+}
+
+std::string GetFunctionalContext(AbsStore callee_store) {
+    // Map the abstract store to a string
+    // Convert abstract store to it's equivalent string representation
+    std::string callee_store_str = AbsStoreToString(callee_store);
+    //std::cout << "Callee store string: " << callee_store_str << std::endl;
+    // If the store is already present in the map, then return the corresponding integer
+    if (store2int.count(callee_store_str) > 0) {
+        return std::to_string(store2int[callee_store_str]);
+    }
+    // Else, add the store to the map and return the corresponding integer
+    else {
+        store2int[callee_store_str] = store_count;
+        int2store[store_count] = callee_store_str;
+        store_count++;
+        return std::to_string(store2int[callee_store_str]);
+    }
+}
+
+
 void execute(
     Program *program,
     Function* func,
@@ -765,7 +806,7 @@ void execute(
             // For context insentive, func_name = context_id
             call_edges[{calldir_inst->callee, calldir_inst->callee}].insert({curr_context, curr_context});
         }
-        else if (sensitivity == 1 || sensitivity == 2 || sensitivity ==3) {
+        else if (sensitivity == 1 || sensitivity == 2) {
             /* Add callsite to stack of call-sites which is our context
              * callsite = func.bb
             */
@@ -777,6 +818,14 @@ void execute(
             call_edges[{calldir_inst->callee, callee_context}].insert({curr_context, curr_cid});
             //std::cout << "Added to call_edges: " << calldir_inst->callee << " : " << callee_context << " -> {" << curr_context << " , " << curr_cid <<  std::endl;
         }
+        else if (sensitivity == 3) {
+            /*
+            * callee context = get_callee_store(...)
+            */
+            AbsStore callee_store_context = GetCalleeStore(program, pointsTo, sigma_prime, calldir_inst->callee, calldir_inst->args, func);
+            std::string callee_context = GetFunctionalContext(callee_store_context);
+            call_edges[{calldir_inst->callee, callee_context}].insert({curr_context, curr_cid});
+        }
 
         AbsStore callee_store = GetCalleeStore(program, pointsTo, sigma_prime, calldir_inst->callee, calldir_inst->args, func);
     
@@ -785,8 +834,14 @@ void execute(
 
         std::string bbs_to_output_key = calldir_inst->callee + "|entry";
         std::string bb2store_key = calldir_inst->callee;
-        if (sensitivity == 1 || sensitivity == 2 || sensitivity ==3) {
+        if (sensitivity == 1 || sensitivity == 2) {
+            // TODO - Move this callee_context to a common place
             std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+            bbs_to_output_key = calldir_inst->callee + "|" + callee_context + "|entry";
+            bb2store_key = calldir_inst->callee + "|" + callee_context;
+        }
+        else if (sensitivity == 3) {
+            std::string callee_context = GetFunctionalContext(callee_store);
             bbs_to_output_key = calldir_inst->callee + "|" + callee_context + "|entry";
             bb2store_key = calldir_inst->callee + "|" + callee_context;
         }
@@ -800,12 +855,16 @@ void execute(
         if (bbs_to_output.count(bbs_to_output_key) == 0 || callee_store_changed)
         {
             bbs_to_output.insert(bbs_to_output_key);
-            if (sensitivity == 1 || sensitivity == 2 || sensitivity ==3) {
+            if (sensitivity == 1 || sensitivity == 2) {
                 std::string callee_context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
                 worklist.push_back({calldir_inst->callee + "|" + callee_context, "entry"});
                 //std::cout << "Pushed to worklist: " << calldir_inst->callee + "|" + callee_context << " , entry" << std::endl;
             }
-            else
+            else if (sensitivity == 3) {
+                std::string callee_context = GetFunctionalContext(callee_store);
+                worklist.push_back({calldir_inst->callee + "|" + callee_context, "entry"});
+            }
+            else if (sensitivity == 0)
                 worklist.push_back({calldir_inst->callee, "entry"});
         }
 
@@ -842,8 +901,10 @@ void execute(
         */
 
         std::string context = calldir_inst->callee;
-        if (sensitivity == 1 || sensitivity == 2 || sensitivity == 3)
+        if (sensitivity == 1 || sensitivity == 2)
             context = AddToCurrentContext(func->name + "." + bb->label, sensitivity, curr_cid);
+        else if (sensitivity == 3)
+            context = GetFunctionalContext(callee_store);
 
         AbsStore returned_store = call_returned[{calldir_inst->callee, context}];
 

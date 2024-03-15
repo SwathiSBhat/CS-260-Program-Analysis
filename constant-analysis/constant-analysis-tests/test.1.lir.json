@@ -1,0 +1,1026 @@
+{
+    "structs": {
+        "struct1": [
+            {
+                "name": "f1",
+                "typ": "Int"
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": "Int"
+                }
+            }
+        ],
+        "struct2": [
+            {
+                "name": "f1",
+                "typ": {
+                    "Struct": "struct1"
+                }
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": {
+                        "Struct": "struct1"
+                    }
+                }
+            }
+        ]
+    },
+    "globals": [
+        {
+            "name": "func1",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": "Int",
+                        "param_ty": []
+                    }
+                }
+            },
+            "scope": null
+        },
+        {
+            "name": "func2",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": {
+                            "Pointer": {
+                                "Struct": "struct2"
+                            }
+                        },
+                        "param_ty": [
+                            "Int",
+                            {
+                                "Pointer": "Int"
+                            }
+                        ]
+                    }
+                }
+            },
+            "scope": null
+        },
+        {
+            "name": "func3",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": null,
+                        "param_ty": [
+                            "Int",
+                            {
+                                "Pointer": "Int"
+                            },
+                            {
+                                "Pointer": {
+                                    "Pointer": "Int"
+                                }
+                            },
+                            {
+                                "Pointer": {
+                                    "Struct": "struct2"
+                                }
+                            },
+                            "Int"
+                        ]
+                    }
+                }
+            },
+            "scope": null
+        }
+    ],
+    "functions": {
+        "func1": {
+            "id": "func1",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 42
+                        }
+                    }
+                }
+            }
+        },
+        "func2": {
+            "id": "func2",
+            "ret_ty": {
+                "Pointer": {
+                    "Struct": "struct2"
+                }
+            },
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func2"
+                },
+                {
+                    "name": "p2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func2"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct2"
+                        }
+                    },
+                    "scope": "func2"
+                },
+                {
+                    "name": "x",
+                    "typ": {
+                        "Struct": "struct2"
+                    },
+                    "scope": "func2"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t1",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Struct": "struct2"
+                                        }
+                                    },
+                                    "scope": "func2"
+                                },
+                                "rhs": {
+                                    "name": "x",
+                                    "typ": {
+                                        "Struct": "struct2"
+                                    },
+                                    "scope": "func2"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "_t1",
+                                "typ": {
+                                    "Pointer": {
+                                        "Struct": "struct2"
+                                    }
+                                },
+                                "scope": "func2"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "func3": {
+            "id": "func3",
+            "ret_ty": null,
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "p2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func3"
+                },
+                {
+                    "name": "p3",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "func3"
+                },
+                {
+                    "name": "p4",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct2"
+                        }
+                    },
+                    "scope": "func3"
+                },
+                {
+                    "name": "p5",
+                    "typ": "Int",
+                    "scope": "func3"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "_t2",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "_t3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func3"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct1"
+                        }
+                    },
+                    "scope": "func3"
+                },
+                {
+                    "name": "_t5",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "func3"
+                },
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "c",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func3"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "func3"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "p1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "z",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "LessEq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 10
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "Greater",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p5",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 3
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "_t1",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "CInt": 1
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "c",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "Neq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 3
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "GreaterEq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "c",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 1
+                                }
+                            }
+                        },
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": "Int",
+                                    "scope": "func3"
+                                },
+                                "rop": "Neq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "func3"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": null
+                    }
+                }
+            }
+        },
+        "func4": {
+            "id": "func4",
+            "ret_ty": "Int",
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "p2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func4"
+                },
+                {
+                    "name": "p3",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "func4"
+                },
+                {
+                    "name": "p4",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct2"
+                        }
+                    },
+                    "scope": "func4"
+                },
+                {
+                    "name": "p5",
+                    "typ": "Int",
+                    "scope": "func4"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "_t2",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "_t3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func4"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct1"
+                        }
+                    },
+                    "scope": "func4"
+                },
+                {
+                    "name": "_t5",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "func4"
+                },
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "c",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func4"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "func4"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p1",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p1",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "z",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 10
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "CInt": 20
+                                },
+                                "op2": {
+                                    "CInt": 0
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Multiply",
+                                "op1": {
+                                    "CInt": 1
+                                },
+                                "op2": {
+                                    "CInt": 1
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "c",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "Var": {
+                                        "name": "b",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "b",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "Var": {
+                                        "name": "c",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "p5",
+                                    "typ": "Int",
+                                    "scope": "func4"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "Var": {
+                                        "name": "c",
+                                        "typ": "Int",
+                                        "scope": "func4"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "func4"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "func_test_cmp": {
+            "id": "func_test_cmp",
+            "ret_ty": null,
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func_test_cmp"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Cmp": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_cmp"
+                                },
+                                "rop": "Eq",
+                                "op1": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "func_test_cmp"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "b",
+                                        "typ": "Int",
+                                        "scope": "func_test_cmp"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func_test_cmp"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "x",
+                                        "typ": "Int",
+                                        "scope": "func_test_cmp"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": null
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "CInt": 0
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Subtract",
+                                "op1": {
+                                    "CInt": 1
+                                },
+                                "op2": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "z",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Multiply",
+                                "op1": {
+                                    "CInt": 3
+                                },
+                                "op2": {
+                                    "CInt": 4
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "CInt": 12
+                                },
+                                "op2": {
+                                    "CInt": 5
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "b",
+                                    "typ": "Int",
+                                    "scope": "main"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "CInt": 14
+                                },
+                                "op2": {
+                                    "CInt": 5
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "main"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {
+        "ext1": {
+            "Function": {
+                "ret_ty": "Int",
+                "param_ty": []
+            }
+        },
+        "ext2": {
+            "Function": {
+                "ret_ty": "Int",
+                "param_ty": [
+                    "Int"
+                ]
+            }
+        },
+        "ext3": {
+            "Function": {
+                "ret_ty": {
+                    "Pointer": "Int"
+                },
+                "param_ty": [
+                    {
+                        "Pointer": "Int"
+                    },
+                    "Int"
+                ]
+            }
+        }
+    }
+}

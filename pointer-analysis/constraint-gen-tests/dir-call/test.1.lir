@@ -1,0 +1,39 @@
+fn main() -> int {
+    let a:int, b:&int, c:int, d:&int, e:&&int, f:&int, g:int 
+
+    entry:
+    a = $copy 42
+    b = $addrof a 
+    c = $copy 12
+    d = $addrof c 
+    e = $addrof d 
+    f = $call_dir foo(b,e) then exit 
+
+    exit:
+    g = $load f 
+    $ret g 
+}
+
+fn foo(p1:&int, p2:&&int) -> &int {
+    let h:&int 
+
+    entry:
+    h = $load p2 
+    $store p2 p1 
+    $ret h 
+}
+
+fn bar() -> _ {
+    let i:&int, j:int, k:&int, l:&&int, m:int
+    entry:
+    i = $addrof j 
+    $call_dir bar2(k,l,m) then exit 
+
+    exit:
+    $ret 
+}
+
+fn bar2(p1:&int,p2:&&int,p3:int) -> _ {
+    entry:
+    $ret 
+}

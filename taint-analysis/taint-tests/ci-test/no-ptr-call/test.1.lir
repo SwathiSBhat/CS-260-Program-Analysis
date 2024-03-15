@@ -1,0 +1,30 @@
+fn4:&(int) -> int
+
+extern snk1:(int) -> _
+extern src8:() -> int
+
+fn fn4(p:int) -> int {
+let _t1:int
+entry:
+  _t1 = $call_ext src8()
+  $ret _t1
+}
+
+fn main() -> int {
+let _ret15:int, _t1:int, _t10:int, _t11:int, _t12:int, _t13:int, _t14:int, _t2:int, _t3:int, _t4:int, _t5:int, _t6:int, _t7:int, _t8:int, _t9:int, id0:int, id1:int, id2:int, id3:int, id4:int, id5:int, id6:int, id7:int
+
+bb29:
+  _t12 = $call_dir fn4(4) then bb31
+
+bb31:
+  $call_ext snk1(_t12)
+  id1 = $copy id6
+  _ret15 = $copy 5
+  $jump exit
+
+entry:
+  $jump bb29
+
+exit:
+  $ret _ret15
+}

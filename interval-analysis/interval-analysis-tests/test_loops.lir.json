@@ -1,0 +1,277 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "func1": {
+            "id": "func1",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func1"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func1"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "func1"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb2"
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb3"
+                    }
+                },
+                "bb3": {
+                    "id": "bb3",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func1"
+                                }
+                            },
+                            "tt": "bb4",
+                            "ff": "exit"
+                        }
+                    }
+                },
+                "bb4": {
+                    "id": "bb4",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb5"
+                    }
+                },
+                "bb5": {
+                    "id": "bb5",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb3"
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                },
+                "exit": {
+                    "id": "exit",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "func2": {
+            "id": "func2",
+            "ret_ty": null,
+            "params": [],
+            "locals": [
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func2"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func2"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "func2"
+                }
+            ],
+            "body": {
+                "bb10": {
+                    "id": "bb10",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func2"
+                                }
+                            },
+                            "tt": "exit",
+                            "ff": "bb5"
+                        }
+                    }
+                },
+                "bb11": {
+                    "id": "bb11",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb2"
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func2"
+                                }
+                            },
+                            "tt": "bb11",
+                            "ff": "bb3"
+                        }
+                    }
+                },
+                "bb3": {
+                    "id": "bb3",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb4"
+                    }
+                },
+                "bb4": {
+                    "id": "bb4",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "Var": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func2"
+                                }
+                            },
+                            "tt": "bb5",
+                            "ff": "bb6"
+                        }
+                    }
+                },
+                "bb5": {
+                    "id": "bb5",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb9"
+                    }
+                },
+                "bb6": {
+                    "id": "bb6",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb7"
+                    }
+                },
+                "bb7": {
+                    "id": "bb7",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb8"
+                    }
+                },
+                "bb8": {
+                    "id": "bb8",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb3"
+                    }
+                },
+                "bb9": {
+                    "id": "bb9",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb10"
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb2"
+                    }
+                },
+                "exit": {
+                    "id": "exit",
+                    "insts": [],
+                    "term": {
+                        "Ret": null
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "main"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

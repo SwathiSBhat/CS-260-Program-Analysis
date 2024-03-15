@@ -1,0 +1,55 @@
+extern src1: () -> int
+extern src2: () -> int
+extern src3: () -> int
+extern src4: () -> int
+extern snk1: (int) -> _
+extern snk2: (int) -> _ 
+extern snk3: (int) -> _
+extern snk4: (int) -> _ 
+
+fn main() -> int {
+  let taint1:int, taint2:int, a:int, b:int
+  entry:
+    taint1 = $call_ext src1()
+    a = $call_dir foo(taint1) then bb1
+
+  bb1:
+    $call_ext snk1(a)
+    taint2 = $call_ext src2()
+    b = $call_dir foo(taint2) then exit
+
+  exit:
+    $call_ext snk2(b)
+    $ret 0
+}
+
+fn foo(p:int) -> int {
+  let taint3:int, taint4:int, c:int
+  entry:
+    $branch p bb1 bb3
+
+  bb1:
+    taint3 = $call_ext src3()
+    c = $call_dir bar(p, taint3) then bb2
+
+  bb2:
+    $call_ext snk3(c)
+    $jump exit
+
+  bb3:
+    taint4 = $call_ext src4()
+    c = $call_dir bar(p, taint4) then bb4
+
+  bb4:
+    $call_ext snk4(c)
+    $jump exit
+
+  exit:
+    $ret c
+}
+
+fn bar(q:int, r:int) -> int {
+  entry:
+    q = $arith add q r
+    $ret q
+}

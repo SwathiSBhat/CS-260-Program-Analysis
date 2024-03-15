@@ -1,0 +1,84 @@
+test:&() -> int
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let _lo1:int, _ret6:int, _t2:int, _t3:int, _t4:int, _t5:int, id0:int, id1:int, id2:int, id3:int, id4:int, id5:int, id6:int, id7:int
+bb1:
+  id0 = $copy 8
+  id4 = $copy id2
+  _ret6 = $copy id6
+  $jump exit
+
+bb10:
+  id7 = $copy id1
+  _t5 = $arith sub 0 id5
+  _ret6 = $copy _t5
+  $jump exit
+
+bb11:
+  id4 = $copy id1
+  id0 = $copy 4
+  _ret6 = $copy 5
+  $jump exit
+
+bb12:
+  id6 = $copy id6
+  $jump bb10
+
+bb2:
+  id0 = $copy id1
+  $branch 6 bb4 bb5
+
+bb3:
+  id2 = $copy 7
+  $branch 0 bb7 bb6
+
+bb4:
+  id1 = $copy id0
+  $jump bb3
+
+bb5:
+  id3 = $copy 8
+  $jump bb3
+
+bb6:
+  _lo1 = $copy 6
+  _t4 = $cmp eq _lo1 0
+  $branch _t4 bb9 bb8
+
+bb7:
+  id4 = $copy id0
+  id5 = $copy id2
+  id3 = $copy id7
+  id6 = $copy 10
+  $jump bb6
+
+bb8:
+  id1 = $copy _lo1
+  id0 = $copy 0
+  $branch 2 bb11 bb12
+
+bb9:
+  _lo1 = $copy 0
+  $jump bb8
+
+entry:
+  id2 = $copy 3
+  id1 = $copy id2
+  id3 = $copy id0
+  _t2 = $arith mul 10 2
+  id4 = $copy _t2
+  id7 = $copy id0
+  _t3 = $cmp gt id3 id7
+  id6 = $copy _t3
+  id5 = $copy id6
+  id0 = $copy 0
+  $branch 1 bb2 bb1
+
+exit:
+  $ret _ret6
+}

@@ -1,0 +1,209 @@
+test:&() -> int
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let _lo1:int, _lo2:int, _lo3:int, _lo4:int, _ret20:int, _t10:int, _t11:int, _t12:int, _t13:int, _t14:int, _t15:int, _t16:int, _t17:int, _t18:int, _t19:int, _t5:int, _t6:int, _t7:int, _t8:int, _t9:int, id0:int, id1:int, id2:int, id3:int, id4:int, id5:int, id6:int, id7:int
+bb1:
+  id1 = $copy _lo1
+  id2 = $copy id2
+  id4 = $copy id3
+  id6 = $copy id4
+  id5 = $copy id6
+  id7 = $copy 2
+  _t6 = $cmp neq id0 id1
+  $branch _t6 bb4 bb5
+
+bb10:
+  id2 = $copy 10
+  id7 = $copy 3
+  id2 = $copy 4
+  id1 = $copy id6
+  $jump bb9
+
+bb11:
+  id5 = $copy id3
+  id5 = $copy id4
+  id5 = $copy id3
+  id1 = $copy 7
+  id2 = $copy id1
+  $jump bb9
+
+bb12:
+  _t11 = $cmp neq 2 id2
+  id1 = $copy _t11
+  $jump bb3
+
+bb13:
+  _lo2 = $copy id4
+  _t9 = $cmp eq _lo2 0
+  $branch _t9 bb16 bb15
+
+bb14:
+  id3 = $copy 9
+  _ret20 = $copy 9
+  $jump exit
+
+bb15:
+  id6 = $copy _lo2
+  id3 = $copy id2
+  id0 = $copy 7
+  id3 = $copy id2
+  _lo3 = $copy 8
+  _t10 = $cmp eq _lo3 0
+  $branch _t10 bb18 bb17
+
+bb16:
+  _lo2 = $copy 5
+  $jump bb15
+
+bb17:
+  id6 = $copy _lo3
+  $jump bb12
+
+bb18:
+  _lo3 = $copy id3
+  $jump bb17
+
+bb19:
+  $branch 8 bb22 bb23
+
+bb2:
+  _lo1 = $copy 3
+  $jump bb1
+
+bb20:
+  _t12 = $cmp lte id2 id1
+  id2 = $copy _t12
+  _t13 = $cmp eq id1 id7
+  id7 = $copy _t13
+  id6 = $copy id6
+  _t14 = $cmp lt id6 id5
+  id3 = $copy _t14
+  id7 = $copy id2
+  $jump bb19
+
+bb21:
+  id4 = $copy 5
+  $branch id7 bb34 bb35
+
+bb22:
+  id4 = $copy id0
+  $jump bb21
+
+bb23:
+  id4 = $copy id2
+  id6 = $copy id4
+  id2 = $copy id0
+  id5 = $copy id0
+  $branch id2 bb25 bb24
+
+bb24:
+  id4 = $copy 2
+  $branch 0 bb27 bb26
+
+bb25:
+  id2 = $copy id6
+  id6 = $copy 5
+  id6 = $copy 6
+  id0 = $copy id7
+  $jump bb24
+
+bb26:
+  _t16 = $cmp eq 10 3
+  $branch _t16 bb31 bb32
+
+bb27:
+  id1 = $copy 0
+  _lo4 = $copy 4
+  _t15 = $cmp neq _lo4 0
+  $branch _t15 bb29 bb28
+
+bb28:
+  id6 = $copy _lo4
+  $jump bb26
+
+bb29:
+  _lo4 = $copy 2
+  $jump bb28
+
+bb3:
+  id3 = $copy 2
+  $branch id6 bb20 bb19
+
+bb30:
+  $jump bb21
+
+bb31:
+  id2 = $copy id0
+  id5 = $copy 3
+  $jump bb30
+
+bb32:
+  id1 = $copy id3
+  _t17 = $cmp eq id6 3
+  id5 = $copy _t17
+  $jump bb30
+
+bb33:
+  _ret20 = $copy 9
+  $jump exit
+
+bb34:
+  id5 = $copy id3
+  id4 = $copy 5
+  _t18 = $cmp lt id6 id1
+  id2 = $copy _t18
+  id5 = $copy 1
+  id1 = $copy 4
+  $jump bb33
+
+bb35:
+  id4 = $copy id1
+  id7 = $copy id2
+  _t19 = $cmp gt id0 10
+  id4 = $copy _t19
+  id1 = $copy id0
+  $jump bb33
+
+bb4:
+  _t7 = $cmp eq 5 6
+  id2 = $copy _t7
+  $branch 8 bb7 bb8
+
+bb5:
+  $branch id2 bb10 bb11
+
+bb6:
+  $jump bb3
+
+bb7:
+  id1 = $copy 10
+  id0 = $copy 9
+  id1 = $copy 0
+  id3 = $copy 4
+  id4 = $copy 9
+  $jump bb6
+
+bb8:
+  id5 = $copy 4
+  _t8 = $cmp gte 0 1
+  id5 = $copy _t8
+  $jump bb6
+
+bb9:
+  id3 = $copy 0
+  $branch 5 bb13 bb14
+
+entry:
+  id0 = $copy 2
+  _lo1 = $copy 0
+  _t5 = $cmp eq _lo1 0
+  $branch _t5 bb2 bb1
+
+exit:
+  $ret _ret20
+}

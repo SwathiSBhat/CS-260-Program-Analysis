@@ -1,0 +1,19 @@
+fn main() -> int {
+    entry:
+    $ret 0
+}
+
+fn execute_once_last() -> _ {
+    let a:int, b:int
+
+    entry:
+    $branch 1 bb1 exit
+
+    bb1:
+    a = $copy b
+    b = $copy 0
+    $jump entry
+
+    exit:
+    $ret
+}

@@ -1,0 +1,18 @@
+
+
+fn main() -> int {
+    entry:
+    $ret 0
+}
+
+fn test(p:int) -> _ {
+    let id0:&int
+    entry:
+    id0 = $addrof p 
+    $jump bb1
+
+    bb1: 
+    p = $copy 1
+    $store id0 8
+    $ret
+}

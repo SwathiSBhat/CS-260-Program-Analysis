@@ -1,0 +1,484 @@
+{
+    "structs": {
+        "struct1": [
+            {
+                "name": "f1",
+                "typ": "Int"
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": "Int"
+                }
+            }
+        ]
+    },
+    "globals": [],
+    "functions": {
+        "func_test_addr_taken": {
+            "id": "func_test_addr_taken",
+            "ret_ty": null,
+            "params": [],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_addr_taken"
+                },
+                {
+                    "name": "_t2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_addr_taken"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_addr_taken"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func_test_addr_taken"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "func_test_addr_taken"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t1",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_addr_taken"
+                                },
+                                "rhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_addr_taken"
+                                }
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_addr_taken"
+                                },
+                                "rhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func_test_addr_taken"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": null
+                    }
+                }
+            }
+        },
+        "func_test_store": {
+            "id": "func_test_store",
+            "ret_ty": "Int",
+            "params": [
+                {
+                    "name": "p1",
+                    "typ": "Int",
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "p2",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": "Int"
+                            }
+                        }
+                    },
+                    "scope": "func_test_store"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "_t1",
+                    "typ": "Int",
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "_t2",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "_t3",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "_t5",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Struct": "struct1"
+                            }
+                        }
+                    },
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "_t6",
+                    "typ": {
+                        "Pointer": {
+                            "Struct": "struct1"
+                        }
+                    },
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "_t7",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": {
+                                    "Pointer": {
+                                        "Pointer": {
+                                            "Pointer": "Int"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "_t8",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": {
+                                "Pointer": {
+                                    "Pointer": {
+                                        "Pointer": "Int"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "func_test_store"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "func_test_store"
+                }
+            ],
+            "body": {
+                "bb0": {
+                    "id": "bb0",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func_test_store"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "p1",
+                                        "typ": "Int",
+                                        "scope": "func_test_store"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                },
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t7",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Pointer": {
+                                                    "Pointer": {
+                                                        "Pointer": {
+                                                            "Pointer": "Int"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "scope": "func_test_store"
+                                },
+                                "rhs": {
+                                    "name": "_t8",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Pointer": {
+                                                    "Pointer": {
+                                                        "Pointer": "Int"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "scope": "func_test_store"
+                                }
+                            }
+                        },
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_store"
+                                },
+                                "op": {
+                                    "CInt": 2
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func_test_store"
+                                },
+                                "aop": "Add",
+                                "op1": {
+                                    "CInt": 2
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "x",
+                                        "typ": "Int",
+                                        "scope": "func_test_store"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb2"
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t2",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_store"
+                                },
+                                "rhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "func_test_store"
+                                }
+                            }
+                        },
+                        {
+                            "AddrOf": {
+                                "lhs": {
+                                    "name": "_t3",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_store"
+                                },
+                                "rhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "func_test_store"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "CInt": 2
+                        }
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_t1",
+                                    "typ": "Int",
+                                    "scope": "func_test_store"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "_t3",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_store"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t1",
+                                        "typ": "Int",
+                                        "scope": "func_test_store"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "_t2",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "func_test_store"
+                                },
+                                "op": {
+                                    "CInt": 6
+                                }
+                            }
+                        },
+                        {
+                            "Store": {
+                                "dst": {
+                                    "name": "_t5",
+                                    "typ": {
+                                        "Pointer": {
+                                            "Pointer": {
+                                                "Struct": "struct1"
+                                            }
+                                        }
+                                    },
+                                    "scope": "func_test_store"
+                                },
+                                "op": {
+                                    "Var": {
+                                        "name": "_t6",
+                                        "typ": {
+                                            "Pointer": {
+                                                "Struct": "struct1"
+                                            }
+                                        },
+                                        "scope": "func_test_store"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb0"
+                    }
+                }
+            }
+        },
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "b",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "main"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "main"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "Var": {
+                                "name": "x",
+                                "typ": "Int",
+                                "scope": "main"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

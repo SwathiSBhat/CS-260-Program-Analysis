@@ -1,0 +1,70 @@
+
+fn func1() -> int {
+    let x:int, y:int, z:int
+    entry:
+        $jump bb1
+
+    bb1:
+        $jump bb2 
+
+    bb2:
+        $jump bb3
+
+    bb3:
+        $branch x bb4 exit 
+
+    bb4:
+        $jump bb5
+    
+    bb5:
+        $jump bb3
+
+    exit:
+        $ret 0
+}
+
+fn func2() -> _ {
+    let x:int, y:int, z:int
+    entry:
+        $jump bb2
+    
+    bb2:
+        $branch x bb11 bb3
+    
+    bb3:
+        $jump bb4
+    
+    bb4:
+        $branch x bb5 bb6
+
+    bb5:
+        $jump bb9
+
+    bb6:
+        $jump bb7
+
+    bb7: 
+        $jump bb8
+
+    bb8:
+        $jump bb3
+
+    bb9:
+        $jump bb10
+    
+    bb10:
+        $branch x exit bb5
+
+    bb11:
+        $jump bb2
+
+    exit:
+        $ret
+}
+  
+  
+fn main() -> int {
+    let x:int, y:int, z:int, a:int, b:int
+    entry:
+        $ret x
+}

@@ -1,0 +1,20 @@
+fn func_test_jump(p1:int, p2:&int, p3: int) -> int {
+    let _t1:int, x:int, _t2:int, _t3:&int, _t4:&&&&int, _t5:int
+    
+    entry:
+    x = $copy 1
+    _t1 = $copy x
+    _t2 = $arith add p3 2
+    $jump bb1
+
+    bb1:
+    _t2 = $arith add x 2
+    p3 = $arith mul 3 2
+    $ret x
+}
+
+fn main() -> int {
+    let x:int, y:int, z:int, a:int, b:int
+    entry:
+    $ret x
+}

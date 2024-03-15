@@ -1,0 +1,143 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "test": {
+            "id": "test",
+            "ret_ty": null,
+            "params": [
+                {
+                    "name": "p",
+                    "typ": "Int",
+                    "scope": "test"
+                }
+            ],
+            "locals": [
+                {
+                    "name": "a",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "x",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "y",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "z",
+                    "typ": "Int",
+                    "scope": "test"
+                }
+            ],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "a",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "x",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 0
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "y",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "Var": {
+                                        "name": "z",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "CInt": 0
+                                }
+                            }
+                        },
+                        {
+                            "Arith": {
+                                "lhs": {
+                                    "name": "z",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "aop": "Divide",
+                                "op1": {
+                                    "Var": {
+                                        "name": "p",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                },
+                                "op2": {
+                                    "Var": {
+                                        "name": "a",
+                                        "typ": "Int",
+                                        "scope": "test"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": null
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

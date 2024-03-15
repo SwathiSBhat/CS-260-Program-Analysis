@@ -1,0 +1,99 @@
+{
+    "structs": {},
+    "globals": [],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "test": {
+            "id": "test",
+            "ret_ty": null,
+            "params": [],
+            "locals": [],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "CInt": 10
+                            },
+                            "tt": "bb2",
+                            "ff": "bb3"
+                        }
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb4"
+                    }
+                },
+                "bb3": {
+                    "id": "bb3",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb5"
+                    }
+                },
+                "bb4": {
+                    "id": "bb4",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "CInt": 1
+                            },
+                            "tt": "bb1",
+                            "ff": "bb6"
+                        }
+                    }
+                },
+                "bb5": {
+                    "id": "bb5",
+                    "insts": [],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "CInt": 10
+                            },
+                            "tt": "bb3",
+                            "ff": "bb4"
+                        }
+                    }
+                },
+                "bb6": {
+                    "id": "bb6",
+                    "insts": [],
+                    "term": {
+                        "Ret": null
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Jump": "bb1"
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

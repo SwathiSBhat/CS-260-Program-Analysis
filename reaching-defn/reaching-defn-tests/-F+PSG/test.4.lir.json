@@ -1,0 +1,398 @@
+{
+    "structs": {
+        "st": [
+            {
+                "name": "f1",
+                "typ": "Int"
+            },
+            {
+                "name": "f2",
+                "typ": {
+                    "Pointer": "Int"
+                }
+            }
+        ]
+    },
+    "globals": [
+        {
+            "name": "g1",
+            "typ": "Int",
+            "scope": null
+        },
+        {
+            "name": "g2",
+            "typ": {
+                "Pointer": "Int"
+            },
+            "scope": null
+        },
+        {
+            "name": "g3",
+            "typ": {
+                "Pointer": {
+                    "Struct": "st"
+                }
+            },
+            "scope": null
+        },
+        {
+            "name": "test",
+            "typ": {
+                "Pointer": {
+                    "Function": {
+                        "ret_ty": "Int",
+                        "param_ty": []
+                    }
+                }
+            },
+            "scope": null
+        }
+    ],
+    "functions": {
+        "main": {
+            "id": "main",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [],
+            "body": {
+                "entry": {
+                    "id": "entry",
+                    "insts": [],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                }
+            }
+        },
+        "test": {
+            "id": "test",
+            "ret_ty": "Int",
+            "params": [],
+            "locals": [
+                {
+                    "name": "_lo1",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo2",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_lo3",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t10",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t11",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t12",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t13",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t14",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t15",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t16",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t17",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t18",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t19",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t20",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t21",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t22",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t23",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t24",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t25",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t26",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t4",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "_t5",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t6",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t7",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t8",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "_t9",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id0",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id1",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id10",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id11",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id2",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id3",
+                    "typ": "Int",
+                    "scope": "test"
+                },
+                {
+                    "name": "id4",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id5",
+                    "typ": {
+                        "Pointer": "Int"
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id6",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id7",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id8",
+                    "typ": {
+                        "Pointer": {
+                            "Pointer": "Int"
+                        }
+                    },
+                    "scope": "test"
+                },
+                {
+                    "name": "id9",
+                    "typ": "Int",
+                    "scope": "test"
+                }
+            ],
+            "body": {
+                "bb1": {
+                    "id": "bb1",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 1
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb3"
+                    }
+                },
+                "bb2": {
+                    "id": "bb2",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo2",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 2
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Jump": "bb3"
+                    }
+                },
+                "bb3": {
+                    "id": "bb3",
+                    "insts": [
+                        {
+                            "Load": {
+                                "lhs": {
+                                    "name": "_t22",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "src": {
+                                    "name": "id5",
+                                    "typ": {
+                                        "Pointer": "Int"
+                                    },
+                                    "scope": "test"
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Ret": {
+                            "CInt": 0
+                        }
+                    }
+                },
+                "entry": {
+                    "id": "entry",
+                    "insts": [
+                        {
+                            "Copy": {
+                                "lhs": {
+                                    "name": "_lo1",
+                                    "typ": "Int",
+                                    "scope": "test"
+                                },
+                                "op": {
+                                    "CInt": 0
+                                }
+                            }
+                        }
+                    ],
+                    "term": {
+                        "Branch": {
+                            "cond": {
+                                "CInt": 1
+                            },
+                            "tt": "bb1",
+                            "ff": "bb2"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externs": {}
+}

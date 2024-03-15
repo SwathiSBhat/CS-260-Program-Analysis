@@ -1,0 +1,256 @@
+test:&() -> int
+
+fn main() -> int {
+entry:
+  $ret 0
+}
+
+fn test() -> int {
+let _lo1:int, _lo10:int, _lo11:int, _lo2:int, _lo3:int, _lo4:int, _lo5:int, _lo6:int, _lo7:int, _lo8:int, _lo9:int, _ret57:int, _t12:int, _t13:int, _t14:int, _t15:int, _t16:int, _t17:int, _t18:int, _t19:int, _t20:int, _t21:int, _t22:int, _t23:int, _t24:int, _t25:int, _t26:int, _t27:int, _t28:int, _t29:int, _t30:int, _t31:int, _t32:int, _t33:int, _t34:int, _t35:int, _t36:int, _t37:int, _t38:int, _t39:int, _t40:int, _t41:int, _t42:int, _t43:int, _t44:int, _t45:int, _t46:int, _t47:int, _t48:int, _t49:int, _t50:int, _t51:int, _t52:int, _t53:int, _t54:int, _t55:int, _t56:int, id0:int, id1:int, id2:int, id3:int, id4:int
+bb1:
+  _t13 = $arith sub 0 id1
+  _t14 = $arith sub 0 _t13
+  _t15 = $arith div _t14 _lo1
+  id0 = $copy _t15
+  _t16 = $arith sub 0 5
+  id3 = $copy _t16
+  _t17 = $arith sub 0 3
+  _t18 = $arith sub 0 _t17
+  id3 = $copy _t18
+  $jump bb4
+
+bb10:
+  id2 = $copy id2
+  id3 = $copy 10
+  id3 = $copy 4
+  $jump bb9
+
+bb11:
+  $jump bb4
+
+bb12:
+  $branch id0 bb46 bb47
+
+bb13:
+  $jump bb15
+
+bb14:
+  _t38 = $cmp lt 6 id2
+  _t39 = $arith sub 0 8
+  _t40 = $cmp gt id0 _t39
+  _t41 = $cmp eq _t38 _t40
+  _t42 = $arith sub 0 _t41
+  $branch _t42 bb24 bb25
+
+bb15:
+  $branch id0 bb16 bb17
+
+bb16:
+  $branch 3 bb19 bb20
+
+bb17:
+  id0 = $copy 8
+  id4 = $copy id0
+  _lo4 = $copy 7
+  _t34 = $cmp neq _lo4 0
+  $branch _t34 bb22 bb21
+
+bb18:
+  id4 = $copy _lo3
+  $jump bb15
+
+bb19:
+  _lo3 = $copy 0
+  $jump bb18
+
+bb2:
+  _lo1 = $copy 0
+  $jump bb1
+
+bb20:
+  _lo3 = $copy 1
+  $jump bb18
+
+bb21:
+  _t36 = $cmp eq _lo4 id1
+  _t37 = $arith sub 0 _t36
+  id0 = $copy _t37
+  $jump bb12
+
+bb22:
+  _t35 = $arith sub 0 6
+  _lo4 = $copy _t35
+  $jump bb21
+
+bb23:
+  $branch id3 bb38 bb39
+
+bb24:
+  _t43 = $arith sub 0 0
+  id2 = $copy _t43
+  id0 = $copy id4
+  $branch id3 bb27 bb28
+
+bb25:
+  id1 = $copy id0
+  _t46 = $arith sub 0 2
+  _ret57 = $copy _t46
+  $jump exit
+
+bb26:
+  _lo5 = $copy _lo6
+  _t44 = $cmp neq _lo5 0
+  $branch _t44 bb30 bb29
+
+bb27:
+  _lo6 = $copy 0
+  $jump bb26
+
+bb28:
+  _lo6 = $copy 1
+  $jump bb26
+
+bb29:
+  $branch _lo5 bb32 bb33
+
+bb3:
+  _lo1 = $copy 1
+  $jump bb1
+
+bb30:
+  _lo5 = $copy 2
+  $jump bb29
+
+bb31:
+  id0 = $copy _lo7
+  id3 = $copy id1
+  $branch 10 bb35 bb36
+
+bb32:
+  _lo7 = $copy 0
+  $jump bb31
+
+bb33:
+  _lo7 = $copy 1
+  $jump bb31
+
+bb34:
+  _t45 = $arith sub 0 _lo8
+  id0 = $copy _t45
+  $jump bb23
+
+bb35:
+  _lo8 = $copy 0
+  $jump bb34
+
+bb36:
+  _lo8 = $copy 1
+  $jump bb34
+
+bb37:
+  _t56 = $arith sub 0 10
+  id0 = $copy _t56
+  $jump bb12
+
+bb38:
+  _t47 = $arith sub 0 4
+  id0 = $copy _t47
+  id2 = $copy id2
+  _t48 = $cmp neq id4 1
+  id0 = $copy _t48
+  _t49 = $arith mul 1 id2
+  id1 = $copy _t49
+  $jump bb37
+
+bb39:
+  _lo9 = $copy id4
+  _t50 = $cmp neq _lo9 0
+  $branch _t50 bb41 bb40
+
+bb4:
+  _t19 = $arith sub 0 10
+  _t20 = $cmp gt id4 _t19
+  $branch _t20 bb5 bb6
+
+bb40:
+  _t51 = $arith sub 0 id4
+  _t52 = $cmp gt _t51 _lo9
+  _t53 = $arith mul _t52 2
+  id4 = $copy _t53
+  _t54 = $arith sub 0 1
+  id2 = $copy _t54
+  $branch 1 bb43 bb44
+
+bb41:
+  _lo9 = $copy id4
+  $jump bb40
+
+bb42:
+  _t55 = $arith sub 0 _lo10
+  id0 = $copy _t55
+  $jump bb37
+
+bb43:
+  _lo10 = $copy 0
+  $jump bb42
+
+bb44:
+  _lo10 = $copy 1
+  $jump bb42
+
+bb45:
+  _ret57 = $copy _lo11
+  $jump exit
+
+bb46:
+  _lo11 = $copy 0
+  $jump bb45
+
+bb47:
+  _lo11 = $copy 1
+  $jump bb45
+
+bb5:
+  _t21 = $arith sub 0 9
+  id0 = $copy _t21
+  _t22 = $arith sub 0 3
+  _t23 = $cmp gte _t22 id2
+  id1 = $copy _t23
+  id3 = $copy id1
+  _t24 = $arith add id0 id3
+  _t25 = $arith sub 1 _t24
+  _lo2 = $copy _t25
+  _t26 = $cmp eq _lo2 0
+  $branch _t26 bb8 bb7
+
+bb6:
+  _t30 = $arith sub 0 9
+  _t31 = $cmp lte 3 id3
+  _t32 = $cmp gt _t30 _t31
+  _t33 = $cmp gt _t32 2
+  $branch _t33 bb13 bb14
+
+bb7:
+  id1 = $copy _lo2
+  _t28 = $arith sub 0 3
+  id2 = $copy _t28
+  id1 = $copy id0
+  $jump bb9
+
+bb8:
+  _t27 = $arith sub 0 10
+  _lo2 = $copy _t27
+  $jump bb7
+
+bb9:
+  _t29 = $cmp eq id2 id4
+  $branch _t29 bb10 bb11
+
+entry:
+  _t12 = $arith sub 0 1
+  id4 = $copy _t12
+  $branch id2 bb2 bb3
+
+exit:
+  $ret _ret57
+}

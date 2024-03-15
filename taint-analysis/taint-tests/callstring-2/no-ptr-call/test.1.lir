@@ -1,0 +1,188 @@
+fn1:&(int) -> int
+fn2:&(int, int) -> int
+fn3:&(int, int, int) -> int
+fn4:&(int) -> int
+
+extern snk1:(int) -> _
+extern snk2:(int) -> _
+extern snk3:(int, int) -> _
+extern snk4:(int, int) -> _
+extern snk5:(int) -> _
+extern snk6:(int) -> _
+extern snk7:(int, int) -> _
+extern snk8:(int, int) -> _
+extern src1:() -> int
+extern src2:() -> int
+extern src3:() -> int
+extern src4:() -> int
+extern src5:() -> int
+extern src6:() -> int
+extern src7:() -> int
+extern src8:() -> int
+
+fn fn1(p:int) -> int {
+let _t1:int
+bb1:
+  $ret _t1
+
+entry:
+  _t1 = $call_dir fn4(p) then bb1
+}
+
+fn fn2(p:int, q:int) -> int {
+let _t1:int
+entry:
+  _t1 = $arith add p q
+  $ret _t1
+}
+
+fn fn3(p:int, q:int, r:int) -> int {
+let _t1:int, _t2:int, _t3:int
+bb1:
+  _t2 = $call_dir fn4(r) then bb2
+
+bb2:
+  _t3 = $arith add _t1 _t2
+  $ret _t3
+
+entry:
+  _t1 = $call_dir fn2(p, q) then bb1
+}
+
+fn fn4(p:int) -> int {
+entry:
+  $ret p
+}
+
+fn main() -> int {
+let _lo1:int, _t10:int, _t11:int, _t12:int, _t13:int, _t14:int, _t15:int, _t16:int, _t2:int, _t3:int, _t4:int, _t5:int, _t6:int, _t7:int, _t8:int, _t9:int, id0:int, id1:int, id2:int, id3:int, id4:int, id5:int, id6:int, id7:int
+bb1:
+  _t4 = $call_ext src7()
+  _t5 = $call_dir fn2(_t4, id2) then bb10
+
+bb10:
+  $branch _t5 bb12 bb13
+
+bb11:
+  $ret 7
+
+bb12:
+  $jump bb14
+
+bb13:
+  _t15 = $call_dir fn4(id2) then bb27
+
+bb14:
+  $branch id4 bb15 bb16
+
+bb15:
+  _t6 = $call_dir fn1(id7) then bb17
+
+bb16:
+  $branch 8 bb22 bb23
+
+bb17:
+  _t7 = $call_ext src2()
+  _t8 = $call_dir fn3(_t6, id7, _t7) then bb18
+
+bb18:
+  id6 = $copy _t8
+  $call_ext snk1(id2)
+  _t9 = $arith mul 0 id3
+  id3 = $copy _t9
+  _lo1 = $copy id0
+  _t10 = $cmp neq _lo1 0
+  $branch _t10 bb20 bb19
+
+bb19:
+  id3 = $copy _lo1
+  $jump bb14
+
+bb2:
+  _t2 = $arith div 1 2
+  id0 = $copy _t2
+  $jump bb4
+
+bb20:
+  _t11 = $arith add id0 id6
+  _lo1 = $copy _t11
+  $jump bb19
+
+bb21:
+  _t13 = $call_ext src5()
+  id7 = $copy _t13
+  _t14 = $call_ext src3()
+  $call_dir fn1(_t14) then bb26
+
+bb22:
+  id2 = $copy id2
+  _t12 = $call_dir fn1(9) then bb24
+
+bb23:
+  id0 = $copy id6
+  $jump bb21
+
+bb24:
+  $call_ext snk2(_t12)
+  $call_dir fn3(id0, 3, id6) then bb25
+
+bb25:
+  $call_ext snk7(id7, id2)
+  $jump bb21
+
+bb26:
+  id6 = $copy id6
+  $jump bb11
+
+bb27:
+  $branch _t15 bb29 bb30
+
+bb28:
+  $jump bb11
+
+bb29:
+  id1 = $copy id5
+  _t16 = $call_ext src4()
+  id4 = $copy _t16
+  $jump bb28
+
+bb3:
+  $call_ext src3()
+  $call_ext src1()
+  id3 = $copy id1
+  $jump bb7
+
+bb30:
+  id1 = $copy id6
+  $call_ext src2()
+  id5 = $copy 1
+  id2 = $copy 6
+  id2 = $copy id2
+  $jump bb28
+
+bb4:
+  $branch 2 bb5 bb6
+
+bb5:
+  id1 = $copy id0
+  id2 = $copy 6
+  $jump bb4
+
+bb6:
+  $jump bb1
+
+bb7:
+  _t3 = $call_ext src2()
+  $branch _t3 bb8 bb9
+
+bb8:
+  id4 = $copy 10
+  $jump bb7
+
+bb9:
+  id5 = $copy 2
+  $jump bb1
+
+entry:
+  $branch 0 bb2 bb3
+}

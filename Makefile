@@ -220,30 +220,6 @@ assn5_taint_analysis/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn5_taint_analysis.dir/build.make CMakeFiles/assn5_taint_analysis.dir/build
 .PHONY : assn5_taint_analysis/fast
 
-assn0.o: assn0.cpp.o
-.PHONY : assn0.o
-
-# target to build an object file
-assn0.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/assn0.cpp.o
-.PHONY : assn0.cpp.o
-
-assn0.i: assn0.cpp.i
-.PHONY : assn0.i
-
-# target to preprocess a source file
-assn0.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/assn0.cpp.i
-.PHONY : assn0.cpp.i
-
-assn0.s: assn0.cpp.s
-.PHONY : assn0.s
-
-# target to generate assembly for a file
-assn0.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/assn0.cpp.s
-.PHONY : assn0.cpp.s
-
 constant-analysis/constant_analysis.o: constant-analysis/constant_analysis.cpp.o
 .PHONY : constant-analysis/constant_analysis.o
 
@@ -315,6 +291,30 @@ control-flow-analysis/control_flow_analysis.s: control-flow-analysis/control_flo
 control-flow-analysis/control_flow_analysis.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn2_control_flow_analysis.dir/build.make CMakeFiles/assn2_control_flow_analysis.dir/control-flow-analysis/control_flow_analysis.cpp.s
 .PHONY : control-flow-analysis/control_flow_analysis.cpp.s
+
+lir-parser.o: lir-parser.cpp.o
+.PHONY : lir-parser.o
+
+# target to build an object file
+lir-parser.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/lir-parser.cpp.o
+.PHONY : lir-parser.cpp.o
+
+lir-parser.i: lir-parser.cpp.i
+.PHONY : lir-parser.i
+
+# target to preprocess a source file
+lir-parser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/lir-parser.cpp.i
+.PHONY : lir-parser.cpp.i
+
+lir-parser.s: lir-parser.cpp.s
+.PHONY : lir-parser.s
+
+# target to generate assembly for a file
+lir-parser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/assn0.dir/build.make CMakeFiles/assn0.dir/lir-parser.cpp.s
+.PHONY : lir-parser.cpp.s
 
 pointer-analysis/constraint_solver.o: pointer-analysis/constraint_solver.cpp.o
 .PHONY : pointer-analysis/constraint_solver.o
@@ -452,9 +452,6 @@ help:
 	@echo "... assn3_constraint_solver"
 	@echo "... assn4_program_slicing"
 	@echo "... assn5_taint_analysis"
-	@echo "... assn0.o"
-	@echo "... assn0.i"
-	@echo "... assn0.s"
 	@echo "... constant-analysis/constant_analysis.o"
 	@echo "... constant-analysis/constant_analysis.i"
 	@echo "... constant-analysis/constant_analysis.s"
@@ -464,6 +461,9 @@ help:
 	@echo "... control-flow-analysis/control_flow_analysis.o"
 	@echo "... control-flow-analysis/control_flow_analysis.i"
 	@echo "... control-flow-analysis/control_flow_analysis.s"
+	@echo "... lir-parser.o"
+	@echo "... lir-parser.i"
+	@echo "... lir-parser.s"
 	@echo "... pointer-analysis/constraint_solver.o"
 	@echo "... pointer-analysis/constraint_solver.i"
 	@echo "... pointer-analysis/constraint_solver.s"

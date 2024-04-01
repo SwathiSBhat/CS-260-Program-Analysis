@@ -2,7 +2,14 @@
 
 ## Overview
 
-This repository contains code that implements static analysis techniques for programs in an intermediate language (LIR) which look similar to C. The input to each analysis is usually an LIR program (plus few other inputs based on the analysis) and the output is printed to stdout. 
+This repository contains code that implements static analysis techniques for programs in an intermediate language (LIR) which look similar to C. The input to each analysis is usually an LIR program (plus few other inputs based on the analysis) and the output is printed to stdout. The following static analyses techniques are implemented:
+1. [Constant analysis](https://github.com/SwathiSBhat/Static-program-analysis-techniques/tree/main/constant-analysis)
+2. [Reaching definitions](https://github.com/SwathiSBhat/Static-program-analysis-techniques/tree/main/reaching-defn)
+3. [Control Flow Analysis](https://github.com/SwathiSBhat/Static-program-analysis-techniques/tree/main/control-flow-analysis)
+4. [Andersen-style pointer analysis constraint generator](https://github.com/SwathiSBhat/Static-program-analysis-techniques/tree/main/constraint-generator)
+5. [Andersen-style pointer analysis constraint solver](https://github.com/SwathiSBhat/Static-program-analysis-techniques/tree/main/pointer-analysis)
+6. [Program Slicing](https://github.com/SwathiSBhat/Static-program-analysis-techniques/tree/main/program-dependence-graph)
+7. [Taint Analysis](https://github.com/SwathiSBhat/Static-program-analysis-techniques/tree/main/taint-analysis) - Includes context-insensitive taint analysis, k-limited callstring taint analysis and functional context sensitive taint analysis
 
 ## Dependencies
 

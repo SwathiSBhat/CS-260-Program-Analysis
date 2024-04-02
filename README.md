@@ -177,4 +177,7 @@ fn foo(p:&int) -> int {
 }
 ```
 
+## LIR Parser
+
+The file at [headers/datatypes.h](https://github.com/SwathiSBhat/Static-program-analysis-techniques/blob/main/headers/datatypes.h) contains code for converting an LIR program in JSON format into an iterable data structure. This allows us to easily iterate over basic blocks, functions, instructions, structs, etc required during program analysis.
 

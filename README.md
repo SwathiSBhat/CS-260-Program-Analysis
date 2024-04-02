@@ -1,4 +1,4 @@
-# Experimental implementations of static analysis techniques
+# Experimental implementation of static analysis techniques
 
 ## Overview
 
